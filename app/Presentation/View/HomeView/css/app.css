@@ -1,0 +1,43 @@
+/* Header */
+body {
+    background-color: #f4f4f4;
+}
+
+.navbar,
+.footer-top {
+    background-color: #d3eaff;
+}
+
+.footer-top {
+    padding: 2rem 0;
+}
+
+.footer-bottom {
+    background-color: #eaeaea;
+    font-size: 0.8rem;
+}
+
+.hero-btn {
+    background-color: #5ea2ff;
+    color: white;
+    font-weight: bold;
+    border-radius: 0.5rem;
+}
+
+.hero-btn:hover {
+    background-color: #4d90e2;
+}
+
+.footer-link {
+    font-weight: bold;
+}
+
+.footer-link a {
+    text-decoration: none;
+    color: black;
+    display: block;
+}
+
+.footer-link a:hover {
+    text-decoration: underline;
+}

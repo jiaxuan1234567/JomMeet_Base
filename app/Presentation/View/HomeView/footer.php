@@ -1,12 +1,12 @@
-</main>
+</body>
 <!-- Footer -->
 <footer class="footer">
     <div class="container">
         <!-- Left Section: Logo and Name -->
         <div class="footer-left">
-        <a href="index.php">
-            <img src="images/bubble.png" alt="JomMeet Logo" class="bubble" width="60" height="60">
-        </a>
+            <a href="index.php">
+                <img src="<?php echo getRoutePath("iconPNG") ?>" alt="JomMeet Logo" class="bubble" width="60" height="60">
+            </a>
             <h2 class="footer-title"><a href="index.php">JomMeet</a></h2>
         </div>
 
@@ -33,8 +33,9 @@
             <div>
                 <h3>Account</h3>
                 <ul>
-                <li>
-                    <a href="account.php">Log In</a></li>
+                    <li>
+                        <a href="account.php">Log In</a>
+                    </li>
                     <li><a href="signup.php">Sign In</a></li>
                 </ul>
             </div>
