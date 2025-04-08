@@ -16,7 +16,8 @@ class HomeView
 ?>
         <section class="text-center my-5">
             <h1 class="fw-bold display-5 mb-4">JomMeet A NewFriend</h1>
-            <img src="mascot.png" alt="Mascot" class="img-fluid mb-4" style="max-width: 250px;" />
+            <!-- Spline 3D Object -->
+            <spline-viewer url="https://prod.spline.design/VDuiMvkxF4DPHkAv/scene.splinecode" class="spline-model"></spline-viewer>
             <div>
                 <a href="#" class="btn hero-btn px-4 py-2">Let's get started</a>
             </div>
@@ -81,30 +82,28 @@ class HomeView
             <div class="footer-top">
                 <div class="container">
                     <div class="row text-start">
-                        <div class="col-md-3">
-                            <img src="logo.png" alt="Logo" width="50" />
+                        <div class="col-md-2 text-center">
+                            <img src="<?php echo getRoutePath("iconPNG") ?>" class="img-fluid mx-auto d-block" alt="Logo" width="50" />
                             <h5 class="mt-2">JomMeet</h5>
                         </div>
-                        <div class="col-md-3 footer-link">
+                        <div class="col footer-link">
                             <h6>Home</h6>
                             <a href="#">Reflection</a>
                             <a href="#">Gathering</a>
                             <a href="#">My Gathering</a>
                         </div>
-                        <div class="col-md-3 footer-link">
+                        <div class="col footer-link">
                             <h6>About Us</h6>
                             <a href="#">About Us</a>
                             <a href="#">Contact Us</a>
                         </div>
-                        <div class="col-md-3 footer-link">
+                        <div class="col footer-link">
                             <h6>Help</h6>
                             <a href="#">FAQ</a>
                             <a href="#">Terms of use</a>
                             <a href="#">Private Policy</a>
                         </div>
-                    </div>
-                    <div class="row mt-4">
-                        <div class="col-md-12 text-end">
+                        <div class="col footer-link">
                             <p class="mb-0">JomMeet Sdn. Bhd.<br>
                                 Unit C, Level 10<br>
                                 Menara KLCC<br>
@@ -117,7 +116,7 @@ class HomeView
                     </div>
                 </div>
             </div>
-            <div class="footer-bottom text-center py-2">
+            <div class="footer-bottom py-2">
                 © 2025 JomMeet (Malaysia) Sdn. Bhd. Reg. No: 200901018343 (081640-H) (AJL931760).
             </div>
         </footer>
