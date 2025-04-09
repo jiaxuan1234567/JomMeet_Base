@@ -25,7 +25,7 @@ class HomeView
     <?php
     }
 
-    public function header()
+    public function include_header()
     {
     ?>
         <!DOCTYPE html>
@@ -45,6 +45,13 @@ class HomeView
             <!-- External Stylesheet -->
             <link rel="stylesheet" href="<?php echo getRoutePath("AppCSS") ?>">
         </head>
+    <?php
+    }
+
+    public function header()
+    {
+        $this->include_header();
+    ?>
 
         <body>
             <!-- Bootstrap JS -->
@@ -61,7 +68,7 @@ class HomeView
                             <li class="nav-item"><a class="nav-link fw-bold" href="#">Home</a></li>
                             <li class="nav-item"><a class="nav-link fw-bold" href="#">Reflection</a></li>
                             <li class="nav-item"><a class="nav-link fw-bold" href="#">Gathering</a></li>
-                            <li class="nav-item"><a class="nav-link fw-bold text-primary" href="#">My Gathering</a></li>
+                            <li class="nav-item"><a class="nav-link fw-bold" href="#">My Gathering</a></li>
                         </ul>
                         <div class="d-flex gap-2">
                             <a href="#" class="btn btn-outline-secondary rounded-pill">Profile</a>
@@ -80,7 +87,7 @@ class HomeView
         <!-- Footer -->
         <footer>
             <div class="footer-top">
-                <div class="container">
+                <div class="container-fluid">
                     <div class="row text-start">
                         <div class="col-md-2 text-center">
                             <img src="<?php echo getRoutePath("iconPNG") ?>" class="img-fluid mx-auto d-block" alt="Logo" width="50" />

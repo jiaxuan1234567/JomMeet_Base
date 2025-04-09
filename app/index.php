@@ -23,6 +23,9 @@ switch ($request) {
         break;
     case '/profile':
         break;
+    case '/login':
+        include getFilePath('Login');
+        break;
     // case '/profile':
     //     $controller = new UserProfileController();
     //     $controller->viewProfile();

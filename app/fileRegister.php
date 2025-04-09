@@ -12,6 +12,7 @@ function getFilePath($key)
         "HomeView" => ROOTPATH . "/Presentation/View/HomeView/HomeView.php",
         "HomeController" => ROOTPATH . "/Presentation/Controller/HomeController/HomeController.php",
         "HomeModel" => ROOTPATH . "/BusinessLogic/Model/HomeModel/HomeModel.php",
+        "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php"
 
         // UserProfile Components
 
