@@ -12,13 +12,14 @@ function getFilePath($key)
         "HomeView" => ROOTPATH . "/Presentation/View/HomeView/HomeView.php",
         "HomeController" => ROOTPATH . "/Presentation/Controller/HomeController/HomeController.php",
         "HomeModel" => ROOTPATH . "/BusinessLogic/Model/HomeModel/HomeModel.php",
-        "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php"
+        "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php",
 
         // UserProfile Components
 
         // SelfReflection Components
 
         // Gathering Components
+        "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php"
     ];
 
     return isset($registered[$key]) ? $registered[$key] : null;

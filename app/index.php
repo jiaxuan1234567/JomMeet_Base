@@ -25,6 +25,8 @@ switch ($request) {
         break;
     case '/login':
         include getFilePath('Login');
+    case '/join-gathering':
+        include getFilePath('JoinGathering');
         break;
     // case '/profile':
     //     $controller = new UserProfileController();
