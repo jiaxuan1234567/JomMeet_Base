@@ -19,7 +19,8 @@ function getFilePath($key)
         // SelfReflection Components
 
         // Gathering Components
-        "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php"
+        "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
+        "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php"
     ];
 
     return isset($registered[$key]) ? $registered[$key] : null;

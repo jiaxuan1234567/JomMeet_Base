@@ -53,3 +53,11 @@ body {
 .bg-blue-color {
     background-color: #DEECFF;
 }
+
+.border-light-blue{
+    border-color: #0077CC !important;
+}
+
+.button-blue-color{
+    background-color: #569FFF;
+}

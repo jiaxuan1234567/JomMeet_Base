@@ -35,6 +35,10 @@ class HomeView
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>JomMeet</title>
+            
+            <!-- Jquery -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="/js/app.js"></script>
 
             <!-- Spline Viewer for 3D Model -->
             <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.79/build/spline-viewer.js"></script>
