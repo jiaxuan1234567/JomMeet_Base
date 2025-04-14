@@ -20,7 +20,14 @@ function getFilePath($key)
 
         // Gathering Components
         "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
-        "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php"
+        "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php",
+        
+        // Test Architecture Components
+        "GatheringController" => ROOTPATH . "/test_architecture/Presentation/Controller/GatheringController.php",
+        "GatheringModel" => ROOTPATH . "/test_architecture/BusinessLogic/Model/GatheringModel.php",
+        "GatheringDAO" => ROOTPATH . "/test_architecture/Persistence/DAO/GatheringDAO.php",
+        "GatheringList" => ROOTPATH . "/test_architecture/Presentation/View/gathering_list.php",
+        "GatheringDetail" => ROOTPATH . "/test_architecture/Presentation/View/gathering_detail.php"
     ];
 
     return isset($registered[$key]) ? $registered[$key] : null;

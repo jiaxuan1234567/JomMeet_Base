@@ -10,18 +10,25 @@ require_once getFilePath("HomeView");
 // require_once __DIR__ . '/Presentation/controller/selfreflectionController/selfreflectionController.php';
 // require_once __DIR__ . '/Presentation/controller/gatheringController/gatheringController.php';
 
-$request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);    
 
 switch ($request) {
     case '/':
         if (is_get()) {
-            echo get('abc');
             $view = new HomeView();
             $view->index();
         }
-
         break;
     case '/profile':
+        break;
+    case '/gathering':
+        require_once getFilePath("GatheringController");
+        $controller = new GatheringController();
+        if (isset($_GET['action'])) {
+            $controller->handleAction();
+        } else {
+            include getFilePath('GatheringList');
+        }
         break;
     case '/login':
         include getFilePath('Login');
