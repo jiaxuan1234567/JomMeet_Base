@@ -1,15 +1,14 @@
 <?php
-define('ROOTPATH', __DIR__);
 
 function getFilePath($key)
 {
     $registered = [
         // index files
-        "Header" => ROOTPATH . "/Presentation/View/HomeView/header.php",
-        "Footer" => ROOTPATH . "/Presentation/View/HomeView/footer.php",
+        "Header" => ROOTPATH . "/Presentation/View/HomeView/_header.php",
+        "Footer" => ROOTPATH . "/Presentation/View/HomeView/_footer.php",
 
         // Home Components
-        "HomeView" => ROOTPATH . "/Presentation/View/HomeView/HomeView.php",
+        "HomePage" => ROOTPATH . "/Presentation/View/HomeView/index.php",
         "HomeController" => ROOTPATH . "/Presentation/Controller/HomeController/HomeController.php",
         "HomeModel" => ROOTPATH . "/BusinessLogic/Model/HomeModel/HomeModel.php",
         "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php",
@@ -21,13 +20,15 @@ function getFilePath($key)
         // Gathering Components
         "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
         "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php",
-        
+
         // Test Architecture Components
-        "GatheringController" => ROOTPATH . "/test_architecture/Presentation/Controller/GatheringController.php",
-        "GatheringModel" => ROOTPATH . "/test_architecture/BusinessLogic/Model/GatheringModel.php",
-        "GatheringDAO" => ROOTPATH . "/test_architecture/Persistence/DAO/GatheringDAO.php",
-        "GatheringList" => ROOTPATH . "/test_architecture/Presentation/View/gathering_list.php",
-        "GatheringDetail" => ROOTPATH . "/test_architecture/Presentation/View/gathering_detail.php"
+        "GatheringController" => ROOTPATH . "/Presentation/Controller/GatheringController/GatheringController.php",
+        "GatheringModel" => ROOTPATH . "/BusinessLogic/Model/GatheringModel/GatheringModel.php",
+        "GatheringDAO" => ROOTPATH . "/Persistence/DAO/GatheringDAO/GatheringDAO.php",
+        "GatheringList" => ROOTPATH . "/Presentation/View/GatheringView/gathering_list.php",
+        "GatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/gathering_detail.php",
+
+        "Database" => ROOTPATH . "/Database.php"
     ];
 
     return isset($registered[$key]) ? $registered[$key] : null;

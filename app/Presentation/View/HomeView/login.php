@@ -1,9 +1,7 @@
 <?php
 require_once './fileRegister.php';
-require_once 'homeView.php';
 
-$homeView = new HomeView();
-$homeView->include_header();
+include getFilePath('Header');
 ?>
 
 <div class="container">
@@ -45,3 +43,5 @@ $homeView->include_header();
     </div>
 
 </div>
+
+<?php include getFilePath('Footer'); ?>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require('../app/_header.php');
+require_once ROOTPATH . '/fileRegister.php';
+require getFilePath('Header');
 require_once getFilePath("GatheringController");
 
 $controller = new GatheringController();
@@ -72,7 +73,7 @@ if (empty($gatherings)) {
     </div>
 
     <?php
-    require('../app/_footer.php');
+    require getFilePath('Footer');
     ?>
 </body>
 

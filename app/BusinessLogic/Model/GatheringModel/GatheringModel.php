@@ -1,25 +1,57 @@
 <?php
-require_once "../../Persistence/DAO/GatheringDAO.php";
+require_once ROOTPATH . '/fileRegister.php';
+require_once getFilePath('GatheringDAO');
 
 class GatheringModel
 {
     private $gatheringDAO;
 
-    public function __construct()
+    public function __construct($db)
     {
-        $this->gatheringDAO = new GatheringDAO();
+        $this->gatheringDAO = new GatheringDAO($db);
     }
 
-    public function createGathering($hostId, $location, $theme, $maxParticipants, $description, $dateTime)
+    public function getAllGatherings()
     {
-        if (empty($hostId) || empty($location) || empty($theme) || empty($maxParticipants) || empty($dateTime)) {
-            return false;
-        }
-        return $this->gatheringDAO->insertGathering($hostId, $location, $theme, $maxParticipants, $description, $dateTime);
+        return $this->gatheringDAO->getAllGatherings();
     }
 
     public function getGatheringById($id)
     {
-        return $this->gatheringDAO->fetchGatheringById($id);
+        return $this->gatheringDAO->getGatheringById($id);
+    }
+
+    public function handleAction()
+    {
+        if (isset($_GET['action'])) {
+            $action = $_GET['action'];
+
+            switch ($action) {
+                case 'view':
+                    if (isset($_GET['id'])) {
+                        $id = $_GET['id'];
+                        $gathering = $this->getGatheringById($id);
+                        if ($gathering) {
+                            require_once(getFilePath('GatheringDetail'));
+                        } else {
+                            header('Location: /gathering');
+                        }
+                    } else {
+                        header('Location: /gathering');
+                    }
+                    break;
+                case 'list':
+                    $gatherings = $this->getAllGatherings();
+                    require_once(getFilePath('GatheringList'));
+                    break;
+                default:
+                    header('Location: /gathering');
+                    break;
+            }
+        } else {
+            // If no action is specified, show the list
+            $gatherings = $this->getAllGatherings();
+            require_once(getFilePath('GatheringList'));
+        }
     }
 }

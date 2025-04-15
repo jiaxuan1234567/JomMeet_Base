@@ -1,25 +1,51 @@
 <?php
-require_once "Database.php";
-
 class GatheringDAO
 {
     private $db;
 
-    public function __construct()
+    public function __construct($db)
     {
-        $this->db = Database::getConnection();
+        $this->db = $db;
     }
 
-    public function insertGathering($hostId, $location, $theme, $maxParticipants, $description, $dateTime)
+    public function getAllGatherings()
     {
-        $stmt = $this->db->prepare("INSERT INTO gatherings (host_id, location, theme, max_participants, description, date_time) VALUES (?, ?, ?, ?, ?, ?)");
-        return $stmt->execute([$hostId, $location, $theme, $maxParticipants, $description, $dateTime]);
+        try {
+            $sql = "SELECT g.*, l.locationName, l.address, l.image as locationImage 
+                    FROM gathering g 
+                    JOIN location l ON g.locationID = l.locationID";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if (empty($result)) {
+                error_log("No gatherings found in database");
+            } else {
+                error_log("Found " . count($result) . " gatherings");
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            error_log("Error in getAllGatherings: " . $e->getMessage());
+            error_log("SQL Query: " . $sql);
+            return false;
+        }
     }
 
-    public function fetchGatheringById($id)
+    public function getGatheringById($id)
     {
-        $stmt = $this->db->prepare("SELECT * FROM gatherings WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT g.*, l.locationName, l.address, l.image as locationImage 
+                    FROM gathering g 
+                    JOIN location l ON g.locationID = l.locationID 
+                    WHERE g.gatheringID = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['id' => $id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error in getGatheringById: " . $e->getMessage());
+            error_log("SQL Query: " . $sql);
+            return false;
+        }
     }
 }
