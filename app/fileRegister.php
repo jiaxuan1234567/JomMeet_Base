@@ -1,4 +1,5 @@
 <?php
+define('ROOTPATH', __DIR__);
 
 $_ASSET = [];
 
