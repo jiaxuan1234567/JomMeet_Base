@@ -25,34 +25,14 @@ function getFilePath($permission)
     global $_HOME;
     global $_GATHERING;
 
-        // Home Components
-        "HomePage" => ROOTPATH . "/Presentation/View/HomeView/index.php",
-        "HomeController" => ROOTPATH . "/Presentation/Controller/HomeController/HomeController.php",
-        "HomeModel" => ROOTPATH . "/BusinessLogic/Model/HomeModel/HomeModel.php",
-        "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php",
+    $registered = [];
 
     if ($permission == "home") {
         $registered += $_HOME;
         $registered += $_GATHERING;
     }
 
-        // SelfReflection Components
-
-        // Gathering Components
-        "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
-        "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php",
-
-        // Test Architecture Components
-        "GatheringController" => ROOTPATH . "/Presentation/Controller/GatheringController/GatheringController.php",
-        "GatheringModel" => ROOTPATH . "/BusinessLogic/Model/GatheringModel/GatheringModel.php",
-        "GatheringDAO" => ROOTPATH . "/Persistence/DAO/GatheringDAO/GatheringDAO.php",
-        "GatheringList" => ROOTPATH . "/Presentation/View/GatheringView/gathering_list.php",
-        "GatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/gathering_detail.php",
-
-        "Database" => ROOTPATH . "/Database.php"
-    ];
-
-    return isset($registered[$key]) ? $registered[$key] : null;
+    return isset($registered) ? $registered : null;
 }
 
 function getRoutePath($key)
