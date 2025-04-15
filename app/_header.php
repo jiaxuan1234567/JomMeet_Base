@@ -1,3 +1,4 @@
+<?php require('fileRegister.php'); ?>
 <!DOCTYPE html>
         <html lang="en">
 
