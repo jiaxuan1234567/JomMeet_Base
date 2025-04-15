@@ -42,37 +42,12 @@ class GatheringController
         }
     }
 
-    public function handleAction()
-    {
-        if (isset($_GET['action'])) {
-            $action = $_GET['action'];
-
-            switch ($action) {
-                case 'view':
-                    if (isset($_GET['id'])) {
-                        $id = $_GET['id'];
-                        $gathering = $this->viewGathering($id);
-                        if ($gathering) {
-                            include __DIR__ . '/../View/gathering_detail.php';
-                        } else {
-                            header('Location: /gathering');
-                        }
-                    } else {
-                        header('Location: /gathering');
-                    }
-                    break;
-                case 'list':
-                    $gatherings = $this->listGatherings();
-                    include __DIR__ . '/../View/gathering_list.php';
-                    break;
-                default:
-                    header('Location: /gathering');
-                    break;
-            }
-        } else {
-            // If no action is specified, show the list
-            $gatherings = $this->listGatherings();
-            include __DIR__ . '/../View/gathering_list.php';
+    public function action(){
+        try{
+            return $this->gatheringModel->handleAction();
+        } catch(Exception $e) {
+            error_log("Error in action: " . $e->getMessage());
+            return null;
         }
     }
 }

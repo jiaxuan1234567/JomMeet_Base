@@ -25,7 +25,7 @@ switch ($request) {
         require_once getFilePath("GatheringController");
         $controller = new GatheringController();
         if (isset($_GET['action'])) {
-            $controller->handleAction();
+            $controller->action();
         } else {
             include getFilePath('GatheringList');
         }
