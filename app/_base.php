@@ -143,6 +143,15 @@ function base($path = '') {
     return "http://$_SERVER[SERVER_NAME]:$_SERVER[SERVER_PORT]/$path";
 }
 
+// Return TRUE if ALL array elements meet the condition given
+function array_all($arr, $fn) {
+    foreach ($arr as $k => $v) {
+        if (!$fn($v, $k)) {
+            return false;
+        }
+    }
+    return true;
+}
 
 // ============================================================================
 // HTML Helpers
