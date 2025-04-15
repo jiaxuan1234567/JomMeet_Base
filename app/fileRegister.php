@@ -4,8 +4,8 @@ function getFilePath($key)
 {
     $registered = [
         // index files
-        "Header" => ROOTPATH . "/Presentation/View/HomeView/_header.php",
-        "Footer" => ROOTPATH . "/Presentation/View/HomeView/_footer.php",
+        "Header" => ROOTPATH . "/Presentation/View/HomeView/header.php",
+        "Footer" => ROOTPATH . "/Presentation/View/HomeView/footer.php",
 
         // Home Components
         "HomePage" => ROOTPATH . "/Presentation/View/HomeView/index.php",
