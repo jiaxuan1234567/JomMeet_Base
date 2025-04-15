@@ -1,11 +1,29 @@
 <?php
 
-function getFilePath($key)
+$_ASSET = [];
+
+$_INDEX = [
+    "Header" => ROOTPATH . "/Presentation/View/HomeView/header.php",
+    "Footer" => ROOTPATH . "/Presentation/View/HomeView/footer.php",
+];
+
+$_HOME = [
+    "HomeView" => ROOTPATH . "/Presentation/View/HomeView/HomeView.php",
+    "HomeController" => ROOTPATH . "/Presentation/Controller/HomeController/HomeController.php",
+    "HomeModel" => ROOTPATH . "/BusinessLogic/Model/HomeModel/HomeModel.php",
+    "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php",
+];
+
+$_GATHERING = [
+    "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
+    "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php"
+];
+
+
+function getFilePath($permission)
 {
-    $registered = [
-        // index files
-        "Header" => ROOTPATH . "/Presentation/View/HomeView/header.php",
-        "Footer" => ROOTPATH . "/Presentation/View/HomeView/footer.php",
+    global $_HOME;
+    global $_GATHERING;
 
         // Home Components
         "HomePage" => ROOTPATH . "/Presentation/View/HomeView/index.php",
@@ -13,7 +31,10 @@ function getFilePath($key)
         "HomeModel" => ROOTPATH . "/BusinessLogic/Model/HomeModel/HomeModel.php",
         "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php",
 
-        // UserProfile Components
+    if ($permission == "home") {
+        $registered += $_HOME;
+        $registered += $_GATHERING;
+    }
 
         // SelfReflection Components
 

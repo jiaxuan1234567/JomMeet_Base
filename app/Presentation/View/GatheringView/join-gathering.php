@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require('../app/_header.php');
+require('../../../_header.php');
 ?>
 
 <head>
@@ -141,7 +141,7 @@ require('../app/_header.php');
     </div>
 
     <?php
-    require('../app/_footer.php');
+    require('../../../_footer.php');
     ?>
 </body>
 
