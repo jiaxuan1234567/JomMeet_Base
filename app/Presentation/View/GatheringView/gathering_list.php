@@ -2,7 +2,9 @@
 <html lang="en">
 <?php
 require_once ROOTPATH . '/fileRegister.php';
-require getFilePath('Header');
+
+include '../HomeView/header.php';
+
 require_once getFilePath("GatheringController");
 
 $controller = new GatheringController();
@@ -73,7 +75,7 @@ if (empty($gatherings)) {
     </div>
 
     <?php
-    require getFilePath('Footer');
+    include '../HomeView/footer.php';
     ?>
 </body>
 

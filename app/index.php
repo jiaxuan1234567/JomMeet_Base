@@ -1,7 +1,8 @@
 <?php
+
 define('ROOTPATH', __DIR__);
-require_once ROOTPATH . '/fileRegister.php';
-require_once './_base.php';
+//require_once '/fileRegister.php';
+//require_once './_base.php';
 
 //session_start();
 
@@ -9,7 +10,8 @@ $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 switch ($request) {
     case '/':
-        include getFilePath('HomePage');
+        require 'Presentation/Controller/HomeController/HomeController.php';
+        include (new homeController())->redirect('HomePage');
         break;
     case '/profile':
         break;

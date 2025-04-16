@@ -1,6 +1,6 @@
 <?php
 require_once ROOTPATH . '/fileRegister.php';
-require getFilePath('Header');
+include 'header.php';
 ?>
 
 <section class="text-center my-5">
@@ -13,4 +13,4 @@ require getFilePath('Header');
 </section>
 
 </body>
-<?php require getFilePath('Footer') ?>;
+<?php include 'footer.php' ?>;

@@ -8,7 +8,7 @@ $_INDEX = [
 ];
 
 $_HOME = [
-    "HomeView" => ROOTPATH . "/Presentation/View/HomeView/HomeView.php",
+    "HomePage" => ROOTPATH . "/Presentation/View/HomeView/index.php",
     "HomeController" => ROOTPATH . "/Presentation/Controller/HomeController/HomeController.php",
     "HomeModel" => ROOTPATH . "/BusinessLogic/Model/HomeModel/HomeModel.php",
     "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php",
@@ -22,12 +22,12 @@ $_GATHERING = [
 
 function getFilePath($permission)
 {
-    global $_HOME;
-    global $_GATHERING;
+    global $_INDEX, $_HOME, $_GATHERING;
 
     $registered = [];
 
     if ($permission == "home") {
+        $registered += $_INDEX;
         $registered += $_HOME;
         $registered += $_GATHERING;
     }
