@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require_once ROOTPATH . '/fileRegister.php';
+//require_once ROOTPATH . '/fileRegister.php';
 
-include '../HomeView/header.php';
+include '../app/Presentation/View/HomeView/header.php';
 
-require_once getFilePath("GatheringController");
+//require_once getFilePath("GatheringController");
 
 $controller = new GatheringController();
 $gatherings = $controller->listGatherings();
@@ -75,7 +75,7 @@ if (empty($gatherings)) {
     </div>
 
     <?php
-    include '../HomeView/footer.php';
+    include '../app/Presentation/View/HomeView/footer.php';
     ?>
 </body>
 

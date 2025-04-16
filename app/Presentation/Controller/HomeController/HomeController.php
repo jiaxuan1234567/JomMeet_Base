@@ -1,9 +1,9 @@
 <?php
 
 //define('ROOTPATH', __DIR__);
-require(ROOTPATH . '/fileRegister.php'); // The file that store the route
+require_once(ROOTPATH . '/fileRegister.php'); // The file that store the route
 
-class homeController
+class HomeController
 {
 
     private $path;

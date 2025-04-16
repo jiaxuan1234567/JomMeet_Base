@@ -4,34 +4,36 @@ define('ROOTPATH', __DIR__);
 //require_once '/fileRegister.php';
 //require_once './_base.php';
 
+require_once 'Presentation/Controller/HomeController/HomeController.php';
+require_once 'Presentation/Controller/UserProfileController/UserProfileController.php';
+require_once 'Presentation/Controller/SelfReflectionController/SelfReflectionController.php';
+require_once 'Presentation/Controller/GatheringController/GatheringController.php';
+
 //session_start();
 
 $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 switch ($request) {
     case '/':
-        require 'Presentation/Controller/HomeController/HomeController.php';
-        include (new homeController())->redirect('HomePage');
+        include (new HomeController())->redirect('HomePage');
         break;
     case '/profile':
         break;
     case '/gathering':
-        require_once getFilePath("GatheringController");
-        $controller = new GatheringController();
         if (isset($_GET['action'])) {
-            $controller->action();
+            (new GatheringController())->action();
         } else {
-            include getFilePath('GatheringList');
+            include (new GatheringController())->redirect('GatheringList');
         }
         break;
     case '/login':
-        include getFilePath('Login');
+        //include getFilePath('Login');
         break;
     case '/join-gathering':
-        include getFilePath('JoinGathering');
+        //include getFilePath('JoinGathering');
         break;
     case '/join-gathering-detail':
-        include getFilePath('JoinGatheringDetail');
+        //include getFilePath('JoinGatheringDetail');
         break;
     default:
         http_response_code(404);

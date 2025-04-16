@@ -1,14 +1,19 @@
 <?php
-require_once ROOTPATH . '/fileRegister.php';
-require_once getFilePath('Database');
-require_once getFilePath('GatheringModel');
+// require_once ROOTPATH . '/fileRegister.php';
+// require_once getFilePath('Database');
+// require_once getFilePath('GatheringModel');
+require_once(ROOTPATH . '/fileRegister.php');
+require ROOTPATH . '/BusinessLogic/Model/GatheringModel/GatheringModel.php';
+require_once '../app/Database.php';
 
 class GatheringController
 {
     private $gatheringModel;
+    private $path;
 
     public function __construct()
     {
+        $this->path = getFilePath("gathering");
         try {
             $db = DatabaseTest::getConnection();
             $this->gatheringModel = new GatheringModel($db);
@@ -16,6 +21,11 @@ class GatheringController
             error_log("Error in GatheringController constructor: " . $e->getMessage());
             throw $e;
         }
+    }
+
+    public function redirect($key)
+    {
+        return $this->path[$key];
     }
 
     public function listGatherings()

@@ -20,7 +20,8 @@ $_REFLECTION = [];
 
 $_GATHERING = [
     "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
-    "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php"
+    "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php",
+    "GatheringList" => ROOTPATH . "/Presentation/View/GatheringView/gathering_list.php"
 ];
 
 

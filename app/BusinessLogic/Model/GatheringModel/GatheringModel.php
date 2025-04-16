@@ -1,6 +1,6 @@
 <?php
 require_once ROOTPATH . '/fileRegister.php';
-require_once getFilePath('GatheringDAO');
+require_once '../app/Persistence/DAO/GatheringDAO/GatheringDAO.php';
 
 class GatheringModel
 {
