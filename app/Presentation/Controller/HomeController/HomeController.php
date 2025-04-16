@@ -11,7 +11,7 @@ class homeController
 
     public function __construct()
     {
-       $this->path = getFilePath("home");
+        $this->path = getFilePath("home");
     }
 
     public function index()
