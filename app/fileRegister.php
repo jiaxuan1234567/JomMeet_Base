@@ -14,6 +14,10 @@ $_HOME = [
     "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php",
 ];
 
+$_PROFILE = [];
+
+$_REFLECTION = [];
+
 $_GATHERING = [
     "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
     "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php"
@@ -22,14 +26,31 @@ $_GATHERING = [
 
 function getFilePath($permission)
 {
-    global $_INDEX, $_HOME, $_GATHERING;
+    global $_INDEX,
+        $_HOME,
+        $_PROFILE,
+        $_REFLECTION,
+        $_GATHERING;
 
     $registered = [];
 
-    if ($permission == "home") {
-        $registered += $_INDEX;
-        $registered += $_HOME;
-        $registered += $_GATHERING;
+    switch ($permission) {
+        case "home":
+            $registered += $_INDEX
+                + $_HOME
+                + $_PROFILE
+                + $_REFLECTION
+                + $_GATHERING;
+            break;
+        case "profile":
+            $registered += $_PROFILE;
+            break;
+        case "reflection":
+            $registered += $_REFLECTION;
+            break;
+        case "gathering":
+            $registered += $_GATHERING;
+            break;
     }
 
     return isset($registered) ? $registered : null;
