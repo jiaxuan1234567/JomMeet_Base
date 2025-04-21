@@ -1,5 +1,16 @@
 <?php
 
+define('ROOTPATH', dirname(__FILE__, 2));
+define('APP', ROOTPATH . '/app');
+define('PRESENTATION', ROOTPATH . '/Presentation');
+define('BUSINESSLOGIC', ROOTPATH . '/BusinessLogic');
+define('PERSISTENCE', ROOTPATH . '/Persistence');
+define('DAO', ROOTPATH . '/Persistence/DAO');
+define('MODEL', ROOTPATH . '/BusinessLogic/Model');
+define('VIEW', ROOTPATH . '/Presentation/View');
+define('CONTROLLER', ROOTPATH . '/Presentation/Controller');
+define('DATABASE', ROOTPATH . '/Database');
+
 $_ASSET = [];
 
 $_INDEX = [

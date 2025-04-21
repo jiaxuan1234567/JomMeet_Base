@@ -1,31 +1,42 @@
-<?php
-class DatabaseTest
-{
-    private static $host = "localhost"; // Change if using a different host
-    private static $dbName = "jommeet"; // Replace with your actual database name
-    private static $username = "root"; // Replace with your DB username
-    private static $password = ""; // Replace with your DB password
-    private static $connection = null;
+use PDO;
+use PDOException;
 
-    private function __construct()
+<?php
+
+class Database
+{
+    private $host = '127.0.0.1'; // Changed from 'localhost' to '127.0.0.1'
+    private $dbName = 'jommeet';
+    private $username = 'root';
+    private $password = '';
+    private $connection;
+
+    public function __construct()
     {
-        // Private constructor to prevent direct instantiation
+        $this->connect();
     }
 
-    public static function getConnection()
+    private function connect()
     {
-        if (self::$connection === null) {
-            try {
-                self::$connection = new PDO(
-                    "mysql:host=" . self::$host . ";dbname=" . self::$dbName . ";charset=utf8",
-                    self::$username,
-                    self::$password
-                );
-                self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            } catch (PDOException $e) {
-                die("Database connection failed: " . $e->getMessage());
-            }
+        try {
+            $this->connection = new PDO(
+                "mysql:host={$this->host};dbname={$this->dbName}",
+                $this->username,
+                $this->password
+            );
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("Database connection failed: " . $e->getMessage());
         }
-        return self::$connection;
+    }
+
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    public function getGatheringDAO()
+    {
+        return new GatheringDAO($this->connection);
     }
 }

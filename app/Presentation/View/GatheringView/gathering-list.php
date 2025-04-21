@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-//require_once ROOTPATH . '/fileRegister.php';
+require_once '../../Controller/GatheringController/GatheringController.php';
+include '../HomeView/header.php';
 
-include '../GatheringView/gathering-detail.php';
-
-//require_once getFilePath("GatheringController");
-
+// Initialize the GatheringController and fetch gatherings
 $controller = new GatheringController();
 $gatherings = $controller->listGatherings();
 
-// Check if we have gatherings to display
-if (empty($gatherings)) {
-    $gatherings = []; // Initialize as empty array if null
-}
+// Ensure gatherings is an array to avoid errors
+$gatherings = $gatherings ?? [];
 ?>
 
 <head>
@@ -57,14 +53,14 @@ if (empty($gatherings)) {
                                 <div>
                                     <strong><?php echo htmlspecialchars($gathering['theme']); ?></strong><br>
                                     <small>Date: <?php echo htmlspecialchars($gathering['date']); ?></small><br>
-                                    <small>Time: <?php echo date('g.ia', strtotime($gathering['startTime'])); ?></small><br>
-                                    <small>End Time: <?php echo date('g.ia', strtotime($gathering['endTime'])); ?></small><br>
+                                    <small>Time: <?php echo date('g:i A', strtotime($gathering['startTime'])); ?></small><br>
+                                    <small>End Time: <?php echo date('g:i A', strtotime($gathering['endTime'])); ?></small><br>
                                     <small>Venue: <?php echo htmlspecialchars($gathering['preference']); ?></small><br>
                                     <p class="fs-7 fw-bold mb-1 mt-2">Current Pax</p>
-                                    <p class="fs-7 mb-0"><?php echo $gathering['currentParticipant'] . '/' . $gathering['maxParticipant']; ?></p>
+                                    <p class="fs-7 mb-0"><?php echo htmlspecialchars($gathering['currentParticipant']) . '/' . htmlspecialchars($gathering['maxParticipant']); ?></p>
                                 </div>
                                 <div class="mt-2">
-                                    <a href="/gathering?action=view&id=<?php echo $gathering['gatheringID']; ?>" class="btn btn-primary w-100">View Details</a>
+                                    <a href="/gathering?action=view&id=<?php echo htmlspecialchars($gathering['gatheringID']); ?>" class="btn btn-primary w-100">View Details</a>
                                 </div>
                             </div>
                         </div>
@@ -74,9 +70,7 @@ if (empty($gatherings)) {
         <?php endif; ?>
     </div>
 
-    <?php
-    include '../app/Presentation/View/HomeView/footer.php';
-    ?>
+    <?php include '../HomeView/footer.php'; ?>
 </body>
 
 </html>

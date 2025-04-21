@@ -1,10 +1,8 @@
 <?php
-// require_once ROOTPATH . '/fileRegister.php';
-// require_once getFilePath('Database');
-// require_once getFilePath('GatheringModel');
-require_once(ROOTPATH . '/fileRegister.php');
-require ROOTPATH . '/BusinessLogic/Model/GatheringModel/GatheringModel.php';
-require_once '../app/Database.php';
+require_once '../../../fileRegister.php';
+require_once '../../../Persistence/DAO/GatheringDAO/GatheringDAO.php';
+require_once '../../../BusinessLogic/Model/GatheringModel/GatheringModel.php';
+require_once '../../../../app/Database.php';
 
 class GatheringController
 {
@@ -13,21 +11,53 @@ class GatheringController
 
     public function __construct()
     {
+        $this->initializeDependencies();
+    }
+
+    /**
+     * Initialize dependencies such as the database connection and GatheringModel.
+     */
+    private function initializeDependencies()
+    {
         $this->path = getFilePath("gathering");
         try {
-            $db = DatabaseTest::getConnection();
+            $database = new Database();
+            $db = $database->getConnection();
             $this->gatheringModel = new GatheringModel($db);
         } catch (Exception $e) {
-            error_log("Error in GatheringController constructor: " . $e->getMessage());
-            throw $e;
+            $this->handleInitializationError($e);
         }
     }
 
-    public function redirect($key)
+    /**
+     * Handle errors during initialization.
+     *
+     * @param Exception $e
+     */
+    private function handleInitializationError(Exception $e)
     {
-        return $this->path[$key];
+        error_log("Error in GatheringController constructor: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(["error" => "Internal Server Error"]);
+        exit;
     }
 
+    /**
+     * Redirect to a specific path based on the provided key.
+     *
+     * @param string $key
+     * @return string|null
+     */
+    public function redirect($key)
+    {
+        return $this->path[$key] ?? null;
+    }
+
+    /**
+     * List all gatherings.
+     *
+     * @return array
+     */
     public function listGatherings()
     {
         try {
@@ -43,6 +73,12 @@ class GatheringController
         }
     }
 
+    /**
+     * View a specific gathering by ID.
+     *
+     * @param int $id
+     * @return array|null
+     */
     public function viewGathering($id)
     {
         try {
@@ -53,6 +89,11 @@ class GatheringController
         }
     }
 
+    /**
+     * Handle a specific action related to gatherings.
+     *
+     * @return mixed|null
+     */
     public function action()
     {
         try {
