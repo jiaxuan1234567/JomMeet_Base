@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require_once '../../Controller/GatheringController/GatheringController.php';
-include '../HomeView/header.php';
 
-// Initialize the GatheringController and fetch gatherings
-$controller = new GatheringController();
+include '../../View/HomeView/header.php';
+
+
+//these to be added to index not here
+require_once __DIR__ . '../../../../Persistence/DAO/Database.php';
+require_once __DIR__ . '../../../../Persistence/DAO/GatheringDAO.php';
+require_once __DIR__ . '../../../../Business/Model/GatheringModel.php';
+require_once __DIR__ . '../../../Controller/GatheringController.php';
+
+$db             = new Database();
+$gatheringDao   = new GatheringDAO($db);
+$gatheringModel = new GatheringModel($gatheringDao);
+$controller     = new GatheringController($gatheringModel);
+
 $gatherings = $controller->listGatherings();
 
-// Ensure gatherings is an array to avoid errors
-$gatherings = $gatherings ?? [];
 ?>
 
 <head>
