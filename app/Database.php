@@ -1,8 +1,8 @@
 <?php
-class Database
+class DatabaseTest
 {
     private static $host = "localhost"; // Change if using a different host
-    private static $dbName = "your_database"; // Replace with your actual database name
+    private static $dbName = "jommeet"; // Replace with your actual database name
     private static $username = "root"; // Replace with your DB username
     private static $password = ""; // Replace with your DB password
     private static $connection = null;
