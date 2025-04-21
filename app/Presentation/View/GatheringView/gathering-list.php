@@ -3,7 +3,7 @@
 <?php
 //require_once ROOTPATH . '/fileRegister.php';
 
-include '../app/Presentation/View/HomeView/header.php';
+include '../GatheringView/gathering-detail.php';
 
 //require_once getFilePath("GatheringController");
 
