@@ -1,29 +1,60 @@
 <?php
-define('ROOTPATH', __DIR__);
 
-function getFilePath($key)
+$_ASSET = [];
+
+$_INDEX = [
+    "Header" => ROOTPATH . "/Presentation/View/HomeView/header.php",
+    "Footer" => ROOTPATH . "/Presentation/View/HomeView/footer.php",
+];
+
+$_HOME = [
+    "HomePage" => ROOTPATH . "/Presentation/View/HomeView/index.php",
+    "HomeController" => ROOTPATH . "/Presentation/Controller/HomeController/HomeController.php",
+    "HomeModel" => ROOTPATH . "/BusinessLogic/Model/HomeModel/HomeModel.php",
+    "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php",
+];
+
+$_PROFILE = [];
+
+$_REFLECTION = [];
+
+$_GATHERING = [
+    "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
+    "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php",
+    "GatheringList" => ROOTPATH . "/Presentation/View/GatheringView/gathering_list.php"
+];
+
+
+function getFilePath($permission)
 {
-    $registered = [
-        // index files
-        "Header" => ROOTPATH . "/Presentation/View/HomeView/header.php",
-        "Footer" => ROOTPATH . "/Presentation/View/HomeView/footer.php",
+    global $_INDEX,
+        $_HOME,
+        $_PROFILE,
+        $_REFLECTION,
+        $_GATHERING;
 
-        // Home Components
-        "HomeView" => ROOTPATH . "/Presentation/View/HomeView/HomeView.php",
-        "HomeController" => ROOTPATH . "/Presentation/Controller/HomeController/HomeController.php",
-        "HomeModel" => ROOTPATH . "/BusinessLogic/Model/HomeModel/HomeModel.php",
-        "Login" => ROOTPATH . "/Presentation/View/HomeView/login.php",
+    $registered = [];
 
-        // UserProfile Components
+    switch ($permission) {
+        case "home":
+            $registered += $_INDEX
+                + $_HOME
+                + $_PROFILE
+                + $_REFLECTION
+                + $_GATHERING;
+            break;
+        case "profile":
+            $registered += $_PROFILE;
+            break;
+        case "reflection":
+            $registered += $_REFLECTION;
+            break;
+        case "gathering":
+            $registered += $_GATHERING;
+            break;
+    }
 
-        // SelfReflection Components
-
-        // Gathering Components
-        "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
-        "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php"
-    ];
-
-    return isset($registered[$key]) ? $registered[$key] : null;
+    return isset($registered) ? $registered : null;
 }
 
 function getRoutePath($key)

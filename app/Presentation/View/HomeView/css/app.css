@@ -3,10 +3,11 @@ body {
     background-color: #f4f4f4;
 }
 
+/* 
 .navbar,
 .footer-top {
     background-color: #d3eaff;
-}
+} */
 
 .footer-top {
     padding: 2rem 0;
@@ -54,10 +55,10 @@ body {
     background-color: #DEECFF;
 }
 
-.border-light-blue{
+.border-light-blue {
     border-color: #0077CC !important;
 }
 
-.button-blue-color{
+.button-blue-color {
     background-color: #569FFF;
 }
