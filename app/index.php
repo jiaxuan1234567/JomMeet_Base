@@ -12,6 +12,7 @@ require_once 'Presentation/Controller/GatheringController/GatheringController.ph
 //session_start();
 
 $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$method = $_SERVER['REQUEST_METHOD'];
 
 switch ($request) {
     case '/':
@@ -20,11 +21,19 @@ switch ($request) {
     case '/profile':
         break;
     case '/gathering':
-        if (isset($_GET['action'])) {
-            (new GatheringController())->action();
-        } else {
-            include (new GatheringController())->redirect('GatheringList');
+
+        $controller = new GatheringController();
+        if ($method === 'GET') {
+            !empty($_GET) ? $controller->action() : $controller->list(); // show list or detail
+        } elseif ($method === 'POST') {
+            //$controller->store();  // post action
         }
+
+        // if (isset($_GET['action'])) {
+        //     (new GatheringController())->action();
+        // } else {
+        //     include (new GatheringController())->redirect('GatheringList');
+        // }
         break;
     case '/login':
         //include getFilePath('Login');

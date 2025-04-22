@@ -8,7 +8,7 @@ class GatheringDAO
         $this->db = $db;
     }
 
-    public function getAllGatherings()
+    public function fetchAllGatherings()
     {
         try {
             $sql = "SELECT g.*, l.locationName, l.address, l.image as locationImage 

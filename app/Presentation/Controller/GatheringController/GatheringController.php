@@ -23,25 +23,32 @@ class GatheringController
         }
     }
 
-    public function redirect($key)
+    public function render($key, $data = [])
     {
-        return $this->path[$key];
+        extract($data);
+        return include($this->path[$key]);
     }
 
-    public function listGatherings()
+    public function list()
     {
-        try {
-            $gatherings = $this->gatheringModel->getAllGatherings();
-            if ($gatherings === false) {
-                error_log("getAllGatherings returned false");
-                return [];
-            }
-            return $gatherings;
-        } catch (Exception $e) {
-            error_log("Error in listGatherings: " . $e->getMessage());
-            return [];
-        }
+        $gatherings = $this->gatheringModel->getAllGatherings();
+        $this->render('GatheringList', ['gatherings' => $gatherings]);
     }
+
+    // public function listGatherings()
+    // {
+    //     try {
+    //         $gatherings = $this->gatheringModel->getAllGatherings();
+    //         if ($gatherings === false) {
+    //             error_log("getAllGatherings returned false");
+    //             return [];
+    //         }
+    //         return $gatherings;
+    //     } catch (Exception $e) {
+    //         error_log("Error in listGatherings: " . $e->getMessage());
+    //         return [];
+    //     }
+    // }
 
     public function viewGathering($id)
     {

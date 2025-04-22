@@ -1,20 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<?php
-//require_once ROOTPATH . '/fileRegister.php';
-
-include '../app/Presentation/View/HomeView/header.php';
-
-//require_once getFilePath("GatheringController");
-
-$controller = new GatheringController();
-$gatherings = $controller->listGatherings();
-
-// Check if we have gatherings to display
-if (empty($gatherings)) {
-    $gatherings = []; // Initialize as empty array if null
-}
-?>
+<?php include '../app/Presentation/View/HomeView/header.php'; ?>
 
 <head>
     <meta charset="UTF-8">
@@ -74,9 +58,5 @@ if (empty($gatherings)) {
         <?php endif; ?>
     </div>
 
-    <?php
-    include '../app/Presentation/View/HomeView/footer.php';
-    ?>
+    <?php include '../app/Presentation/View/HomeView/footer.php'; ?>
 </body>
-
-</html>

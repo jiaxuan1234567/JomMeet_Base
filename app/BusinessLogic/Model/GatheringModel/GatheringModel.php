@@ -13,7 +13,13 @@ class GatheringModel
 
     public function getAllGatherings()
     {
-        return $this->gatheringDAO->getAllGatherings();
+        try {
+            $gatherings = $this->gatheringDAO->fetchAllGatherings();
+            return $gatherings ?: [];
+        } catch (Exception $e) {
+            error_log("BLL Error: " . $e->getMessage());
+            return [];
+        }
     }
 
     public function getGatheringById($id)
