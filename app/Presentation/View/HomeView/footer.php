@@ -5,7 +5,7 @@
                 <div class="container-fluid">
                     <div class="row text-start">
                         <div class="col-md-2 text-center">
-                            <img src="<?php echo getRoutePath("iconPNG") ?>" class="img-fluid mx-auto d-block" alt="Logo" width="50" />
+                            <img src="../../../images/bubble.png" class="img-fluid mx-auto d-block" alt="Logo" width="50" />
                             <h5 class="mt-2">JomMeet</h5>
                         </div>
                         <div class="col footer-link">

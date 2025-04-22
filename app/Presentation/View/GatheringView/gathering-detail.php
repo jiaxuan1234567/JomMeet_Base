@@ -10,8 +10,6 @@ require('../app/_header.php');
     <title>Join a Gathering</title>
 </head>
 
-<!-- Searchbar container -->
-
 <body>
     <div class="container-sm mt-4">
         <div class="row">
@@ -31,37 +29,36 @@ require('../app/_header.php');
                     <div class="row">
                         <div class="col">
                             <p class="fs-4 fw-bolder mb-1">Gathering Theme</p>
-                            <p class="fs-5 mb-3">Dinner</p>
+                            <p class="fs-5 mb-3"><?php echo htmlspecialchars($gathering['theme']); ?></p>
                             <p class="fs-4 fw-bolder mb-1">Address</p>
-                            <p class="fs-5 mb-0">1, Jalan Manis 4,<br> Taman Bukit Segar, <br> 56100 Kuala Lumpur,<br> Wilayah Persekutuan Kuala Lumpur</p>
+                            <p class="fs-5 mb-0"><?php echo nl2br(htmlspecialchars($gathering['address'])); ?></p>
                         </div>
                         <div class="col">
                             <p class="fs-4 fw-bolder mb-1">Date</p>
-                            <p class="fs-5 mb-3">25 March 2025</p>
+                            <p class="fs-5 mb-3"><?php echo date('d F Y', strtotime($gathering['date'])); ?></p>
                             <p class="fs-4 fw-bolder mb-1">Start Time</p>
-                            <p class="fs-5 mb-0">6.00pm</p>
+                            <p class="fs-5 mb-0"><?php echo date('g.ia', strtotime($gathering['startTime'])); ?></p>
                             <p class="fs-4 fw-bolder mb-1">End Time</p>
-                            <p class="fs-5 mb-0">8.00pm</p>
+                            <p class="fs-5 mb-0"><?php echo date('g.ia', strtotime($gathering['endTime'])); ?></p>
                         </div>
                     </div>
                     <div class="row my-3">
-
                     </div>
-                    <div class="row align-items-center justify-content-center my-5 ">
+                    <div class="row align-items-center justify-content-center my-5">
                         <p class="fs-4 fw-bolder mb-1">Current Pax</p>
-                        <p class="fs-7 mb-0">1/5</p>
+                        <p class="fs-7 mb-0"><?php echo $gathering['currentParticipant'] . '/' . $gathering['maxParticipant']; ?></p>
                     </div>
                     <div class="row justify-content-center">
-                        <button class="btn btn-light mx-1" style="height: 35px; width: 200px;" data-get="join-gathering">Cancel</button>
+                        <a href="/gathering?action=list" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Cancel</a>
                         <button class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">Join</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <?php
     require('../app/_footer.php');
     ?>
 </body>
-
-</html>
+</html> 
