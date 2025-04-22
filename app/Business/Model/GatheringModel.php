@@ -12,7 +12,7 @@ class GatheringModel
         $this->dao = $dao;
     }
 
-    public function getAllGatherings(): array|false
+    public function getAllGatherings(): array
     {
         return $this->dao->getAllGatherings();
     }
