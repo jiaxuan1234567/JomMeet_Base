@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require('../app/_header.php');
+require('../app/Presentation/View/HomeView/header.php');
 ?>
 
 <head>
@@ -60,7 +60,7 @@ require('../app/_header.php');
         </div>
     </div>
     <?php
-    require('../app/_footer.php');
+    require('../app/Presentation/View/HomeView/footer.php');
     ?>
 </body>
 

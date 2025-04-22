@@ -19,6 +19,7 @@ $_PROFILE = [];
 $_REFLECTION = [];
 
 $_GATHERING = [
+    "CreateGathering" => ROOTPATH . "/Presentation/View/GatheringView/create-gathering.php",
     "JoinGathering" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering.php",
     "JoinGatheringDetail" => ROOTPATH . "/Presentation/View/GatheringView/join-gathering-detail.php",
     "GatheringList" => ROOTPATH . "/Presentation/View/GatheringView/gathering_list.php"

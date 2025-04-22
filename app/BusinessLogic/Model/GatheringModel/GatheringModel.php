@@ -24,7 +24,13 @@ class GatheringModel
 
     public function getGatheringById($id)
     {
-        return $this->gatheringDAO->getGatheringById($id);
+        try {
+            $gathering = $this->gatheringDAO->getGatheringById($id);
+            return $gathering ?: [];
+        } catch (Exception $e) {
+            error_log("BLL Error: " . $e->getMessage());
+            return [];
+        }
     }
 
     public function handleAction()
@@ -60,4 +66,6 @@ class GatheringModel
             require_once(getFilePath('GatheringList'));
         }
     }
+
+    public function createGathering($postData) {}
 }

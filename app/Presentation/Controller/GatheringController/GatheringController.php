@@ -15,8 +15,7 @@ class GatheringController
     {
         $this->path = getFilePath("gathering");
         try {
-            $db = DatabaseTest::getConnection();
-            $this->gatheringModel = new GatheringModel($db);
+            $this->gatheringModel = new GatheringModel(DatabaseTest::getConnection());
         } catch (Exception $e) {
             error_log("Error in GatheringController constructor: " . $e->getMessage());
             throw $e;
@@ -29,31 +28,17 @@ class GatheringController
         return include($this->path[$key]);
     }
 
-    public function list()
+    public function listGathering()
     {
         $gatherings = $this->gatheringModel->getAllGatherings();
         $this->render('GatheringList', ['gatherings' => $gatherings]);
     }
 
-    // public function listGatherings()
-    // {
-    //     try {
-    //         $gatherings = $this->gatheringModel->getAllGatherings();
-    //         if ($gatherings === false) {
-    //             error_log("getAllGatherings returned false");
-    //             return [];
-    //         }
-    //         return $gatherings;
-    //     } catch (Exception $e) {
-    //         error_log("Error in listGatherings: " . $e->getMessage());
-    //         return [];
-    //     }
-    // }
-
     public function viewGathering($id)
     {
         try {
-            return $this->gatheringModel->getGatheringById($id);
+            $gathering = $this->gatheringModel->getGatheringById($id);
+            $this->render('JoinGatheringDetail', ['gathering' => $gathering]);
         } catch (Exception $e) {
             error_log("Error in viewGathering: " . $e->getMessage());
             return null;
@@ -62,11 +47,43 @@ class GatheringController
 
     public function action()
     {
-        try {
-            return $this->gatheringModel->handleAction();
-        } catch (Exception $e) {
-            error_log("Error in action: " . $e->getMessage());
-            return null;
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $action = $_GET['action'] ?? 'list';
+            switch ($action) {
+                case 'view':
+                    $this->viewGathering($_GET['id'] ?? null);
+                    break;
+                default:
+                    $this->listGathering();
+            }
+        }
+    }
+
+    public function createGathering($postData)
+    {
+        $this->gatheringModel->createGathering($postData);
+        header('Location: /gathering');
+        exit;
+    }
+
+    public function dispatch($request)
+    {
+        $action = $request['action'] ?? 'list';
+
+        switch ($action) {
+            case 'view':
+                $id = $request['id'] ?? null;
+                $this->viewGathering($id);
+                break;
+            case 'create':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $this->createGathering($_POST);
+                } else {
+                    $this->render('CreateGathering');
+                }
+                break;
+            default:
+                $this->listGathering();
         }
     }
 }
