@@ -8,6 +8,8 @@ $path = trim(parse_url($requestUri, PHP_URL_PATH), '/');
 
 // Default route if root
 if ($path === '') {
+    $path = 'home';
+}else if($path === 'gathering'){
     $path = 'join-gathering';
 }
 

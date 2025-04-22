@@ -23,21 +23,21 @@ class GatheringDAO
 
 
     public function getGatheringById($id)
-    {
-        try {
-            $stmt = $this->db->getConnection()->prepare("SELECT * FROM gathering WHERE gatheringID = :id");
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            error_log("Error in getGatheringById: " . $e->getMessage());
-            return null;
-        }
+{
+    try {
+        $stmt = $this->db->getConnection()->prepare("
+            SELECT g.*, l.*
+            FROM gathering g
+            JOIN location l ON g.locationID = l.locationID
+            WHERE g.gatheringID = :id
+        ");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        error_log("Error in getGatheringById: " . $e->getMessage());
+        return null;
     }
+}
 
-
-    public function handleAction()
-    {
-        // Handle action logic here
-    }
 }

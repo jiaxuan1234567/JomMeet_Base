@@ -24,7 +24,7 @@ include __DIR__ . '../../../View/HomeView/header.php';
         <div class="container justify-content-between p-3 mt-7 border rounded bg-blue-color border-light-blue">
             <div class="row">
                 <div class="col align-self-start">
-                    <img src="Presentation\View\GatheringView\images\map.png" alt="" style="width: 470px; height: 470px;">
+                    <img src="<?= getLinks('map') ?>" alt="" style="width: 470px; height: 470px;">
                 </div>
                 <div class="col align-self-start">
                     <div class="row">
