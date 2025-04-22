@@ -20,7 +20,7 @@ include __DIR__ . '../../../View/HomeView/header.php';
         </div>
     </div>
 
-    <div class="container py-3">
+    <div class="container py-3" style="height:630px;">
         <div class="container justify-content-between p-3 mt-7 border rounded bg-blue-color border-light-blue">
             <div class="row">
                 <div class="col align-self-start">

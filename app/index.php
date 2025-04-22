@@ -18,16 +18,8 @@ if (!isset($routes[$path])) {
     echo "<h1>404 Not Found</h1><p>No route for '$path'</p>";
     exit;
 }
-
-// Instantiate dependencies
-require_once __DIR__ . '/Persistence/DAO/Database.php';
-require_once __DIR__ . '/Persistence/DAO/GatheringDAO.php';
-require_once __DIR__ . '/Business/Model/GatheringModel.php';
+//Instantiate controller
 require_once __DIR__ . '/Presentation/Controller/GatheringController.php';
-
-$db = new Database();
-$gatheringDAO = new GatheringDAO($db);
-$gatheringModel = new GatheringModel($gatheringDAO);
 $controller = new GatheringController($gatheringModel);
 
 // Handle action parameter if needed

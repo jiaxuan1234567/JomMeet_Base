@@ -6,7 +6,6 @@ include __DIR__ . '../../../View/HomeView/header.php';
 
 
 require_once __DIR__ . '../../../../index.php';
-
 $gatherings = $controller->listGatherings();
 
 ?>

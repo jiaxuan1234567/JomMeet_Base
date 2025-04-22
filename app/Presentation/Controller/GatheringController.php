@@ -1,5 +1,8 @@
 <?php
-
+require_once __DIR__ . '../../../Business/Model/GatheringModel.php';
+require_once __DIR__ . '../../../Persistence/DAO/GatheringDAO.php'; 
+$dao = new GatheringDAO($db);
+$gatheringModel = new GatheringModel($dao);
 
 class GatheringController
 {
