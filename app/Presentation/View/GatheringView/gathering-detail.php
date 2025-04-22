@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require('../app/_header.php');
+include __DIR__ . '../../../View/HomeView/header.php';
+
 ?>
 
 <head>
@@ -58,7 +59,8 @@ require('../app/_header.php');
     </div>
 
     <?php
-    require('../app/_footer.php');
+    include __DIR__ . '../../../View/HomeView/footer.php';
     ?>
 </body>
-</html> 
+
+</html>

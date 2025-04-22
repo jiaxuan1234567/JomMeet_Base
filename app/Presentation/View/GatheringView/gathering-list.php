@@ -2,19 +2,10 @@
 <html lang="en">
 <?php
 
-include '../../View/HomeView/header.php';
+include __DIR__ . '../../../View/HomeView/header.php';
 
 
-//these to be added to index not here
-require_once __DIR__ . '../../../../Persistence/DAO/Database.php';
-require_once __DIR__ . '../../../../Persistence/DAO/GatheringDAO.php';
-require_once __DIR__ . '../../../../Business/Model/GatheringModel.php';
-require_once __DIR__ . '../../../Controller/GatheringController.php';
-
-$db             = new Database();
-$gatheringDao   = new GatheringDAO($db);
-$gatheringModel = new GatheringModel($gatheringDao);
-$controller     = new GatheringController($gatheringModel);
+require_once __DIR__ . '../../../../index.php';
 
 $gatherings = $controller->listGatherings();
 
@@ -39,7 +30,7 @@ $gatherings = $controller->listGatherings();
             </div>
             <div class="col">
                 <button type="button" class="btn btn-light border border-secondary d-flex align-items-center gap-2" id="create-gathering">
-                    <img src="Presentation/View/GatheringView/images/Random.png" alt="Icon" style="width: 20px; height: 20px;">
+                    <img src="<?= getLinks('match') ?>" alt="Icon" style="width: 20px; height: 20px;">
                     <span>Match</span>
                 </button>
             </div>
@@ -56,7 +47,7 @@ $gatherings = $controller->listGatherings();
                 <?php foreach ($gatherings as $gathering): ?>
                     <div class="col-md-6">
                         <div class="d-flex border rounded shadow-sm p-2 bg-white">
-                            <img src="Presentation/View/GatheringView/images/dinnerpic.png" alt="Dinner" class="rounded" style="width: 120px; height: auto; object-fit: cover;">
+                            <img src="../../../images/dinnerpic.png" alt="Dinner" class="rounded" style="width: 120px; height: auto; object-fit: cover;">
                             <div class="ms-3 d-flex flex-column justify-content-between flex-grow-1">
                                 <div>
                                     <strong><?php echo htmlspecialchars($gathering['theme']); ?></strong><br>
@@ -78,7 +69,7 @@ $gatherings = $controller->listGatherings();
         <?php endif; ?>
     </div>
 
-    <?php include '../HomeView/footer.php'; ?>
+    <?php include __DIR__ . '../../../View/HomeView/footer.php'; ?>
 </body>
 
 </html>
