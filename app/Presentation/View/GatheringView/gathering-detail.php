@@ -51,7 +51,11 @@ include __DIR__ . '../../../View/HomeView/header.php';
                     </div>
                     <div class="row justify-content-center">
                         <a href="/gathering?action=list" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Cancel</a>
-                        <a data-confirm-gathering href="/gathering?action=list" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">Join</a>
+
+                        <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant']): ?>
+                            <a data-confirm-gathering href="/gathering?action=list" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">Join</a>
+                        <?php endif; ?>
+
                     </div>
                 </div>
             </div>
