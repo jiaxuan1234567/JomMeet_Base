@@ -11,7 +11,7 @@ require_once '_base.php';
 
     <!-- Jquery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="/app.js"></script>
 
     <!-- Spline Viewer for 3D Model -->
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.79/build/spline-viewer.js"></script>
