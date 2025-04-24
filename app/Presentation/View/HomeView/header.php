@@ -35,7 +35,7 @@
                     <li class="nav-item"><a class="nav-link fw-bold" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link fw-bold" href="#">Reflection</a></li>
                     <li class="nav-item"><a class="nav-link fw-bold" href="/gathering">Gathering</a></li>
-                    <li class="nav-item"><a class="nav-link fw-bold" href="#">My Gathering</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" href="/own">My Gathering</a></li>
                 </ul>
                 <div class="d-flex gap-2">
                     <a href="#" class="btn btn-outline-secondary rounded-pill">Profile</a>

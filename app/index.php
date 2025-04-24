@@ -31,6 +31,9 @@ switch ($request) {
         //     //$controller->store();  // post action
         // }
         break;
+    case '/own':
+        (new GatheringController())->dispatch($_GET);
+        break;
     case '/login':
         //include getFilePath('Login');
         break;
