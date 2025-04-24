@@ -30,4 +30,9 @@ class HomeController
         $gatherings = (new HomeModel())->getAllGatherings();
         include $this->fileHelper->getFilePath('GatheringList');
     }
+
+    public function myGatheringHome()
+    {
+        include $this->fileHelper->getFilePath('MyGatheringList');
+    }
 }

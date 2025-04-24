@@ -19,7 +19,7 @@ class FileHelper
         ];
 
         $homePaths = [
-            'HomePage' => "/Presentation/View/HomeView/index.php",
+            'HomePage' => "/Presentation/View/HomeView/home.php",
             'HomeController' => "/Presentation/Controller/HomeController/HomeController.php",
             'HomeModel' => "/BusinessLogic/Model/HomeModel/HomeModel.php",
             'Login' => "/Presentation/View/HomeView/login.php",
@@ -34,6 +34,7 @@ class FileHelper
         ];
 
         $gatheringPaths = [
+            'MyGatheringList' => "/Presentation/View/GatheringView/my-gathering.php",
             'CreateGathering' => "/Presentation/View/GatheringView/create-gathering.php",
             'JoinGathering' => "/Presentation/View/GatheringView/join-gathering.php",
             'JoinGatheringDetail' => "/Presentation/View/GatheringView/join-gathering-detail.php",
