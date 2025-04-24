@@ -1,5 +1,4 @@
 <?php
-require_once ROOTPATH . '/fileRegister.php';
 include 'header.php';
 ?>
 

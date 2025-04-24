@@ -17,7 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
 
     <!-- External Stylesheet -->
-    <link rel="stylesheet" href="<?php echo getRoutePath("AppCSS") ?>">
+    <link rel="stylesheet" href="<?php echo (new FileHelper('asset'))->getFilePath('AppCSS') ?>">
 </head>
 
 <body>
@@ -28,7 +28,7 @@
         <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-lg navbar-light px-3 bg-blue-color">
             <a class="navbar-brand" href="#">
-                <img src="<?php echo getRoutePath("iconPNG") ?>" alt="Logo" width="40" height="40" />
+                <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" alt="Logo" width="40" height="40" />
             </a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">

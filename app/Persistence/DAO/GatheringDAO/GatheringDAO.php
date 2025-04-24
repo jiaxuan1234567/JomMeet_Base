@@ -1,11 +1,18 @@
 <?php
+
+namespace Persistence\DAO\GatheringDAO;
+
+use PDO;
+use PDOException;
+use Database;
+
 class GatheringDAO
 {
     private $db;
 
-    public function __construct($db)
+    public function __construct()
     {
-        $this->db = $db;
+        $this->db = Database::getConnection();
     }
 
     public function fetchAllGatherings()

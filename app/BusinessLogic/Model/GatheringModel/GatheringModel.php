@@ -1,14 +1,20 @@
 <?php
-require_once ROOTPATH . '/fileRegister.php';
+
+namespace BusinessLogic\Model\GatheringModel;
+
+use Persistence\DAO\GatheringDAO\GatheringDAO;
+use Exception;
+use FileHelper;
+
 require_once '../app/Persistence/DAO/GatheringDAO/GatheringDAO.php';
 
 class GatheringModel
 {
     private $gatheringDAO;
 
-    public function __construct($db)
+    public function __construct()
     {
-        $this->gatheringDAO = new GatheringDAO($db);
+        $this->gatheringDAO = new GatheringDAO();
     }
 
     public function getAllGatherings()
@@ -44,7 +50,7 @@ class GatheringModel
                         $id = $_GET['id'];
                         $gathering = $this->getGatheringById($id);
                         if ($gathering) {
-                            require_once(getFilePath('GatheringDetail'));
+                            //require_once(getFilePath('GatheringDetail'));
                         } else {
                             header('Location: /gathering');
                         }
@@ -54,7 +60,7 @@ class GatheringModel
                     break;
                 case 'list':
                     $gatherings = $this->getAllGatherings();
-                    require_once(getFilePath('GatheringList'));
+                    //require_once(getFilePath('GatheringList'));
                     break;
                 default:
                     header('Location: /gathering');
@@ -63,7 +69,7 @@ class GatheringModel
         } else {
             // If no action is specified, show the list
             $gatherings = $this->getAllGatherings();
-            require_once(getFilePath('GatheringList'));
+            //require_once(getFilePath('GatheringList'));
         }
     }
 

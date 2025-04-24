@@ -1,16 +1,14 @@
 <?php
-class DatabaseTest
+final class Database
 {
-    private static $host = "localhost"; // Change if using a different host
-    private static $dbName = "jommeet"; // Replace with your actual database name
-    private static $username = "root"; // Replace with your DB username
-    private static $password = ""; // Replace with your DB password
+    private static $host = "localhost";
+    private static $dbName = "jommeet";
+    private static $username = "root";
+    private static $password = "";
     private static $connection = null;
 
-    private function __construct()
-    {
-        // Private constructor to prevent direct instantiation
-    }
+    private function __construct() {}
+    private function __clone() {}
 
     public static function getConnection()
     {
@@ -23,9 +21,15 @@ class DatabaseTest
                 );
                 self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
+                error_log($e->getMessage());
                 die("Database connection failed: " . $e->getMessage());
             }
         }
         return self::$connection;
+    }
+
+    public static function closeConnection()
+    {
+        self::$connection = null;
     }
 }

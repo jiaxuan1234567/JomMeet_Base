@@ -1,10 +1,11 @@
 <?php
-// require_once ROOTPATH . '/fileRegister.php';
-// require_once getFilePath('Database');
-// require_once getFilePath('GatheringModel');
-require_once(ROOTPATH . '/fileRegister.php');
-require ROOTPATH . '/BusinessLogic/Model/GatheringModel/GatheringModel.php';
-require_once '../app/Database.php';
+
+namespace Presentation\Controller\GatheringController;
+
+use BusinessLogic\Model\GatheringModel\GatheringModel;
+use Database;
+use Exception;
+use FileHelper;
 
 class GatheringController
 {
@@ -13,9 +14,9 @@ class GatheringController
 
     public function __construct()
     {
-        $this->path = getFilePath("gathering");
+        $this->path = new FileHelper("gathering");
         try {
-            $this->gatheringModel = new GatheringModel(DatabaseTest::getConnection());
+            $this->gatheringModel = new GatheringModel(Database::getConnection());
         } catch (Exception $e) {
             error_log("Error in GatheringController constructor: " . $e->getMessage());
             throw $e;

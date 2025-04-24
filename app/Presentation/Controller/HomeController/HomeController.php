@@ -1,20 +1,33 @@
 <?php
 
-//define('ROOTPATH', __DIR__);
-require_once(ROOTPATH . '/fileRegister.php'); // The file that store the route
+namespace Presentation\Controller\HomeController;
+
+use BusinessLogic\Model\HomeModel\HomeModel;
+use FileHelper;
 
 class HomeController
 {
 
-    private $path;
+    private $paths;
 
     public function __construct()
     {
-        $this->path = getFilePath("home");
+        $this->paths = new FileHelper('home');
     }
 
     public function redirect($key)
     {
-        return $this->path[$key];
+        return $this->paths->getFilePath($key);
+    }
+
+    public function home()
+    {
+        include $this->paths->getFilePath('HomePage');
+    }
+
+    public function gatheringHome()
+    {
+        $gatherings = (new HomeModel())->getAllGatherings();
+        include $this->paths->getFilePath('GatheringList');
     }
 }
