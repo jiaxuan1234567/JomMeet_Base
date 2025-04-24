@@ -8,26 +8,26 @@ use FileHelper;
 class HomeController
 {
 
-    private $paths;
+    private $fileHelper;
 
     public function __construct()
     {
-        $this->paths = new FileHelper('home');
+        $this->fileHelper = new FileHelper('home');
     }
 
     public function redirect($key)
     {
-        return $this->paths->getFilePath($key);
+        return $this->fileHelper->getFilePath($key);
     }
 
     public function home()
     {
-        include $this->paths->getFilePath('HomePage');
+        include $this->fileHelper->getFilePath('HomePage');
     }
 
     public function gatheringHome()
     {
         $gatherings = (new HomeModel())->getAllGatherings();
-        include $this->paths->getFilePath('GatheringList');
+        include $this->fileHelper->getFilePath('GatheringList');
     }
 }

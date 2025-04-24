@@ -10,11 +10,11 @@ use FileHelper;
 class GatheringController
 {
     private $gatheringModel;
-    private $path;
+    private $fileHelper;
 
     public function __construct()
     {
-        $this->path = new FileHelper("gathering");
+        $this->fileHelper = new FileHelper("gathering");
         try {
             $this->gatheringModel = new GatheringModel(Database::getConnection());
         } catch (Exception $e) {
@@ -23,68 +23,74 @@ class GatheringController
         }
     }
 
-    public function render($key, $data = [])
+    public function viewDetail($id)
     {
-        extract($data);
-        return include($this->path[$key]);
+        $gathering = $this->gatheringModel->getGatheringById($id);
+        include $this->fileHelper->getFilePath('JoinGatheringDetail');
     }
 
-    public function listGathering()
-    {
-        $gatherings = $this->gatheringModel->getAllGatherings();
-        $this->render('GatheringList', ['gatherings' => $gatherings]);
-    }
+    // public function render($key, $data = [])
+    // {
+    //     extract($data);
+    //     return include($this->fileHelper[$key]);
+    // }
 
-    public function viewGathering($id)
-    {
-        try {
-            $gathering = $this->gatheringModel->getGatheringById($id);
-            $this->render('JoinGatheringDetail', ['gathering' => $gathering]);
-        } catch (Exception $e) {
-            error_log("Error in viewGathering: " . $e->getMessage());
-            return null;
-        }
-    }
+    // public function listGathering()
+    // {
+    //     $gatherings = $this->gatheringModel->getAllGatherings();
+    //     $this->render('GatheringList', ['gatherings' => $gatherings]);
+    // }
 
-    public function action()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $action = $_GET['action'] ?? 'list';
-            switch ($action) {
-                case 'view':
-                    $this->viewGathering($_GET['id'] ?? null);
-                    break;
-                default:
-                    $this->listGathering();
-            }
-        }
-    }
+    // public function viewGathering($id)
+    // {
+    //     try {
+    //         $gathering = $this->gatheringModel->getGatheringById($id);
+    //         $this->render('JoinGatheringDetail', ['gathering' => $gathering]);
+    //     } catch (Exception $e) {
+    //         error_log("Error in viewGathering: " . $e->getMessage());
+    //         return null;
+    //     }
+    // }
 
-    public function createGathering($postData)
-    {
-        $this->gatheringModel->createGathering($postData);
-        header('Location: /gathering');
-        exit;
-    }
+    // public function action()
+    // {
+    //     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    //         $action = $_GET['action'] ?? 'list';
+    //         switch ($action) {
+    //             case 'view':
+    //                 $this->viewGathering($_GET['id'] ?? null);
+    //                 break;
+    //             default:
+    //                 $this->listGathering();
+    //         }
+    //     }
+    // }
 
-    public function dispatch($request)
-    {
-        $action = $request['action'] ?? 'list';
+    // public function createGathering($postData)
+    // {
+    //     $this->gatheringModel->createGathering($postData);
+    //     header('Location: /gathering');
+    //     exit;
+    // }
 
-        switch ($action) {
-            case 'view':
-                $id = $request['id'] ?? null;
-                $this->viewGathering($id);
-                break;
-            case 'create':
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->createGathering($_POST);
-                } else {
-                    $this->render('CreateGathering');
-                }
-                break;
-            default:
-                $this->listGathering();
-        }
-    }
+    // public function dispatch($request)
+    // {
+    //     $action = $request['action'] ?? 'list';
+
+    //     switch ($action) {
+    //         case 'view':
+    //             $id = $request['id'] ?? null;
+    //             $this->viewGathering($id);
+    //             break;
+    //         case 'create':
+    //             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    //                 $this->createGathering($_POST);
+    //             } else {
+    //                 $this->render('CreateGathering');
+    //             }
+    //             break;
+    //         default:
+    //             $this->listGathering();
+    //     }
+    // }
 }
