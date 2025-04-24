@@ -26,11 +26,11 @@ class FileHelper
         ];
 
         $profilePaths = [
-            'ProfileDetail' => "/Presentation/View/ProfileView/profile.php",
+            'ProfileDetail' => "/Presentation/View/ProfileView/profile.php", // sample path
         ];
 
         $reflectionPaths = [
-            'ReflectionList' => "/Presentation/View/ReflectionView/list.php",
+            'ReflectionList' => "/Presentation/View/ReflectionView/list.php", // sample path
         ];
 
         $gatheringPaths = [

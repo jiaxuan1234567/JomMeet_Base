@@ -48,7 +48,7 @@
                                     <p class="fs-7 mb-0"><?php echo $gathering['currentParticipant'] . '/' . $gathering['maxParticipant']; ?></p>
                                 </div>
                                 <div class="mt-2">
-                                    <a href="/gathering?action=view&id=<?php echo $gathering['gatheringID']; ?>" class="btn btn-primary w-100">View Details</a>
+                                    <a href="/gathering/view/<?php echo $gathering['gatheringID']; ?>" class="btn btn-primary w-100">View Details</a>
                                 </div>
                             </div>
                         </div>
