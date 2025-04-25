@@ -63,4 +63,23 @@ class GatheringController
     {
         return $this->gatheringModel->verifyUserInGathering($userID, $gatheringID);
     }
+
+    public function isBeforeStartTime($gatheringID){
+        try {
+            return $this->gatheringModel->isBeforeStartTime($gatheringID);
+        } catch (Exception $e) {
+            error_log("Error in isBeforeStartTime: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function isNewGatheringConflicting($userID, $gatheringID)
+    {
+        try {
+            return $this->gatheringModel->isNewGatheringConflicting($userID, $gatheringID);
+        } catch (Exception $e) {
+            error_log("Error in isNewGatheringConflicting: " . $e->getMessage());
+            return false;
+        }
+    }
 }
