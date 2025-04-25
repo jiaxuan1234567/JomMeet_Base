@@ -44,16 +44,33 @@ class GatheringDAO
     }
 
     public function addUserToGathering($userID, $gatheringID)
-    {
-        try {
-            $stmt = $this->db->getConnection()->prepare("INSERT INTO profileGathering (userID, gatheringID) VALUES (:userID, :gatheringID)");
-            $stmt->bindParam(':userID', $userID, PDO::PARAM_INT);
-            $stmt->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
-            $stmt->execute();
-            return true;
-        } catch (Exception $e) {
-            error_log("Error in addUserToGathering: " . $e->getMessage());
-            return false;
-        }
+{
+    try {
+        // Begin a transaction to ensure both queries are executed together
+        $this->db->getConnection()->beginTransaction();
+
+        // First query: Add user to the profileGathering table
+        $stmt1 = $this->db->getConnection()->prepare("INSERT INTO profileGathering (profileID, gatheringID) VALUES (:profileID, :gatheringID)");
+        $stmt1->bindParam(':profileID', $userID, PDO::PARAM_INT);
+        $stmt1->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
+        $stmt1->execute();
+
+        // Second query: Increment the currentParticipant in the gathering table
+        $stmt2 = $this->db->getConnection()->prepare("UPDATE gathering SET currentParticipant = currentParticipant + 1 WHERE gatheringID = :gatheringID");
+        $stmt2->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
+        $stmt2->execute();
+
+        // Commit the transaction if both queries were successful
+        $this->db->getConnection()->commit();
+
+        return true;
+    } catch (Exception $e) {
+        // Rollback the transaction in case of any error
+        $this->db->getConnection()->rollBack();
+        
+        error_log("Error in addUserToGathering: " . $e->getMessage());
+        return false;
     }
+}
+
 }

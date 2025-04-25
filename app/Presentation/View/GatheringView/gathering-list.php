@@ -6,7 +6,8 @@ include __DIR__ . '../../../View/HomeView/header.php';
 require_once __DIR__ . '../../../../index.php';
 
 $gatherings = $controller->listGatherings();
-
+//For testing purposes only
+$userid = 1;
 ?>
 
 <head>
@@ -58,7 +59,7 @@ $gatherings = $controller->listGatherings();
                                         <p class="fs-7 mb-0"><?php echo htmlspecialchars($gathering['currentParticipant']) . '/' . htmlspecialchars($gathering['maxParticipant']); ?></p>
                                     </div>
                                     <div class="mt-2">
-                                        <a data-get="/gathering?action=view&id=<?php echo htmlspecialchars($gathering['gatheringID']); ?>" class="btn btn-primary w-100">View Details</a>
+                                        <a data-get="/gathering?action=view&id=<?php echo htmlspecialchars($gathering['gatheringID'])?>" class="btn btn-primary w-100">View Details</a>
                                     </div>
                                 </div>
                             </div>

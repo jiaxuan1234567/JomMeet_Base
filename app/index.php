@@ -1,5 +1,6 @@
 <?php
 require '_base.php';
+require 'FileRegister.php';
 // Load route map
 $routes = include 'FileRegister.php';
 
@@ -11,41 +12,32 @@ $path = trim(parse_url($requestUri, PHP_URL_PATH), '/');
 if ($path === '') {
     $path = 'home';
 } else if ($path === 'gathering') {
-    $path = 'join-gathering';
+    require_once 'Presentation/Controller/GatheringController.php';
+    $controller = new GatheringController($gatheringModel);
+    
+    $action = $_GET['action'] ?? null;
+
+    if ($action === 'view') {
+        $path = 'gathering-detail';
+        $routeFile = __DIR__ . $routes[$path];
+        require $routeFile;
+    } else if ($action === 'join') {
+        $controller->joinGathering();
+        $path = 'gathering-list';
+        $routeFile = __DIR__ . $routes[$path];
+        require $routeFile;
+    } else {
+        $path = 'gathering-list';
+        $routeFile = __DIR__ . $routes[$path];
+        require $routeFile;
+    }
 }
+
+
+
 
 if (!isset($routes[$path])) {
     http_response_code(404);
     echo "<h1>404 Not Found</h1><p>No route for '$path'</p>";
     exit;
 }
-
-// Route to correct file
-$routeFile = __DIR__ . $routes[$path];
-
-
-
-// {GATHERING}
-//Instantiate controller
-require_once __DIR__ . '/Presentation/Controller/GatheringController.php';
-$controller = new GatheringController($gatheringModel);
-
-
-// Handle action parameter if needed
-$action = $_GET['action'] ?? null;
-
-
-
-if (is_get()) {
-    $gatheringid = req('id');
-
-    // You can optionally check for specific actions here:
-    if ($action === 'view' && $path === 'join-gathering') {
-        $gathering = $controller->viewGathering($gatheringid);
-        require __DIR__ . '/Presentation/View/GatheringView/gathering-detail.php';
-    } else {
-        $gatherings = $controller->listGatherings();
-        require $routeFile;
-    }
-}
-

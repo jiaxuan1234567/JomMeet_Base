@@ -2,6 +2,14 @@
 <html lang="en">
 <?php
 include __DIR__ . '../../../View/HomeView/header.php';
+require_once __DIR__ . '../../../../index.php';
+
+//For testing purposes only
+$userid = 1;
+$gatheringid = $_GET['id'];
+$action = $_GET['action'] ?? null;
+
+$gathering = $controller->viewGathering();
 
 ?>
 
@@ -15,7 +23,7 @@ include __DIR__ . '../../../View/HomeView/header.php';
     <div class="container-sm mt-4">
         <div class="row">
             <div class="col">
-                <h2>Gathering Details</h2>
+                <h2>Gathering Details <?php echo $gatheringid ?></h2>
             </div>
         </div>
     </div>
@@ -50,10 +58,16 @@ include __DIR__ . '../../../View/HomeView/header.php';
                         <p class="fs-7 mb-0"><?php echo $gathering['currentParticipant'] . '/' . $gathering['maxParticipant']; ?></p>
                     </div>
                     <div class="row justify-content-center">
-                        <a href="/gathering?action=list" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Cancel</a>
+                        <a href="/gathering" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Cancel</a>
 
                         <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant']): ?>
-                            <a data-confirm-gathering data-post="/gathering?action=list" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">Join</a>
+                            <form method="POST" action="/gathering?action=join" style="width:200px;">
+                                <input type="hidden" name="id" value="<?php echo $gatheringid; ?>">
+                                <input type="hidden" name="userid" value="<?php echo $userid; ?>">
+                                <button type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
+                                    Join
+                                </button>
+                            </form>
                         <?php endif; ?>
 
                     </div>
