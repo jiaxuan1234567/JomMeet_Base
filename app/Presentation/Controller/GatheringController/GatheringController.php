@@ -23,11 +23,20 @@ class GatheringController
         }
     }
 
+    // -- Gathering --
     public function viewDetail($id)
     {
         $gathering = $this->gatheringModel->getGatheringById($id);
         include $this->fileHelper->getFilePath('JoinGatheringDetail');
     }
+
+    // -- My Gathering --
+    public function viewCreate()
+    {
+        include $this->fileHelper->getFilePath('CreateGathering');
+    }
+
+    public function createGathering() {}
 
     // public function render($key, $data = [])
     // {

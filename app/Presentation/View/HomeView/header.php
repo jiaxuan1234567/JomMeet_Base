@@ -17,6 +17,7 @@
 
     <!-- External Stylesheet -->
     <link rel="stylesheet" href="<?php echo (new FileHelper('asset'))->getFilePath('AppCSS') ?>">
+    <title><?php echo $_title ?? 'Jom Meet' ?></title>
 </head>
 
 <body>
@@ -43,3 +44,4 @@
             </div>
         </nav>
     </header>
+    <main>

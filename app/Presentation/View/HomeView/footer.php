@@ -1,4 +1,4 @@
-</body>
+</main>
 <!-- Footer -->
 <footer>
     <div class="footer mt-auto py-3 bg-blue-color">
@@ -42,3 +42,6 @@
         © 2025 JomMeet (Malaysia) Sdn. Bhd. Reg. No: 200901018343 (081640-H) (AJL931760).
     </div>
 </footer>
+</body>
+
+</html>
