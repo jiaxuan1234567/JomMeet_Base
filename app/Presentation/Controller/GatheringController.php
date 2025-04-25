@@ -41,24 +41,26 @@ class GatheringController
     }
 
     public function joinGathering()
-{
-    try {
-        $gatheringid = $_POST['id'] ?? null;
-        $userid = $_POST['userid'] ?? null;
+    {
+        try {
+            $gatheringid = $_POST['id'] ?? null;
+            $userid = $_POST['userid'] ?? null;
 
-        error_log("Joining Gathering: GatheringID: $gatheringid, UserID: $userid"); // Debugging log
-
-        if ($gatheringid != null && $userid != null) {
-            $result = $this->gatheringModel->addUserToGathering($userid, $gatheringid);
-            error_log("Join Result: " . ($result ? 'Success' : 'Failure'));
-            return $result;
-        } else {
-            error_log("Missing gatheringid or userid");
+            if ($gatheringid != null && $userid != null) {
+                $result = $this->gatheringModel->addUserToGathering($userid, $gatheringid);
+                error_log("Join Result: " . ($result ? 'Success' : 'Failure'));
+                return $result;
+            } else {
+                error_log("Missing gatheringid or userid");
+            }
+        } catch (Exception $e) {
+            error_log("Error in joinGathering: " . $e->getMessage());
+            return false;
         }
-    } catch (Exception $e) {
-        error_log("Error in joinGathering: " . $e->getMessage());
-        return false;
     }
-}
 
+    public function verifyUserInGathering($userID, $gatheringID)
+    {
+        return $this->gatheringModel->verifyUserInGathering($userID, $gatheringID);
+    }
 }
