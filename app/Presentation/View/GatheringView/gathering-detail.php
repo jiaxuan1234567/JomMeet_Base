@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require('../app/_header.php');
+include __DIR__ . '../../../View/HomeView/header.php';
+require_once __DIR__ . '../../../../index.php';
+
+//For testing purposes only
+$userid = 1;
+$gatheringid = $_GET['id'];
+$action = $_GET['action'] ?? null;
+
+$gathering = $controller->viewGathering();
+
 ?>
 
 <head>
@@ -14,16 +23,16 @@ require('../app/_header.php');
     <div class="container-sm mt-4">
         <div class="row">
             <div class="col">
-                <h2>Gathering Details</h2>
+                <h2>Gathering Details <?php echo $gatheringid ?></h2>
             </div>
         </div>
     </div>
 
-    <div class="container py-3">
+    <div class="container py-3" style="height:630px;">
         <div class="container justify-content-between p-3 mt-7 border rounded bg-blue-color border-light-blue">
             <div class="row">
                 <div class="col align-self-start">
-                    <img src="Presentation\View\GatheringView\images\map.png" alt="" style="width: 470px; height: 470px;">
+                    <img src="<?= getLinks('map') ?>" alt="" style="width: 470px; height: 470px;">
                 </div>
                 <div class="col align-self-start">
                     <div class="row">
@@ -49,8 +58,18 @@ require('../app/_header.php');
                         <p class="fs-7 mb-0"><?php echo $gathering['currentParticipant'] . '/' . $gathering['maxParticipant']; ?></p>
                     </div>
                     <div class="row justify-content-center">
-                        <a href="/gathering?action=list" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Cancel</a>
-                        <button class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">Join</button>
+                        <a href="/gathering" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Cancel</a>
+
+                        <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant']): ?>
+                            <form method="POST" action="/gathering?action=join" style="width:200px;">
+                                <input type="hidden" name="id" value="<?php echo $gatheringid; ?>">
+                                <input type="hidden" name="userid" value="<?php echo $userid; ?>">
+                                <button type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
+                                    Join
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
                     </div>
                 </div>
             </div>
@@ -58,7 +77,8 @@ require('../app/_header.php');
     </div>
 
     <?php
-    require('../app/_footer.php');
+    include __DIR__ . '../../../View/HomeView/footer.php';
     ?>
 </body>
-</html> 
+
+</html>

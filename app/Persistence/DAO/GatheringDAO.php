@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__ . '/Database.php';
+$db = new Database();
+
 class GatheringDAO
 {
     private $db;
@@ -25,7 +28,12 @@ class GatheringDAO
     public function getGatheringById($id)
     {
         try {
-            $stmt = $this->db->getConnection()->prepare("SELECT * FROM gathering WHERE gatheringID = :id");
+            $stmt = $this->db->getConnection()->prepare("
+            SELECT g.*, l.*
+            FROM gathering g
+            JOIN location l ON g.locationID = l.locationID
+            WHERE g.gatheringID = :id
+        ");
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -35,9 +43,34 @@ class GatheringDAO
         }
     }
 
+    public function addUserToGathering($userID, $gatheringID)
+{
+    try {
+        // Begin a transaction to ensure both queries are executed together
+        $this->db->getConnection()->beginTransaction();
 
-    public function handleAction()
-    {
-        // Handle action logic here
+        // First query: Add user to the profileGathering table
+        $stmt1 = $this->db->getConnection()->prepare("INSERT INTO profileGathering (profileID, gatheringID) VALUES (:profileID, :gatheringID)");
+        $stmt1->bindParam(':profileID', $userID, PDO::PARAM_INT);
+        $stmt1->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
+        $stmt1->execute();
+
+        // Second query: Increment the currentParticipant in the gathering table
+        $stmt2 = $this->db->getConnection()->prepare("UPDATE gathering SET currentParticipant = currentParticipant + 1 WHERE gatheringID = :gatheringID");
+        $stmt2->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
+        $stmt2->execute();
+
+        // Commit the transaction if both queries were successful
+        $this->db->getConnection()->commit();
+
+        return true;
+    } catch (Exception $e) {
+        // Rollback the transaction in case of any error
+        $this->db->getConnection()->rollBack();
+        
+        error_log("Error in addUserToGathering: " . $e->getMessage());
+        return false;
     }
+}
+
 }

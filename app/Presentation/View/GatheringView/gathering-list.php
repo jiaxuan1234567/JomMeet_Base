@@ -2,22 +2,12 @@
 <html lang="en">
 <?php
 
-include '../../View/HomeView/header.php';
-
-
-//these to be added to index not here
-require_once __DIR__ . '../../../../Persistence/DAO/Database.php';
-require_once __DIR__ . '../../../../Persistence/DAO/GatheringDAO.php';
-require_once __DIR__ . '../../../../Business/Model/GatheringModel.php';
-require_once __DIR__ . '../../../Controller/GatheringController.php';
-
-$db             = new Database();
-$gatheringDao   = new GatheringDAO($db);
-$gatheringModel = new GatheringModel($gatheringDao);
-$controller     = new GatheringController($gatheringModel);
+include __DIR__ . '../../../View/HomeView/header.php';
+require_once __DIR__ . '../../../../index.php';
 
 $gatherings = $controller->listGatherings();
-
+//For testing purposes only
+$userid = 1;
 ?>
 
 <head>
@@ -39,7 +29,7 @@ $gatherings = $controller->listGatherings();
             </div>
             <div class="col">
                 <button type="button" class="btn btn-light border border-secondary d-flex align-items-center gap-2" id="create-gathering">
-                    <img src="Presentation/View/GatheringView/images/Random.png" alt="Icon" style="width: 20px; height: 20px;">
+                    <img src="<?= getLinks('match') ?>" alt="Icon" style="width: 20px; height: 20px;">
                     <span>Match</span>
                 </button>
             </div>
@@ -54,31 +44,38 @@ $gatherings = $controller->listGatherings();
         <?php else: ?>
             <div class="row g-4">
                 <?php foreach ($gatherings as $gathering): ?>
-                    <div class="col-md-6">
-                        <div class="d-flex border rounded shadow-sm p-2 bg-white">
-                            <img src="Presentation/View/GatheringView/images/dinnerpic.png" alt="Dinner" class="rounded" style="width: 120px; height: auto; object-fit: cover;">
-                            <div class="ms-3 d-flex flex-column justify-content-between flex-grow-1">
-                                <div>
-                                    <strong><?php echo htmlspecialchars($gathering['theme']); ?></strong><br>
-                                    <small>Date: <?php echo htmlspecialchars($gathering['date']); ?></small><br>
-                                    <small>Time: <?php echo date('g:i A', strtotime($gathering['startTime'])); ?></small><br>
-                                    <small>End Time: <?php echo date('g:i A', strtotime($gathering['endTime'])); ?></small><br>
-                                    <small>Venue: <?php echo htmlspecialchars($gathering['preference']); ?></small><br>
-                                    <p class="fs-7 fw-bold mb-1 mt-2">Current Pax</p>
-                                    <p class="fs-7 mb-0"><?php echo htmlspecialchars($gathering['currentParticipant']) . '/' . htmlspecialchars($gathering['maxParticipant']); ?></p>
-                                </div>
-                                <div class="mt-2">
-                                    <a href="/gathering?action=view&id=<?php echo htmlspecialchars($gathering['gatheringID']); ?>" class="btn btn-primary w-100">View Details</a>
+                    <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant']): ?>
+                        <div class="col-md-6">
+                            <div class="d-flex border rounded shadow-sm p-2 bg-white">
+                                <img src="../../../images/dinnerpic.png" alt="Dinner" class="rounded" style="width: 120px; height: auto; object-fit: cover;">
+                                <div class="ms-3 d-flex flex-column justify-content-between flex-grow-1">
+                                    <div>
+                                        <strong><?php echo htmlspecialchars($gathering['theme']); ?></strong><br>
+                                        <small>Date: <?php echo htmlspecialchars($gathering['date']); ?></small><br>
+                                        <small>Time: <?php echo date('g:i A', strtotime($gathering['startTime'])); ?></small><br>
+                                        <small>End Time: <?php echo date('g:i A', strtotime($gathering['endTime'])); ?></small><br>
+                                        <small>Venue: <?php echo htmlspecialchars($gathering['preference']); ?></small><br>
+                                        <p class="fs-7 fw-bold mb-1 mt-2">Current Pax</p>
+                                        <p class="fs-7 mb-0"><?php echo htmlspecialchars($gathering['currentParticipant']) . '/' . htmlspecialchars($gathering['maxParticipant']); ?></p>
+                                    </div>
+                                    <div class="mt-2">
+                                        <a data-get="/gathering?action=view&id=<?php echo htmlspecialchars($gathering['gatheringID'])?>" class="btn btn-primary w-100">View Details</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    <?php else: ?>
+                        <div class="alert alert-info">
+                            No gatherings available at the moment.
+                        </div>
+                    <?php endif; ?>
+
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
     </div>
 
-    <?php include '../HomeView/footer.php'; ?>
+    <?php include __DIR__ . '../../../View/HomeView/footer.php'; ?>
 </body>
 
 </html>

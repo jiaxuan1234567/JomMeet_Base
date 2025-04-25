@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<?php
+require_once 'FileRegister.php';
+require_once '_base.php';
+?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +11,7 @@
 
     <!-- Jquery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="/app.js"></script>
 
     <!-- Spline Viewer for 3D Model -->
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.79/build/spline-viewer.js"></script>
@@ -28,7 +31,7 @@
         <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-lg navbar-light px-3 bg-blue-color">
             <a class="navbar-brand" href="#">
-                <img src="../../../images/bubble.png" alt="Logo" width="40" height="40" />
+                <img src="<?= getLinks('icon') ?>" alt="Logo" width="40" height="40" />
             </a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
