@@ -18,7 +18,7 @@ class GatheringModel
     // Fetch all gatherings
     public function getAllGatherings(): array
     {
-        return $this->dao->fetchAllGatherings();
+        return $this->dao->getAllGatherings();
     }
 
     // Fetch a gathering by its ID

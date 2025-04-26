@@ -61,6 +61,21 @@ class GatheringController
         }
     }
 
+    public function listGatherings()
+    {
+        try {
+            $gatherings = $this->gatheringModel->getAllGatherings();
+            if ($gatherings === false) {
+                error_log("getAllGatherings returned false");
+                return [];
+            }
+            return $gatherings;
+        } catch (Exception $e) {
+            error_log("Error in listAllGatherings: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function isNewGatheringConflicting($userID, $gatheringID)
     {
         try {

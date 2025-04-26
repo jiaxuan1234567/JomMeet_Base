@@ -31,7 +31,7 @@ class GatheringDAO
     }
 
 
-    public function fetchAllGatherings()
+    public function getAllGatherings()
     {
         try {
             $stmt = $this->db->prepare("SELECT * FROM gathering");
