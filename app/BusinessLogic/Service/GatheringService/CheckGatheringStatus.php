@@ -1,49 +1,39 @@
 <?php
-namespace BusinessLogic\Service\GatheringService;
+namespace BusinessLogic\Service\GatheringService\CheckGatheringStatus;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
 use DateTime;
 
-class CheckGatheringStatus
-{
-    private $dao;
+$dao = new GatheringDAO();
+$gatherings = $dao->getAllGatherings();
+$now = new DateTime();
+$updated = false;
 
-    public function __construct()
-    {
-        date_default_timezone_set('Asia/Kuala_Lumpur');
-        $this->dao = new GatheringDAO();
-    }
+error_log("[CheckGatheringStatus] Script started at " . $now->format('Y-m-d H:i:s'));
+error_log("[CheckGatheringStatus] Total gatherings fetched: " . count($gatherings));
 
-    public function run(): bool
-    {
-        $gatherings = $this->dao->fetchAllGatherings();
-        $now = new DateTime();
-        $updated = false;
+foreach ($gatherings as $g) {
+    $endDateTimeString = $g['date'] . ' ' . $g['endTime'];
+    $endDateTime = new DateTime($endDateTimeString);
 
-        error_log("[CheckGatheringStatus] Script started at " . $now->format('Y-m-d H:i:s'));
-        error_log("[CheckGatheringStatus] Total gatherings fetched: " . count($gatherings));
+    error_log("[CheckGatheringStatus] Checking Gathering ID {$g['gatheringID']} | Gathering EndDateTime: " . $endDateTime->format('Y-m-d H:i:s') . " | Current Status: {$g['status']}");
 
-        foreach ($gatherings as $g) {
-            $endDateTimeString = $g['date'] . ' ' . $g['endTime'];
-            $endDateTime = new DateTime($endDateTimeString);
-
-            error_log("[CheckGatheringStatus] Checking Gathering ID {$g['gatheringID']} | Gathering EndDateTime: " . $endDateTime->format('Y-m-d H:i:s') . " | Current Status: {$g['status']}");
-
-            if ($now >= $endDateTime && $g['status'] !== 'END') {
-                error_log("[CheckGatheringStatus] Condition matched. Updating Gathering ID {$g['gatheringID']} to 'END'");
-                $this->dao->updateGatheringStatus($g['gatheringID'], 'END');
-                $updated = true;
-            } else {
-                error_log("[CheckGatheringStatus] Condition NOT matched. No update for Gathering ID {$g['gatheringID']}");
-            }
-        }
-
-        if ($updated) {
-            error_log("[CheckGatheringStatus] One or more gatherings were updated.");
-        } else {
-            error_log("[CheckGatheringStatus] No gatherings needed updating.");
-        }
-
-        return $updated;
+    // Only update if the system time >= gathering end time, and status is not yet "ended"
+    if ($now >= $endDateTime && $g['status'] !== 'ended') {
+        error_log("[CheckGatheringStatus] Condition matched. Updating Gathering ID {$g['gatheringID']} to 'ended'");
+        $dao->updateGatheringStatus($g['gatheringID'], 'ended');
+        $updated = true;
+    } else {
+        error_log("[CheckGatheringStatus] Condition NOT matched. No update for Gathering ID {$g['gatheringID']}");
     }
 }
+
+if ($updated) {
+    error_log("[CheckGatheringStatus] One or more gatherings were updated.");
+} else {
+    error_log("[CheckGatheringStatus] No gatherings needed updating.");
+}
+
+// Return JSON response
+header('Content-Type: application/json');
+echo json_encode(['updated' => $updated]);

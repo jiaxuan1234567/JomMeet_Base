@@ -1,7 +1,7 @@
 setInterval(() => {
     console.log("Checking gathering statuses...");
 
-    fetch('/api/check-gathering-status')  // This matches your route configuration
+    fetch('/BusinessLogic/Service/GatheringService/CheckGatheringStatus.php') // adjust path if needed
         .then(res => {
             if (!res.ok) {
                 throw new Error("Network response was not ok " + res.statusText);
@@ -19,4 +19,4 @@ setInterval(() => {
             }
         })
         .catch(error => console.error("AJAX Error:", error));
-}, 30000); // Every 30 seconds
+}, 10000); // Every 60 seconds
