@@ -13,6 +13,7 @@ class GatheringController
 {
     private $gatheringModel;
     private $fileHelper;
+    private $fileHelper;
 
     public function __construct()
     {
@@ -20,20 +21,36 @@ class GatheringController
         $this->gatheringModel = new GatheringModel(Database::getConnection());
     }
 
-    public function listGatherings()
+    // -- My Gathering --
+    public function viewCreate()
     {
-        try {
-            $gatherings = $this->gatheringModel->getAllGatherings();
-            if ($gatherings === false) {
-                error_log("getAllGatherings returned false");
-                return [];
-            }
-            return $gatherings;
-        } catch (Exception $e) {
-            error_log("Error in listGatherings: " . $e->getMessage());
-            return [];
-        }
+        include $this->fileHelper->getFilePath('CreateGathering');
     }
+
+    public function createGathering() {}
+
+    // public function render($key, $data = [])
+    // {
+    //     extract($data);
+    //     return include($this->fileHelper[$key]);
+    // }
+
+    // public function listGathering()
+    // {
+    //     $gatherings = $this->gatheringModel->getAllGatherings();
+    //     $this->render('GatheringList', ['gatherings' => $gatherings]);
+    // }
+
+    // public function viewGathering($id)
+    // {
+    //     try {
+    //         $gathering = $this->gatheringModel->getGatheringById($id);
+    //         $this->render('JoinGatheringDetail', ['gathering' => $gathering]);
+    //     } catch (Exception $e) {
+    //         error_log("Error in viewGathering: " . $e->getMessage());
+    //         return null;
+    //     }
+    // }
 
     public function viewDetail($id)
     {

@@ -1,5 +1,6 @@
 <?php
 final class Database
+final class Database
 {
     private static $host = "127.0.0.1";
     private static $dbName = "jommeet";
@@ -7,6 +8,8 @@ final class Database
     private static $password = "";
     private static $connection = null;
 
+    private function __construct() {}
+    private function __clone() {}
     private function __construct() {}
     private function __clone() {}
 
@@ -22,10 +25,16 @@ final class Database
                 self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
                 error_log($e->getMessage());
+                error_log($e->getMessage());
                 die("Database connection failed: " . $e->getMessage());
             }
         }
         return self::$connection;
+    }
+
+    public static function closeConnection()
+    {
+        self::$connection = null;
     }
 
     public static function closeConnection()

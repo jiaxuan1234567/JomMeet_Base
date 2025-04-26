@@ -20,9 +20,19 @@ class HomeController
         return $this->fileHelper->getFilePath($key);
     }
 
+    public function home()
+    {
+        include $this->fileHelper->getFilePath('HomePage');
+    }
+
     public function gatheringHome()
     {
         $gatherings = (new HomeModel())->getAllGatherings();
         include $this->fileHelper->getFilePath('GatheringList');
+    }
+
+    public function myGatheringHome()
+    {
+        include $this->fileHelper->getFilePath('MyGatheringList');
     }
 }

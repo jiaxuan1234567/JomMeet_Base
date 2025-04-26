@@ -14,6 +14,7 @@ class GatheringModel
     private $dao;
 
     public function __construct()
+    public function __construct()
     {
         $this->dao = new GatheringDAO();
     }
@@ -162,4 +163,6 @@ class GatheringModel
             return false;
         }
     }
+
+    public function createGathering($postData) {}
 }
