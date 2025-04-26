@@ -8,3 +8,7 @@ Route::get('/gathering/view/{id}', [GatheringController::class, 'viewDetail']);
 Route::post('/gathering/join/{userid}/{gatheringid}', [GatheringController::class, 'joinGathering']);
 Route::get('/own/create', [GatheringController::class, 'viewCreate']);
 Route::post('/gathering/leave', [GatheringController::class, 'leave']);
+
+
+//AJAX
+Route::get('/api/check-gathering-status', [GatheringController::class, 'checkGatheringStatus']);

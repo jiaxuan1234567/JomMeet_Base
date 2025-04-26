@@ -1,10 +1,13 @@
 <?php
+
 namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
 use Exception;
 use FileHelper;
 use DateTime;
+
+date_default_timezone_set('Asia/Kuala_Lumpur'); // ✅ Set your local timezone
 
 class GatheringModel
 {
@@ -148,5 +151,15 @@ class GatheringModel
         error_log("No conflict found for user $userID and gathering $gatheringID.");
         // If no conflicts, return false
         return false;
+    }
+
+    public function verifyEnded($gatheringID)
+    {
+        $gathering = $this->dao->getGatheringById($gatheringID);
+        if ($gathering['status'] == 'END') {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

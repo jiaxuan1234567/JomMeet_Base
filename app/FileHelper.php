@@ -40,6 +40,7 @@ class FileHelper
             'JoinGathering' => "/Presentation/View/GatheringView/join-gathering.php",
             'GatheringDetail' => "/Presentation/View/GatheringView/gathering-detail.php",
             'GatheringList' => "/Presentation/View/GatheringView/gathering-list.php",
+            'GatheringAPI'=> "BusinessLogic/Service/GatheringService/CheckGatheringStatus.php",
         ];
 
         $assetPaths = [
