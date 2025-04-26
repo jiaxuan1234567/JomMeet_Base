@@ -1,7 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
 <?php
-
+$_title = "Join a Gathering";
 include __DIR__ . '../../../View/HomeView/header.php';
 
 use Presentation\Controller\GatheringController\GatheringController;
@@ -13,13 +11,6 @@ $gatherings = $controller->listGatherings();
 $userid = 1;
 ?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join a Gathering</title>
-</head>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/js/gatheringlist.js"></script>
 
 <body>
