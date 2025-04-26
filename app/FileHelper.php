@@ -37,14 +37,17 @@ class FileHelper
             'MyGatheringList' => "/Presentation/View/GatheringView/my-gathering.php",
             'CreateGathering' => "/Presentation/View/GatheringView/create-gathering.php",
             'JoinGathering' => "/Presentation/View/GatheringView/join-gathering.php",
-            'JoinGatheringDetail' => "/Presentation/View/GatheringView/join-gathering-detail.php",
-            'GatheringList' => "/Presentation/View/GatheringView/gathering_list.php",
+            'GatheringDetail' => "/Presentation/View/GatheringView/gathering-detail.php",
+            'GatheringList' => "/Presentation/View/GatheringView/gathering-list.php",
         ];
 
         $assetPaths = [
             "AppCSS" => "/Presentation/View/HomeView/css/app.css",
             "StylesCSS" => "/Presentation/View/HomeView/css/styles.css",
             "iconPNG" => "/Presentation/View/HomeView/images/bubble.png",
+            "match" => "/Presentation/View/HomeView/images/Random.png",
+            "dinner" => "/Presentation/View/HomeView/images/dinnerpic.png",
+            "map" => "/Presentation/View/HomeView/images/map.png",
         ];
 
         switch ($this->permission) {

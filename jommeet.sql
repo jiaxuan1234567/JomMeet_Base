@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Apr 12, 2025 at 03:52 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: Apr 25, 2025 at 03:36 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -51,11 +51,20 @@ CREATE TABLE `gathering` (
   `minParticipant` int(11) NOT NULL,
   `currentParticipant` int(11) NOT NULL,
   `date` date NOT NULL,
-  `startTIme` time NOT NULL,
+  `startTime` time NOT NULL,
   `endTime` time NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `preference` enum('ENTERTAINMENT','SPORTS','DINING','NATURE','HANGOUT','COFFEE','PICNIC','CHILL') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `gathering`
+--
+
+INSERT INTO `gathering` (`gatheringID`, `locationID`, `theme`, `maxParticipant`, `minParticipant`, `currentParticipant`, `date`, `startTime`, `endTime`, `createdAt`, `preference`) VALUES
+(1, 1, 'Movie', 5, 3, 2, '2025-04-21', '31:38:28', '34:38:28', '2025-04-25 13:21:35', 'ENTERTAINMENT'),
+(3, 1, 'JomMovie', 5, 1, 2, '2025-04-25', '13:13:33', '15:13:33', '2025-04-25 13:21:36', 'ENTERTAINMENT'),
+(4, 1, 'JomMovie', 5, 1, 2, '2025-04-25', '13:13:33', '15:13:33', '2025-04-25 13:21:38', 'ENTERTAINMENT');
 
 -- --------------------------------------------------------
 
@@ -74,6 +83,13 @@ CREATE TABLE `location` (
   `state` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `location`
+--
+
+INSERT INTO `location` (`locationID`, `locationName`, `address`, `longtitude`, `latitude`, `image`, `city`, `state`) VALUES
+(1, 'TGV Cinemas', 'TGV', '123', '123', 'Yea', 'Ampang', 'Selangor');
+
 -- --------------------------------------------------------
 
 --
@@ -91,6 +107,35 @@ CREATE TABLE `profile` (
   `phone` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `profile`
+--
+
+INSERT INTO `profile` (`profileID`, `nickname`, `aboutme`, `hobbies`, `preference`, `mbti`, `profileStatus`, `phone`, `password`) VALUES
+(1, 'Yeoh', 'Yeah', 'BASKETBALL', 'ENTERTAINMENT', 'INFJ', 'NEW', '0102348059', '123'),
+(2, 'Yeoh', 'Yeah', 'BASKETBALL', 'ENTERTAINMENT', 'INFJ', 'NEW', '0102348059', '123');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `profileGathering`
+--
+
+CREATE TABLE `profileGathering` (
+  `profileGatheringID` int(11) NOT NULL,
+  `profileID` int(11) NOT NULL,
+  `gatheringID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `profileGathering`
+--
+
+INSERT INTO `profileGathering` (`profileGatheringID`, `profileID`, `gatheringID`) VALUES
+(19, 1, 1),
+(20, 1, 3),
+(21, 1, 4);
 
 -- --------------------------------------------------------
 
@@ -152,6 +197,14 @@ ALTER TABLE `profile`
   ADD PRIMARY KEY (`profileID`);
 
 --
+-- Indexes for table `profileGathering`
+--
+ALTER TABLE `profileGathering`
+  ADD PRIMARY KEY (`profileGatheringID`),
+  ADD KEY `gatheringID` (`gatheringID`),
+  ADD KEY `profileID` (`profileID`);
+
+--
 -- Indexes for table `reminder`
 --
 ALTER TABLE `reminder`
@@ -179,19 +232,25 @@ ALTER TABLE `feedback`
 -- AUTO_INCREMENT for table `gathering`
 --
 ALTER TABLE `gathering`
-  MODIFY `gatheringID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `gatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `location`
 --
 ALTER TABLE `location`
-  MODIFY `locationID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `locationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `profile`
 --
 ALTER TABLE `profile`
-  MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `profileGathering`
+--
+ALTER TABLE `profileGathering`
+  MODIFY `profileGatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `reminder`
@@ -222,6 +281,13 @@ ALTER TABLE `feedback`
 --
 ALTER TABLE `gathering`
   ADD CONSTRAINT `gathering_ibfk_1` FOREIGN KEY (`locationID`) REFERENCES `location` (`locationID`);
+
+--
+-- Constraints for table `profileGathering`
+--
+ALTER TABLE `profileGathering`
+  ADD CONSTRAINT `profilegathering_ibfk_1` FOREIGN KEY (`gatheringID`) REFERENCES `gathering` (`gatheringID`),
+  ADD CONSTRAINT `profilegathering_ibfk_2` FOREIGN KEY (`profileID`) REFERENCES `profile` (`profileID`);
 
 --
 -- Constraints for table `reminder`

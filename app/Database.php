@@ -1,7 +1,7 @@
 <?php
 final class Database
 {
-    private static $host = "localhost";
+    private static $host = "127.0.0.1";
     private static $dbName = "jommeet";
     private static $username = "root";
     private static $password = "";
