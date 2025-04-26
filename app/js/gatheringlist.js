@@ -1,7 +1,7 @@
 setInterval(() => {
     console.log("Checking gathering statuses...");
 
-    fetch('/BusinessLogic/Service/GatheringService/CheckGatheringStatus.php') // adjust path if needed
+    fetch('/api/check-gathering-status') // adjust path if needed
         .then(res => {
             if (!res.ok) {
                 throw new Error("Network response was not ok " + res.statusText);

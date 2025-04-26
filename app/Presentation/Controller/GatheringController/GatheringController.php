@@ -1,5 +1,8 @@
 <?php
+
 namespace Presentation\Controller\GatheringController;
+
+use BusinessLogic\Service\GatheringService\CheckGatheringStatus;
 use BusinessLogic\Model\GatheringModel\GatheringModel;
 
 use Database;
@@ -52,7 +55,8 @@ class GatheringController
         return $this->gatheringModel->verifyUserInGathering($userID, $gatheringID);
     }
 
-    public function isBeforeStartTime($gatheringID){
+    public function isBeforeStartTime($gatheringID)
+    {
         try {
             return $this->gatheringModel->isBeforeStartTime($gatheringID);
         } catch (Exception $e) {
@@ -84,5 +88,14 @@ class GatheringController
             error_log("Error in isNewGatheringConflicting: " . $e->getMessage());
             return false;
         }
+    }
+
+    public function checkGatheringStatus()
+    {
+        $checker = new CheckGatheringStatus();
+        $updated = $checker->run();
+
+        header('Content-Type: application/json');
+        echo json_encode(['updated' => $updated]);
     }
 }
