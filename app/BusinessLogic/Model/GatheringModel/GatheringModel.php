@@ -6,7 +6,7 @@ use Persistence\DAO\GatheringDAO\GatheringDAO;
 use Exception;
 use FileHelper;
 
-require_once '../app/Persistence/DAO/GatheringDAO/GatheringDAO.php';
+//require_once '../app/Persistence/DAO/GatheringDAO/GatheringDAO.php';
 
 class GatheringModel
 {

@@ -2,6 +2,10 @@
 <html lang="en">
 <?php
 require('../app/Presentation/View/HomeView/header.php');
+
+use Presentation\Controller\GatheringController\GatheringController;
+
+$controller = new GatheringController();
 ?>
 
 <head>

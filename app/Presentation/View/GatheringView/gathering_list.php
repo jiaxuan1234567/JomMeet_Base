@@ -1,4 +1,6 @@
-<?php include '../app/Presentation/View/HomeView/header.php'; ?>
+<?php include __DIR__ . '../../HomeView/header.php'
+//'/Presentation/View/HomeView/header.php'; 
+?>
 
 <head>
     <meta charset="UTF-8">

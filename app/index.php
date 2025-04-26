@@ -1,7 +1,6 @@
 <?php
 define('ROOTPATH', __DIR__);
 
-
 spl_autoload_register(function ($className) {
     $baseDir = ROOTPATH . DIRECTORY_SEPARATOR;
     $classPath = str_replace('\\', DIRECTORY_SEPARATOR, $className);
