@@ -1,0 +1,22 @@
+setInterval(() => {
+    console.log("Checking gathering statuses...");
+
+    fetch('/BusinessLogic/Service/GatheringService/CheckGatheringStatus.php') // adjust path if needed
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Network response was not ok " + res.statusText);
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log("Server Response:", data);
+
+            if (data.updated) {
+                console.log("Gatherings updated. Reloading page...");
+                location.reload(); // Optional: refresh to see changes
+            } else {
+                console.log("No gatherings updated.");
+            }
+        })
+        .catch(error => console.error("AJAX Error:", error));
+}, 10000); // Every 60 seconds

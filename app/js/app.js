@@ -174,10 +174,4 @@ $(() => {
             },
         });
     }
-
-    $('#payment-temp-message').fadeIn();
-    setTimeout(() => {
-        $('#payment-temp-message').fadeOut();
-        $('body').find('#payment-temp-message').remove();
-    }, 1000);
 });

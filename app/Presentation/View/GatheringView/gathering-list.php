@@ -19,6 +19,9 @@ $userid = 1;
     <title>Join a Gathering</title>
 </head>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/js/gatheringlist.js"></script>
+
 <body>
     <div class="container-sm mt-4">
         <div class="row">
