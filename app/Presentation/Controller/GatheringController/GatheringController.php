@@ -28,7 +28,22 @@ class GatheringController
     public function viewDetail($id)
     {
         $gathering = $this->gatheringModel->getGatheringById($id);
-        include $this->fileHelper->getFilePath('JoinGatheringDetail');
+        include $this->fileHelper->getFilePath('GatheringDetail');
+    }
+
+    public function listGatherings()
+    {
+        try {
+            $gatherings = $this->gatheringModel->getAllGatherings();
+            if ($gatherings === false) {
+                error_log("getAllGatherings returned false");
+                return [];
+            }
+            return $gatherings;
+        } catch (Exception $e) {
+            error_log("Error in listGatherings: " . $e->getMessage());
+            return [];
+        }
     }
 
     // -- Join Gathering --
