@@ -2,6 +2,10 @@
 include 'header.php';
 ?>
 
+<head>
+    <title>Jom Meet</title>
+</head>
+
 <section class="text-center my-5">
     <h1 class="fw-bold display-5 mb-4">JomMeet A NewFriend</h1>
     <!-- Spline 3D Object -->

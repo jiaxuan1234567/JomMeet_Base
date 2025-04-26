@@ -1,17 +1,20 @@
 <?php
 namespace Presentation\Controller\GatheringController;
 use BusinessLogic\Model\GatheringModel\GatheringModel;
-use Databse;
+
+use Database;
 use Exception;
 use FileHelper;
 
 class GatheringController
 {
     private $gatheringModel;
+    private $fileHelper;
 
     public function __construct()
     {
-        $this->gatheringModel = new GatheringModel();
+        $this->fileHelper = new FileHelper('gathering');
+        $this->gatheringModel = new GatheringModel(Database::getConnection());
     }
 
     public function listGatherings()
@@ -29,29 +32,19 @@ class GatheringController
         }
     }
 
-    public function viewGathering()
+    public function viewDetail($id)
     {
-        try {
-            $id = $_GET['id'] ?? null;
-            if ($id != null) {
-                return $this->gatheringModel->getGatheringById($id);
-            }
-        } catch (Exception $e) {
-            error_log("Error in viewGathering: " . $e->getMessage());
-            return null;
-        }
+        $gathering = $this->gatheringModel->getGatheringById($id);
+        include $this->fileHelper->getFilePath('GatheringDetail');
     }
 
-    public function joinGathering()
+    public function joinGathering($userid, $gatheringid)
     {
         try {
-            $gatheringid = $_POST['id'] ?? null;
-            $userid = $_POST['userid'] ?? null;
-
             if ($gatheringid != null && $userid != null) {
                 $result = $this->gatheringModel->addUserToGathering($userid, $gatheringid);
                 error_log("Join Result: " . ($result ? 'Success' : 'Failure'));
-                return $result;
+                return include $this->fileHelper->getFilePath('GatheringList');
             } else {
                 error_log("Missing gatheringid or userid");
             }

@@ -4,11 +4,14 @@
 
 include ROOTPATH . '/Presentation/View/HomeView/header.php';
 
+use Presentation\Controller\GatheringController\GatheringController;
+
 //For testing purposes only
 $userid = 1;
-$gatheringid = $_GET['id'];
-$gathering = $controller->viewGathering();
-
+$controller = new GatheringController();
+$asset = new FileHelper('asset');
+$gatheringid = $gathering['gatheringID'];
+error_log("Gathering ID: " . $gatheringid);
 // Call the method to check if the user has joined
 $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
 ?>
@@ -32,7 +35,7 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
         <div class="container justify-content-between p-3 mt-7 border rounded bg-blue-color border-light-blue">
             <div class="row">
                 <div class="col align-self-start">
-                    <img src="<?= getLinks('map') ?>" alt="" style="width: 470px; height: 470px;">
+                    <img src="<?= $asset->getFilePath('map') ?>" alt="" style="width: 470px; height: 470px;">
                 </div>
                 <div class="col align-self-start">
                     <div class="row">
@@ -62,13 +65,11 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
 
                         <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant']): ?>
                             <?php if ($notJoined): ?> <!-- Only show the form if the user has not joined -->
-                                <form method="POST" action="/gathering?action=join" style="width:200px;">
-                                    <input type="hidden" name="id" value="<?php echo $gatheringid; ?>">
-                                    <input type="hidden" name="userid" value="<?php echo $userid; ?>">
-                                    <button type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
-                                        Join
-                                    </button>
-                                </form>
+                                    <form method="POST" action="/gathering/join/<?php echo $userid; ?>/<?php echo $gathering['gatheringID']; ?>" style="width:200px;">
+                                        <button type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
+                                            Join
+                                        </button>
+                                    </form>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>

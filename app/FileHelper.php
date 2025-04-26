@@ -15,6 +15,7 @@ class FileHelper
     {
         $basePaths = [
             'Header' => "/Presentation/View/HomeView/header.php",
+
             'Footer' => "/Presentation/View/HomeView/footer.php",
         ];
 
@@ -45,6 +46,9 @@ class FileHelper
             "AppCSS" => "/Presentation/View/HomeView/css/app.css",
             "StylesCSS" => "/Presentation/View/HomeView/css/styles.css",
             "iconPNG" => "/Presentation/View/HomeView/images/bubble.png",
+            "match" => "/Presentation/View/HomeView/images/Random.png",
+            "dinner" => "/Presentation/View/HomeView/images/dinnerpic.png",
+            "map"=> "/Presentation/View/HomeView/images/map.png",
         ];
 
         switch ($this->permission) {
