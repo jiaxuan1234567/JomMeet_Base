@@ -1,15 +1,17 @@
 <?php
-require_once __DIR__ . '../../../Business/Model/GatheringModel.php';
-require_once __DIR__ . '../../../Persistence/DAO/GatheringDAO.php';
-$gatheringModel = new GatheringModel($dao);
+namespace Presentation\Controller\GatheringController;
+use BusinessLogic\Model\GatheringModel\GatheringModel;
+use Databse;
+use Exception;
+use FileHelper;
 
 class GatheringController
 {
     private $gatheringModel;
 
-    public function __construct($gatheringModel)
+    public function __construct()
     {
-        $this->gatheringModel = $gatheringModel;
+        $this->gatheringModel = new GatheringModel();
     }
 
     public function listGatherings()

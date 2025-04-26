@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-include __DIR__ . '../../../View/HomeView/header.php';
-require_once __DIR__ . '../../../../index.php';
+
+include ROOTPATH . '/Presentation/View/HomeView/header.php';
 
 //For testing purposes only
 $userid = 1;
