@@ -1,6 +1,7 @@
 <?php
 
 namespace BusinessLogic\Service\GatheringService;
+require_once __DIR__ . '/../../../autoload.php';
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
 use DateTime;
