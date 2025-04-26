@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php
-require_once 'FileRegister.php';
-require_once '_base.php';
-?>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JomMeet</title>
 
     <!-- Jquery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="/app.js"></script>
+    <script src="/js/app.js"></script>
 
     <!-- Spline Viewer for 3D Model -->
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.79/build/spline-viewer.js"></script>
@@ -20,7 +16,8 @@ require_once '_base.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
 
     <!-- External Stylesheet -->
-    <link rel="stylesheet" href="../../../css/app.css">
+    <link rel="stylesheet" href="<?php echo (new FileHelper('asset'))->getFilePath('AppCSS') ?>">
+    <title><?php echo $_title ?? 'Jom Meet' ?></title>
 </head>
 
 <body>
@@ -31,14 +28,14 @@ require_once '_base.php';
         <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-lg navbar-light px-3 bg-blue-color">
             <a class="navbar-brand" href="#">
-                <img src="<?= getLinks('icon') ?>" alt="Logo" width="40" height="40" />
+                <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" alt="Logo" width="40" height="40" />
             </a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link fw-bold" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link fw-bold" href="#">Reflection</a></li>
                     <li class="nav-item"><a class="nav-link fw-bold" href="/gathering">Gathering</a></li>
-                    <li class="nav-item"><a class="nav-link fw-bold" href="#">My Gathering</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" href="/own">My Gathering</a></li>
                 </ul>
                 <div class="d-flex gap-2">
                     <a href="#" class="btn btn-outline-secondary rounded-pill">Profile</a>
@@ -47,3 +44,4 @@ require_once '_base.php';
             </div>
         </nav>
     </header>
+    <main>

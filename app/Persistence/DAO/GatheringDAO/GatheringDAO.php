@@ -1,24 +1,27 @@
 <?php
+namespace Persistence\DAO\GatheringDAO;
 
-require_once __DIR__ . '/Database.php';
-$db = new Database();
+use PDO;
+use PDOException;
+use Database;
+
 
 class GatheringDAO
 {
     private $db;
 
-    public function __construct($db)
+    public function __construct()
     {
-        $this->db = $db;
+        $this->db = Database::getConnection();
     }
 
     public function getAllGatherings()
     {
         try {
-            $stmt = $this->db->getConnection()->prepare("SELECT * FROM gathering");
+            $stmt = $this->db->prepare("SELECT * FROM gathering");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             error_log("Error in getAllGatherings: " . $e->getMessage());
             return false;
         }
@@ -28,7 +31,7 @@ class GatheringDAO
     public function getGatheringById($id)
     {
         try {
-            $stmt = $this->db->getConnection()->prepare("
+            $stmt = $this->db->prepare("
             SELECT g.*, l.*
             FROM gathering g
             JOIN location l ON g.locationID = l.locationID
@@ -37,7 +40,7 @@ class GatheringDAO
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             error_log("Error in getGatheringById: " . $e->getMessage());
             return null;
         }
@@ -46,7 +49,7 @@ class GatheringDAO
     public function getProfileGatheringByUserId($userID)
     {
         try {
-            $stmt = $this->db->getConnection()->prepare("
+            $stmt = $this->db->prepare("
         SELECT *
         FROM profileGathering
         WHERE profileID = :profileID        
@@ -55,7 +58,7 @@ class GatheringDAO
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             error_log("Error in getProfileGatheringByUserId: " . $e->getMessage());
             return [];
         }
@@ -64,7 +67,7 @@ class GatheringDAO
     public function getJoinedGatheringByUserId($userID)
     {
         try {
-            $stmt = $this->db->getConnection()->prepare("
+            $stmt = $this->db->prepare("
             SELECT g.*
             FROM gathering g
             JOIN profileGathering pg ON g.gatheringID = pg.gatheringID
@@ -74,7 +77,7 @@ class GatheringDAO
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             error_log("Error in getJoinedGatheringByUserId: " . $e->getMessage());
             return [];
         }
@@ -86,26 +89,26 @@ class GatheringDAO
     {
         try {
             // Begin a transaction to ensure both queries are executed together
-            $this->db->getConnection()->beginTransaction();
+            $this->db->beginTransaction();
 
             // First query: Add user to the profileGathering table
-            $stmt1 = $this->db->getConnection()->prepare("INSERT INTO profileGathering (profileID, gatheringID) VALUES (:profileID, :gatheringID)");
+            $stmt1 = $this->db->prepare("INSERT INTO profileGathering (profileID, gatheringID) VALUES (:profileID, :gatheringID)");
             $stmt1->bindParam(':profileID', $userID, PDO::PARAM_INT);
             $stmt1->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
             $stmt1->execute();
 
             // Second query: Increment the currentParticipant in the gathering table
-            $stmt2 = $this->db->getConnection()->prepare("UPDATE gathering SET currentParticipant = currentParticipant + 1 WHERE gatheringID = :gatheringID");
+            $stmt2 = $this->db->prepare("UPDATE gathering SET currentParticipant = currentParticipant + 1 WHERE gatheringID = :gatheringID");
             $stmt2->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
             $stmt2->execute();
 
             // Commit the transaction if both queries were successful
-            $this->db->getConnection()->commit();
+            $this->db->commit();
 
             return true;
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             // Rollback the transaction in case of any error
-            $this->db->getConnection()->rollBack();
+            $this->db->rollBack();
 
             error_log("Error in addUserToGathering: " . $e->getMessage());
             return false;

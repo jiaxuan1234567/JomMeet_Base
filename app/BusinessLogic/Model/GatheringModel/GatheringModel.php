@@ -1,14 +1,18 @@
 <?php
-require_once __DIR__ . '../../../Persistence/DAO/GatheringDAO.php';
-$dao = new GatheringDAO($db);
+namespace BusinessLogic\Model\GatheringModel;
+
+use Persistence\DAO\GatheringDAO\GatheringDAO;
+use Exception;
+use FileHelper;
+use DateTime;
 
 class GatheringModel
 {
     private $dao;
 
-    public function __construct($dao)
+    public function __construct()
     {
-        $this->dao = $dao;
+        $this->dao = new GatheringDAO();
     }
 
     // Fetch all gatherings
