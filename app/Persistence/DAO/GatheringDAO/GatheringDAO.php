@@ -15,6 +15,21 @@ class GatheringDAO
         $this->db = Database::getConnection();
     }
 
+    public function updateGatheringStatus($gatheringID, $status)
+    {
+        try {
+            $stmt = $this->db->prepare("UPDATE gathering SET status = :status WHERE gatheringID = :id");
+            $stmt->execute([
+                ':status' => $status,
+                ':id' => $gatheringID
+            ]);
+        } catch (PDOException $e) {
+            error_log("Error in updateGatheringStatus: " . $e->getMessage());
+            return false;
+        }
+    }
+
+
     public function getAllGatherings()
     {
         try {
