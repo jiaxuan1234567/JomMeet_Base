@@ -14,15 +14,14 @@ class GatheringModel
     private $dao;
 
     public function __construct()
-    public function __construct()
-    {
+   {
         $this->dao = new GatheringDAO();
     }
 
     // Fetch all gatherings
     public function getAllGatherings(): array
     {
-        return $this->dao->getAllGatherings();
+        return $this->dao->fetchAllGatherings();
     }
 
     // Fetch a gathering by its ID

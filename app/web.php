@@ -12,7 +12,6 @@ Route::post('/gathering/leave', [GatheringController::class, 'leave']);
 
 //AJAX
 Route::get('/api/check-gathering-status', [GatheringController::class, 'checkGatheringStatus']);
-<?php
 
 Route::get('/', [HomeController::class, 'home']);
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);

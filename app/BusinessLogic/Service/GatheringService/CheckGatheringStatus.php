@@ -16,7 +16,7 @@ class CheckGatheringStatus
 
     public function run(): bool
     {
-        $gatherings = $this->dao->getAllGatherings();
+        $gatherings = $this->dao->fetchAllGatherings();
         $now = new DateTime();
         $updated = false;
 
