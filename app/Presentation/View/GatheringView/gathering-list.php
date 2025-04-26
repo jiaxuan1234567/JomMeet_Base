@@ -53,10 +53,11 @@ $userid = 1;
 
                     <?php $notJoined = $controller->verifyUserInGathering($userid, $gathering['gatheringID']); ?>
 
-                    <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant'] 
-                    && $controller->isBeforeStartTime($gathering['gatheringID']) 
-                    && !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])
-                    && !$controller->verifyEnded($gathering['gatheringID'])):?>
+                    <?php if (
+                        $gathering['currentParticipant'] < $gathering['maxParticipant']
+                        && $controller->isBeforeStartTime($gathering['gatheringID'])
+                        && !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])
+                    ): ?>
                         <?php if ($notJoined): ?>
                             <div class="col-md-6">
                                 <div class="d-flex border rounded shadow-sm p-2 bg-white">

@@ -19,4 +19,4 @@ setInterval(() => {
             }
         })
         .catch(error => console.error("AJAX Error:", error));
-}, 60000); // Every 5 seconds
+}, 30000); // Every 30 seconds
