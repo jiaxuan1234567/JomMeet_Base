@@ -1,5 +1,4 @@
 <?php
-
 namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
@@ -12,7 +11,7 @@ class GatheringModel
     private $dao;
 
     public function __construct()
-    {
+   {
         $this->dao = new GatheringDAO();
     }
 
@@ -150,6 +149,4 @@ class GatheringModel
         // If no conflicts, return false
         return false;
     }
-
-    public function createGathering($postData) {}
 }

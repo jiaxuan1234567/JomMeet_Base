@@ -2,7 +2,9 @@
 
 namespace Presentation\Controller\GatheringController;
 
+use BusinessLogic\Service\GatheringService\CheckGatheringStatus;
 use BusinessLogic\Model\GatheringModel\GatheringModel;
+
 use Database;
 use Exception;
 use FileHelper;
@@ -14,36 +16,22 @@ class GatheringController
 
     public function __construct()
     {
-        $this->fileHelper = new FileHelper("gathering");
-        try {
-            $this->gatheringModel = new GatheringModel(Database::getConnection());
-        } catch (Exception $e) {
-            error_log("Error in GatheringController constructor: " . $e->getMessage());
-            throw $e;
-        }
+        $this->fileHelper = new FileHelper('gathering');
+        $this->gatheringModel = new GatheringModel(Database::getConnection());
     }
 
-    // -- Gathering --
+    // -- My Gathering --
+    public function viewCreate()
+    {
+        include $this->fileHelper->getFilePath('CreateGathering');
+    }
+
+    public function createGathering() {}
 
     public function viewDetail($id)
     {
         $gathering = $this->gatheringModel->getGatheringById($id);
         include $this->fileHelper->getFilePath('GatheringDetail');
-    }
-
-    public function listGatherings()
-    {
-        try {
-            $gatherings = $this->gatheringModel->getAllGatherings();
-            if ($gatherings === false) {
-                error_log("getAllGatherings returned false");
-                return [];
-            }
-            return $gatherings;
-        } catch (Exception $e) {
-            error_log("Error in listGatherings: " . $e->getMessage());
-            return [];
-        }
     }
 
     // -- Join Gathering --
@@ -79,6 +67,21 @@ class GatheringController
         }
     }
 
+    public function listGatherings()
+    {
+        try {
+            $gatherings = $this->gatheringModel->getAllGatherings();
+            if ($gatherings === false) {
+                error_log("getAllGatherings returned false");
+                return [];
+            }
+            return $gatherings;
+        } catch (Exception $e) {
+            error_log("Error in listAllGatherings: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function isNewGatheringConflicting($userID, $gatheringID)
     {
         try {
@@ -89,12 +92,12 @@ class GatheringController
         }
     }
 
-    // -- My Gathering --
-
-    public function viewCreate()
+    public function checkGatheringStatus()
     {
-        include $this->fileHelper->getFilePath('CreateGathering');
-    }
+        $checker = new CheckGatheringStatus();
+        $updated = $checker->run();
 
-    public function createGathering() {}
+        header('Content-Type: application/json');
+        echo json_encode(['updated' => $updated]);
+    }
 }

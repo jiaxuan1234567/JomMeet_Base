@@ -6,6 +6,7 @@ use PDO;
 use PDOException;
 use Database;
 
+
 class GatheringDAO
 {
     private $db;

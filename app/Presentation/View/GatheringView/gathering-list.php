@@ -43,7 +43,11 @@ $userid = 1;
 
                 <?php $notJoined = $controller->verifyUserInGathering($userid, $gathering['gatheringID']); ?>
 
-                <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant'] && $controller->isBeforeStartTime($gathering['gatheringID']) && !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])): ?>
+                <?php if (
+                    $gathering['currentParticipant'] < $gathering['maxParticipant']
+                    && $controller->isBeforeStartTime($gathering['gatheringID'])
+                    && !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])
+                ): ?>
                     <?php if ($notJoined): ?>
                         <div class="col-md-6">
                             <div class="d-flex border rounded shadow-sm p-2 bg-white">
@@ -64,11 +68,12 @@ $userid = 1;
                                 </div>
                             </div>
                         </div>
-                    <?php endif; ?>
-                <?php endif; ?>
-            <?php endforeach; ?>
         </div>
     <?php endif; ?>
+<?php endif; ?>
+<?php endforeach; ?>
+</div>
+<?php endif; ?>
 </div>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
