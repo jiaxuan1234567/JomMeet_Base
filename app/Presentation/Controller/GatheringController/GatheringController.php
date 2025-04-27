@@ -34,6 +34,11 @@ class GatheringController
         include $this->fileHelper->getFilePath('GatheringDetail');
     }
 
+    public function viewSelectLocation()
+    {
+        require_once $this->fileHelper->getFilePath('SelectLocation');
+    }
+
     // -- Join Gathering --
 
     public function joinGathering($userid, $gatheringid)

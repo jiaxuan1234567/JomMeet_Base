@@ -4,6 +4,7 @@ require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
 <?php
+// dummy data
 $myGatherings = [
     [
         "cover" => "image.jpg",

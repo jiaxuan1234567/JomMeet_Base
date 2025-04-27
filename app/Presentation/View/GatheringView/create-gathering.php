@@ -90,7 +90,7 @@ require_once __DIR__ . '/../HomeView/header.php';
 </div>
 
 
-<script src="../../../public/js/gatheringMap.js"></script>
+<script src="/js/gatheringMap.js"></script>
 
 <script>
     function adjustPax(change) {
@@ -117,7 +117,7 @@ require_once __DIR__ . '/../HomeView/header.php';
 
     // Initialize based on current state
     function initApp() {
-        if (window.location.pathname.endsWith("/select-location")) {
+        if (window.location.pathname.endsWith("/location")) {
             loadLocationPicker(false); // don’t push on first paint
         } else {
             showGatheringForm(false); // don’t push on first paint
@@ -127,7 +127,7 @@ require_once __DIR__ . '/../HomeView/header.php';
     // Load location picker via AJAX
     function loadLocationPicker(addToHistory = true) {
         $.ajax({
-            url: '/Presentation/View/GatheringView/select-location.php',
+            url: '/my-gathering/create/location',
             method: 'GET',
             success: function(html) {
                 $('#selectLocationForm').html(html);

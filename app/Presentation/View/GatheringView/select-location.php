@@ -24,4 +24,4 @@
         <div id="map" style="width:100%;height:100%"></div>
     </div>
 </div>
-<script src="../../../public/js/gatheringMap.js"></script>
+<script src="/js/gatheringMap.js"></script>
