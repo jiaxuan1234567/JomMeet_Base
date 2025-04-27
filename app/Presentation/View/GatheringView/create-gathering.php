@@ -145,7 +145,7 @@ require_once __DIR__ . '/../HomeView/header.php';
         if (addToHistory) {
             history.pushState({
                 page: "create-gathering"
-            }, "", "/own/create");
+            }, "", "/my-gathering/create");
         }
         $("#selectLocationForm").hide();
         $("#createGatheringForm").show();
@@ -155,7 +155,7 @@ require_once __DIR__ . '/../HomeView/header.php';
         if (addToHistory) {
             history.pushState({
                 page: "select-location"
-            }, "", "/own/create/location");
+            }, "", "/my-gathering/create/location");
         }
         $("#createGatheringForm").hide();
         $("#selectLocationForm").show();

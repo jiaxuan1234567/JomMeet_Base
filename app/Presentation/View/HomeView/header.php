@@ -23,7 +23,7 @@
     <script src="/js/app.js"></script>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/Presentation/View/HomeView/images/bubble.png">
+    <link rel="icon" type="image/x-icon" href="asset/bubble.png">
 
     <!-- Tab Title -->
     <title><?php echo $_title ?? 'Jom Meet' ?></title>
@@ -41,7 +41,7 @@
                     <li class="nav-item"><a class="nav-link fw-bold" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link fw-bold" href="#">Reflection</a></li>
                     <li class="nav-item"><a class="nav-link fw-bold" href="/gathering">Gathering</a></li>
-                    <li class="nav-item"><a class="nav-link fw-bold" href="/own">My Gathering</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" href="/my-gathering">My Gathering</a></li>
                 </ul>
                 <div class="d-flex gap-2">
                     <a href="#" class="btn btn-outline-secondary rounded-pill">Profile</a>

@@ -40,7 +40,7 @@ $myGatherings = [
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">My Gathering</h2>
-        <a href="/own/create" class="btn btn-primary px-4">Create</a>
+        <a href="/my-gathering/create" class="btn btn-primary px-4">Create</a>
     </div>
     <div class="container">
         <!-- Tabs -->
