@@ -42,12 +42,12 @@ class FileHelper
         ];
 
         $assetPaths = [
-            "AppCSS" => "/Presentation/View/HomeView/css/app.css",
-            "StylesCSS" => "/Presentation/View/HomeView/css/styles.css",
-            "iconPNG" => "/Presentation/View/HomeView/images/bubble.png",
-            "match" => "/Presentation/View/HomeView/images/Random.png",
-            "dinner" => "/Presentation/View/HomeView/images/dinnerpic.png",
-            "map" => "/Presentation/View/HomeView/images/map.png",
+            "AppCSS" => "/css/app.css",
+            "StylesCSS" => "/css/styles.css",
+            "iconPNG" => "/asset/bubble.png",
+            "match" => "/asset/Random.png",
+            "dinner" => "/asset/dinnerpic.png",
+            "map" => "/asset/map.png",
         ];
 
         switch ($this->permission) {

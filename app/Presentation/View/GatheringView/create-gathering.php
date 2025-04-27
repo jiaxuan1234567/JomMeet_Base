@@ -1,7 +1,8 @@
 <?php
 $_title = 'Create Gathering';
-include '../app/Presentation/View/HomeView/header.php'
+require_once __DIR__ . '/../HomeView/header.php';
 ?>
+
 <div class="container-fluid" id="mainContent">
     <div id="createGatheringForm">
         <div class="d-flex mb-4 align-items-center">
@@ -89,7 +90,7 @@ include '../app/Presentation/View/HomeView/header.php'
 </div>
 
 
-<script src="/js/gatheringMap.js"></script>
+<script src="../../../public/js/gatheringMap.js"></script>
 
 <script>
     function adjustPax(change) {
@@ -192,4 +193,4 @@ include '../app/Presentation/View/HomeView/header.php'
     });
 </script>
 
-<?php include '../app/Presentation/View/HomeView/footer.php' ?>
+<?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

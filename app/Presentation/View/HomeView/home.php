@@ -1,10 +1,7 @@
 <?php
-include 'header.php';
+$_title = 'Jom Meet';
+require_once __DIR__ . '/../HomeView/header.php';
 ?>
-
-<head>
-    <title>Jom Meet</title>
-</head>
 
 <section class="text-center my-5">
     <h1 class="fw-bold display-5 mb-4">JomMeet A NewFriend</h1>
@@ -15,5 +12,4 @@ include 'header.php';
     </div>
 </section>
 
-</body>
-<?php include 'footer.php' ?>
+<?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
