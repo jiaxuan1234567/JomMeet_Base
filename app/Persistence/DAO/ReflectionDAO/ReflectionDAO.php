@@ -16,5 +16,15 @@ class ReflectionDAO
         $this->db = Database::getConnection();
     }
 
-    public function getAllReflections() {}
+    public function getAllReflections()
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM self_reflect");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error in getAllReflections: " . $e->getMessage());
+            return false;
+        }
+    }
 }
