@@ -39,12 +39,12 @@
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link fw-bold" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link fw-bold" href="#">Reflection</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" href="/reflection">Reflection</a></li>
                     <li class="nav-item"><a class="nav-link fw-bold" href="/gathering">Gathering</a></li>
                     <li class="nav-item"><a class="nav-link fw-bold" href="/my-gathering">My Gathering</a></li>
                 </ul>
                 <div class="d-flex gap-2">
-                    <a href="#" class="btn btn-outline-secondary rounded-pill">Profile</a>
+                    <a href="/profile" class="btn btn-outline-secondary rounded-pill">Profile</a>
                     <a href="#" class="btn btn-light rounded-pill">Log out</a>
                 </div>
             </div>
