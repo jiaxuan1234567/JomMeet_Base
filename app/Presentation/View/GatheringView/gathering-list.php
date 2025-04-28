@@ -20,7 +20,7 @@ $userid = 1;
             </div>
             <div class="col">
                 <form class="d-flex" id="search" style="width: 750px;" action="/gathering/search" method="POST">
-                    <input class="form-control me-2" name="searchTerm" type="search" placeholder="Search by theme, date, time, or preference" aria-label="Search" value="<?php echo htmlspecialchars($_POST['searchTerm'] ?? ''); ?>">
+                    <input class="form-control me-4" name="searchTerm" type="search" placeholder="Search by theme, date, time, or preference" aria-label="Search" value="<?php echo htmlspecialchars($_POST['searchTerm'] ?? ''); ?>">
                     <button type="submit" class="btn btn-outline-primary">Search</button>
                 </form>
             </div>
