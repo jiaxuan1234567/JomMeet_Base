@@ -21,6 +21,17 @@ class GatheringModel
         return $this->dao->getAllGatherings();
     }
 
+    public function searchGatherings(string $searchTerm): array
+    {
+        try {
+            $results = $this->dao->searchGatherings($searchTerm);
+            return $results ?: [];
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error in searchGatherings: " . $e->getMessage());
+            return [];
+        }
+    }
+
     // Fetch a gathering by its ID
     public function getGatheringById(int $id): array
     {
@@ -34,7 +45,7 @@ class GatheringModel
 
         if (empty($gathering)) {
             // If no gatherings found for the user, log it
-            error_log("No gatherings found for user $userID.");
+            error_log("[GatheringModel] No gatherings found for user $userID.");
         }
 
         // Iterate through the gatherings

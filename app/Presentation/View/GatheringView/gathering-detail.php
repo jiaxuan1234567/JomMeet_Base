@@ -55,8 +55,10 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
 
                     <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant']): ?>
                         <?php if ($notJoined): ?> <!-- Only show the form if the user has not joined -->
-                            <form method="POST" action="/gathering/join/<?php echo $userid; ?>/<?php echo $gathering['gatheringID']; ?>" style="width:200px;">
-                                <button type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
+                            <form method="POST" action="/gathering/join" style="width:200px;">
+                                <input type="hidden" name="userid" value="<?php echo htmlspecialchars($userid); ?>">
+                                <input type="hidden" name="gatheringid" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
+                                <button data-confirm type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
                                     Join
                                 </button>
                             </form>
