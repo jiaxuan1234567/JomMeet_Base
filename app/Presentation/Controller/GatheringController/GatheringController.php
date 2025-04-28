@@ -17,7 +17,7 @@ class GatheringController
     public function __construct()
     {
         $this->fileHelper = new FileHelper('gathering');
-        $this->gatheringModel = new GatheringModel(Database::getConnection());
+        $this->gatheringModel = new GatheringModel();
     }
 
     // -- My Gathering --
