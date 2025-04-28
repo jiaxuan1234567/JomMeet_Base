@@ -31,6 +31,7 @@ class FileHelper
 
         $reflectionPaths = [
             'ReflectionList' => "/Presentation/View/ReflectionView/reflection-list.php",
+            'CreateReflection' => "/Presentation/View/ReflectionView/create-reflection.php",
         ];
 
         $gatheringPaths = [

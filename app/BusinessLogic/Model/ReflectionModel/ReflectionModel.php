@@ -15,8 +15,8 @@ class ReflectionModel
         $this->reflectionDAO = new ReflectionDAO();
     }
 
-    public function getAllReflections()
+    public function getAllReflections($profileId)
     {
-        return $this->reflectionDAO->getAllReflections();
+        return $this->reflectionDAO->getAllReflections($profileId);
     }
 }

@@ -32,7 +32,7 @@ class HomeController
 
     public function reflectionHome()
     {
-        //$reflections = (new ReflectionModel())->getAllReflections();
+        $reflections = (new HomeModel())->getAllReflections();
         include $this->fileHelper->getFilePath('ReflectionList');
     }
 
