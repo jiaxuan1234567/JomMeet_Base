@@ -11,7 +11,7 @@ $gatherings = $controller->listGatherings();
 $userid = 1;
 ?>
 
-<script src="../../../public/js/gatheringlist.js"></script>
+<script src="/js/gatheringlist.js"></script>
 
 <div class="container-sm mt-4">
     <div class="row">
@@ -68,12 +68,11 @@ $userid = 1;
                                 </div>
                             </div>
                         </div>
+                    <?php endif; ?>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </div>
     <?php endif; ?>
-<?php endif; ?>
-<?php endforeach; ?>
-</div>
-<?php endif; ?>
 </div>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
