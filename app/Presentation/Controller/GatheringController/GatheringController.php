@@ -6,11 +6,13 @@ use BusinessLogic\Service\GatheringService\CheckGatheringStatus;
 use BusinessLogic\Model\GatheringModel\GatheringModel;
 
 // need dlt
-use BusinessLogic\Service\GatheringManagementService\LocationService;
+use BusinessLogic\Service\GatheringService\LocationService;
 
 use Database;
 use Exception;
 use FileHelper;
+
+use PDOException;
 
 class GatheringController
 {
@@ -42,25 +44,46 @@ class GatheringController
         require_once $this->fileHelper->getFilePath('SelectLocation');
     }
 
+    // own use function
     public function saveLocation()
     {
         // read JSON POST body
-        $data = json_decode(file_get_contents('php://input'), true);
+        $loc = json_decode(file_get_contents('php://input'), true);
 
-        // basic validation
-        if (empty($data['place_id'] ?? '') || empty($data['gathering_id'] ?? '')) {
-            http_response_code(400);
-            echo "Missing place_id or gathering_id";
-            return;
-        }
-
-        // hand off to service
-        $svc = new LocationService();
+        $db = Database::getConnection();
         try {
-            $svc->addLocationToGathering($data['gathering_id'], $data);
+            try {
+                $placeId = $loc['place_id'];
+                $name = $loc['name'];
+                $address = $loc['address'];
+                $latitude = $loc['latitude'];
+                $longtitude = $loc['longitude'];
+
+                $sql = "
+                      INSERT INTO `location` (placeID, locationName, address,  longitude, latitude)
+                      VALUES (:pid, :name, :addr, :lng, :lat)
+                      ON DUPLICATE KEY UPDATE
+                        locationName = VALUES(locationName),
+                        `address`    = VALUES(`address`),
+                        latitude     = VALUES(latitude),
+                        longitude    = VALUES(longitude)
+        
+                    ";
+                $stmt = $db->prepare($sql);
+                return $stmt->execute([
+                    ':pid'  => $placeId,
+                    ':name' => $name,
+                    ':addr' => $address,
+                    ':lng'  => $longtitude,
+                    ':lat'  => $latitude,
+                ]);
+            } catch (PDOException $e) {
+                error_log("Error in saveLocation: " . $e->getMessage());
+                return false;
+            }
             http_response_code(200);
-            echo "OK";
-        } catch (\Exception $e) {
+            echo $status;
+        } catch (Exception $e) {
             http_response_code(500);
             echo $e->getMessage();
         }

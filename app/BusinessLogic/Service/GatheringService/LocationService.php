@@ -1,6 +1,6 @@
 <?php
 
-namespace BusinessLogic\Service\GatheringManagementService;
+namespace BusinessLogic\Service\GatheringService;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
 
@@ -11,10 +11,5 @@ class LocationService
     public function __construct()
     {
         $this->gatheringDAO = new GatheringDAO();
-    }
-
-    public function addLocationToGathering(array $locData)
-    {
-        return $this->gatheringDAO->saveLocation($locData);
     }
 }
