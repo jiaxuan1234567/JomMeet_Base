@@ -16,6 +16,27 @@ class GatheringDAO
         $this->db = Database::getConnection();
     }
 
+    // dummy function
+    public function saveLocation(array $loc): bool
+    {
+        $sql = "INSERT INTO location (placeID, locationName, address, latitude, longitude) 
+        VALUES (:gid, :pid, :name, :addr, :lat, :lng)
+          ON DUPLICATE KEY UPDATE
+            name = VALUES(name),
+            address = VALUES(address),
+            latitude = VALUES(latitude),
+            longitude = VALUES(longitude)
+        ";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':pid'   => $loc['place_id'],
+            ':name'  => $loc['name'],
+            ':addr'  => $loc['address'],
+            ':lat'   => $loc['latitude'],
+            ':lng'   => $loc['longitude'],
+        ]);
+    }
+
     public function updateGatheringStatus($gatheringID, $status)
     {
         try {
@@ -47,7 +68,7 @@ class GatheringDAO
     {
         try {
             $searchTerm = "%{$searchTerm}%";
-            
+
             // Handle date formats
             $dateFormats = [
                 'Y-m-d',    // 2025-06-10
@@ -85,7 +106,7 @@ class GatheringDAO
                 OR TIME_FORMAT(endTime, '%h:%i %p') LIKE :searchTerm
                 OR TIME_FORMAT(endTime, '%h %p') LIKE :searchTerm
             ");
-            
+
             $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

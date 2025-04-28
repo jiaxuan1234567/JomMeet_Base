@@ -30,3 +30,7 @@ Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSe
 
 //AJAX
 Route::get('/api/check-gathering-status', [GatheringController::class, 'checkGatheringStatus']);
+Route::get('/api/locations/{gatheringId}', [GatheringController::class, 'apiLocations']);
+
+// need dlt
+Route::post('/gathering/location/save', [GatheringController::class, 'saveLocation']);

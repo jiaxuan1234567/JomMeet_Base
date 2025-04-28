@@ -5,6 +5,9 @@ namespace Presentation\Controller\GatheringController;
 use BusinessLogic\Service\GatheringService\CheckGatheringStatus;
 use BusinessLogic\Model\GatheringModel\GatheringModel;
 
+// need dlt
+use BusinessLogic\Service\GatheringManagementService\LocationService;
+
 use Database;
 use Exception;
 use FileHelper;
@@ -37,6 +40,30 @@ class GatheringController
     public function viewSelectLocation()
     {
         require_once $this->fileHelper->getFilePath('SelectLocation');
+    }
+
+    public function saveLocation()
+    {
+        // read JSON POST body
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        // basic validation
+        if (empty($data['place_id'] ?? '') || empty($data['gathering_id'] ?? '')) {
+            http_response_code(400);
+            echo "Missing place_id or gathering_id";
+            return;
+        }
+
+        // hand off to service
+        $svc = new LocationService();
+        try {
+            $svc->addLocationToGathering($data['gathering_id'], $data);
+            http_response_code(200);
+            echo "OK";
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo $e->getMessage();
+        }
     }
 
     // -- Join Gathering --
@@ -95,7 +122,7 @@ class GatheringController
     {
         try {
             $searchTerm = $_POST['searchTerm'] ?? '';
-            
+
             if ($searchTerm === '' || $searchTerm === null) {
                 $gatherings = $this->listGatherings();
                 return include $this->fileHelper->getFilePath('GatheringList');
