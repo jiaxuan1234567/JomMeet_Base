@@ -6,7 +6,6 @@ use PDO;
 use PDOException;
 use Database;
 
-
 class GatheringDAO
 {
     private $db;
@@ -29,7 +28,6 @@ class GatheringDAO
             return false;
         }
     }
-
 
     public function getAllGatherings()
     {
@@ -149,8 +147,6 @@ class GatheringDAO
             return [];
         }
     }
-
-
 
     public function addUserToGathering($userID, $gatheringID)
     {

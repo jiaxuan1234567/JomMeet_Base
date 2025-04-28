@@ -20,7 +20,7 @@ $userid = 1;
             </div>
             <div class="col">
                 <form class="d-flex" id="search" style="width: 750px;" action="/gathering/search" method="POST">
-                    <input class="form-control me-2" name="searchTerm" type="search" placeholder="Search by theme, date, time, or preference" aria-label="Search" value="<?php echo htmlspecialchars($_POST['searchTerm'] ?? ''); ?>">
+                    <input class="form-control me-4" name="searchTerm" type="search" placeholder="Search by theme, date, time, or preference" aria-label="Search" value="<?php echo htmlspecialchars($_POST['searchTerm'] ?? ''); ?>">
                     <button type="submit" class="btn btn-outline-primary">Search</button>
                 </form>
             </div>
@@ -41,14 +41,11 @@ $userid = 1;
         <?php else: ?>
             <div class="row g-4">
                 <?php foreach ($gatherings as $gathering): ?>
-
                     <?php $notJoined = $controller->verifyUserInGathering($userid, $gathering['gatheringID']); ?>
 
-                    <?php if (
-                        $gathering['currentParticipant'] < $gathering['maxParticipant']
-                        || $controller->isBeforeStartTime($gathering['gatheringID'])
-                        || !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])
-                    ): ?>
+                    <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant'] 
+                    || $controller->isBeforeStartTime($gathering['gatheringID']) 
+                    || !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])): ?>
                         <?php if ($notJoined): ?>
                             <div class="col-md-6">
                                 <div class="d-flex border rounded shadow-sm p-2 bg-white">

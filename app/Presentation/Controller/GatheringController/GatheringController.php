@@ -144,7 +144,7 @@ class GatheringController
             }
             return $gatherings;
         } catch (Exception $e) {
-            error_log("Error in listAllGatherings: " . $e->getMessage());
+            error_log("Error in listGatherings: " . $e->getMessage());
             return [];
         }
     }

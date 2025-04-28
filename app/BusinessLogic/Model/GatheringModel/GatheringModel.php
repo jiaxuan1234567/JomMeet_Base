@@ -91,7 +91,6 @@ class GatheringModel
         return false;
     }
 
-
     // Add a user to a gathering (Join gathering)
     public function addUserToGathering(int $userID, int $gatheringID): bool
     {
@@ -115,7 +114,6 @@ class GatheringModel
     {
         return $this->dao->getJoinedGatheringByUserId($userID);
     }
-
 
     public function isNewGatheringConflicting($userID, $gatheringID)
     {
