@@ -2,14 +2,19 @@
 
 namespace BusinessLogic\Service\GatheringService;
 
-use Persistence\DAO\GatheringDAO\GatheringDAO;
+use Persistence\DAO\GatheringDAO\LocationDAO;
 
 class LocationService
 {
-    private $gatheringDAO;
+    private $locationDAO;
 
     public function __construct()
     {
-        $this->gatheringDAO = new GatheringDAO();
+        $this->locationDAO = new LocationDAO();
+    }
+
+    public function getAllLocations(): array
+    {
+        return $this->locationDAO->fetchAll();
     }
 }

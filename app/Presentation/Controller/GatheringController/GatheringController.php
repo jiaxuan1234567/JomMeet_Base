@@ -44,7 +44,15 @@ class GatheringController
         require_once $this->fileHelper->getFilePath('SelectLocation');
     }
 
-    // own use function
+    public function apiSavedLocations()
+    {
+        header('Content-Type: application/json');
+        $svc = new LocationService();
+        // returns array of ['placeId'=>…, 'name'=>…, 'address'=>…, 'latitude'=>…, 'longitude'=>…]
+        echo json_encode($svc->getAllLocations());
+    }
+
+    // helper function to save location (need delete in future)
     public function saveLocation()
     {
         // read JSON POST body
