@@ -20,4 +20,14 @@ class ReflectionController
     {
         include $this->fileHelper->getFilePath('CreateReflection');
     }
+
+    public function editReflection()
+    {
+        include $this->fileHelper->getFilePath('EditReflection');
+    }
+
+    public function viewReflection()
+    {
+        include $this->fileHelper->getFilePath('ViewReflection');
+    }
 }

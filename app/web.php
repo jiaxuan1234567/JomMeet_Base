@@ -17,6 +17,9 @@ Route::get('/my-gathering', [HomeController::class, 'myGatheringHome']);
 
 // self-reflection routes
 Route::get('/reflection/create', [ReflectionController::class, 'createReflection']);
+Route::get('/reflection/edit', [ReflectionController::class, 'editReflection']);
+Route::get('/reflection/delete', [ReflectionController::class, 'deleteReflection']);
+Route::get('/reflection/view', [ReflectionController::class, 'viewReflection']);
 
 // gathering routes
 Route::get('/gathering/view/{id}', [GatheringController::class, 'viewDetail']);
