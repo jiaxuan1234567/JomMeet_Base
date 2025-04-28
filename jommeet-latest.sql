@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 25, 2025 at 03:36 PM
+-- Generation Time: Apr 26, 2025 at 08:38 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `jommeet`
 --
+CREATE DATABASE IF NOT EXISTS `jommeet` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `jommeet`;
 
 -- --------------------------------------------------------
 
@@ -54,6 +56,7 @@ CREATE TABLE `gathering` (
   `startTime` time NOT NULL,
   `endTime` time NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `status` enum('NEW','START','END') NOT NULL DEFAULT 'NEW',
   `preference` enum('ENTERTAINMENT','SPORTS','DINING','NATURE','HANGOUT','COFFEE','PICNIC','CHILL') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -61,10 +64,10 @@ CREATE TABLE `gathering` (
 -- Dumping data for table `gathering`
 --
 
-INSERT INTO `gathering` (`gatheringID`, `locationID`, `theme`, `maxParticipant`, `minParticipant`, `currentParticipant`, `date`, `startTime`, `endTime`, `createdAt`, `preference`) VALUES
-(1, 1, 'Movie', 5, 3, 2, '2025-04-21', '31:38:28', '34:38:28', '2025-04-25 13:21:35', 'ENTERTAINMENT'),
-(3, 1, 'JomMovie', 5, 1, 2, '2025-04-25', '13:13:33', '15:13:33', '2025-04-25 13:21:36', 'ENTERTAINMENT'),
-(4, 1, 'JomMovie', 5, 1, 2, '2025-04-25', '13:13:33', '15:13:33', '2025-04-25 13:21:38', 'ENTERTAINMENT');
+INSERT INTO `gathering` (`gatheringID`, `locationID`, `theme`, `maxParticipant`, `minParticipant`, `currentParticipant`, `date`, `startTime`, `endTime`, `createdAt`, `status`, `preference`) VALUES
+(1, 1, 'Movie', 5, 3, 0, '2025-05-25', '20:00:00', '00:00:00', '2025-04-26 06:05:15', 'NEW', 'ENTERTAINMENT'),
+(3, 1, 'JomMovie', 5, 1, 0, '2025-05-25', '22:00:00', '00:00:00', '2025-04-26 06:05:17', 'NEW', 'ENTERTAINMENT'),
+(4, 1, 'JomMovie', 5, 1, 0, '2025-06-25', '13:13:33', '15:13:33', '2025-04-26 06:05:19', 'NEW', 'ENTERTAINMENT');
 
 -- --------------------------------------------------------
 
@@ -127,15 +130,6 @@ CREATE TABLE `profileGathering` (
   `profileID` int(11) NOT NULL,
   `gatheringID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `profileGathering`
---
-
-INSERT INTO `profileGathering` (`profileGatheringID`, `profileID`, `gatheringID`) VALUES
-(19, 1, 1),
-(20, 1, 3),
-(21, 1, 4);
 
 -- --------------------------------------------------------
 
@@ -250,7 +244,7 @@ ALTER TABLE `profile`
 -- AUTO_INCREMENT for table `profileGathering`
 --
 ALTER TABLE `profileGathering`
-  MODIFY `profileGatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `profileGatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `reminder`
