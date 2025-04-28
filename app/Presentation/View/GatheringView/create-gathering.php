@@ -100,97 +100,98 @@ require_once __DIR__ . '/../HomeView/header.php';
         paxInput.value = current < 1 ? 1 : current;
     }
 
-    function loadGoogleMapsApi(onLoad) {
-        if (window.google && window.google.maps && google.maps.places) {
-            return onLoad();
-        }
-        const s = document.createElement('script');
-        s.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCIm3LWq0gbsblgi0kmbEscuFq9zUoERD4&libraries=places&callback=initMap`;
-        s.async = true;
-        s.defer = true;
-        s.onload = onLoad;
-        document.head.appendChild(s);
-    }
+    // function loadGoogleMapsApi(onLoad) {
+    //     if (window.google && window.google.maps && google.maps.places) {
+    //         return onLoad();
+    //     }
+    //     const s = document.createElement('script');
+    //     s.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCIm3LWq0gbsblgi0kmbEscuFq9zUoERD4&libraries=places&callback=initMap`;
+    //     s.async = true;
+    //     s.defer = true;
+    //     s.onload = onLoad;
+    //     document.head.appendChild(s);
+    // }
 
-    // Store current state
-    let currentPage = "create-gathering";
+    // let currentPage = "create-gathering";
 
-    // Initialize based on current state
-    function initApp() {
-        if (window.location.pathname.endsWith("/location")) {
-            loadLocationPicker(false); // don’t push on first paint
-        } else {
-            showGatheringForm(false); // don’t push on first paint
-        }
-    }
+    // function initApp() {
+    //     if (window.location.pathname.endsWith("/location")) {
+    //         loadLocationPicker(false); // don’t push on first paint
+    //     } else {
+    //         showGatheringForm(false); // don’t push on first paint
+    //     }
+    // }
 
-    // Load location picker via AJAX
-    function loadLocationPicker(addToHistory = true) {
-        $.ajax({
-            url: '/my-gathering/create/location',
-            method: 'GET',
-            success: function(html) {
-                $('#selectLocationForm').html(html);
-                showLocationPicker(addToHistory);
-            },
-            error: function(xhr, status, error) {
-                console.error('Failed to load location picker:', error);
-                // Fallback to gathering form if location picker fails to load
-                showGatheringForm();
-            }
-        });
-    }
+    // function loadLocationPicker(addToHistory = true) {
+    //     $.ajax({
+    //         url: '/my-gathering/create/location',
+    //         method: 'GET',
+    //         success: function(html) {
+    //             $('#selectLocationForm').html(html);
+    //             showLocationPicker(addToHistory);
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error('Failed to load location picker:', error);
+    //             // Fallback to gathering form if location picker fails to load
+    //             showGatheringForm();
+    //         }
+    //     });
+    // }
 
-    function showGatheringForm(addToHistory = true) {
-        if (addToHistory) {
-            history.pushState({
-                page: "create-gathering"
-            }, "", "/my-gathering/create");
-        }
-        $("#selectLocationForm").hide();
-        $("#createGatheringForm").show();
-    }
+    // function showGatheringForm(addToHistory = true) {
+    //     if (addToHistory) {
+    //         history.pushState({
+    //             page: "create-gathering"
+    //         }, "", "/my-gathering/create");
+    //     }
+    //     $("#selectLocationForm").hide();
+    //     $("#createGatheringForm").show();
+    // }
 
-    function showLocationPicker(addToHistory = true) {
-        if (addToHistory) {
-            history.pushState({
-                page: "select-location"
-            }, "", "/my-gathering/create/location");
-        }
-        $("#createGatheringForm").hide();
-        $("#selectLocationForm").show();
+    // function showLocationPicker(addToHistory = true) {
+    //     if (addToHistory) {
+    //         history.pushState({
+    //             page: "select-location"
+    //         }, "", "/my-gathering/create/location");
+    //     }
+    //     $("#createGatheringForm").hide();
+    //     $("#selectLocationForm").show();
 
-        loadGoogleMapsApi(function() {
-            // now google.maps is ready, so initMap can run
-            initMap();
-        });
-    }
+    //     loadGoogleMapsApi(function() {
+    //         // now google.maps is ready, so initMap can run
+    //         initMap();
+    //     });
+    // }
 
-    // First render – use **replaceState** so the first entry isn’t duplicated
-    if (window.location.pathname.endsWith('/location')) {
-        loadLocationPicker(false);
-    } else {
-        showGatheringForm(false);
-    }
+    // // First render – use **replaceState** so the first entry isn’t duplicated
+    // if (window.location.pathname.endsWith('/location')) {
+    //     loadLocationPicker(false);
+    // } else {
+    //     showGatheringForm(false);
+    // }
 
-    // popstate – never push here
-    window.addEventListener('popstate', () => {
-        if (window.location.pathname.endsWith('/location')) {
-            showLocationPicker(false);
-        } else {
-            showGatheringForm(false);
-        }
-    });
+    // // popstate – never push here
+    // window.addEventListener('popstate', () => {
+    //     if (window.location.pathname.endsWith('/location')) {
+    //         showLocationPicker(false);
+    //     } else {
+    //         showGatheringForm(false);
+    //     }
+    // });
 
     // User-triggered navigation – keep pushing
+    // $('#chooseLocationBtn').on('click', () => {
+    //     loadLocationPicker(); // default addToHistory = true
+    // });
+
     $('#chooseLocationBtn').on('click', () => {
-        loadLocationPicker(); // default addToHistory = true
+        window.location.href = '/my-gathering/create/location';
     });
 
-    $(document).on('click', '#backToForm', e => {
-        e.preventDefault();
-        showGatheringForm(false);
-    });
+    // $(document).on('click', '#backToForm', e => {
+    //     e.preventDefault();
+    //     showGatheringForm(false);
+    // });
 </script>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

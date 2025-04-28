@@ -1,5 +1,3 @@
-// gatheringMap.js
-
 let map, marker;
 let placesService;
 let markers = []; // to keep track and clear them
@@ -9,45 +7,42 @@ function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: defaultLocation,
         zoom: 13,
+        mapTypeControl: false,
+        fullscreenControl: false,
+        streetViewControl: false,
     });
 
-    marker = new google.maps.Marker({
-        position: defaultLocation,
-        map,
-        draggable: true,
-    });
     updateCoordinates(defaultLocation);
 
-    // Set up PlacesService
     placesService = new google.maps.places.PlacesService(map);
 
-    // Handle your “Search” button click
-    document.getElementById('searchBtn').addEventListener('click', performSearch);
+    $('#searchBtn').on('click', function () {
+        performSearch();
+    });
 
-    // Optionally: also search on Enter key
-    document.getElementById('searchBox').addEventListener('keydown', (e) => {
+    $('#searchBox').on('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             performSearch();
         }
     });
 
-    // Back button
-    document.getElementById('backToForm').addEventListener('click', () => {
+    $('#backToForm').on('click', function () {
         history.back();
     });
 }
 
 function performSearch() {
-    const query = document.getElementById('searchBox').value.trim();
+    const query = $('#searchBox').val().trim();
     if (!query) return;
 
-    // Clear old markers + list
     clearMarkers();
-    const resultsList = document.getElementById('resultsList');
-    resultsList.innerHTML = '';
+    $('#resultsList').empty();
 
-    // Ask PlacesService for textSearch within the current map bounds
+    if (marker) {
+        marker.setMap(null);
+    }
+
     placesService.textSearch({
         query,
         bounds: map.getBounds(),
@@ -55,44 +50,69 @@ function performSearch() {
         if (status !== google.maps.places.PlacesServiceStatus.OK || !places) return;
 
         places.forEach(place => {
-            // 1) render list item
-            const li = document.createElement('li');
-            li.className = 'list-group-item list-group-item-action';
-            li.innerHTML = `
-        <strong>${place.name}</strong><br>
-        ${place.formatted_address || ''}<br>
-        <small>Rating: ${place.rating || '–'}</small>
-      `;
-            li.addEventListener('click', () => {
-                selectPlace(place);
-            });
-            resultsList.appendChild(li);
+            const position = {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            };
 
-            // 2) drop a marker
+            // Create search list item
+            const $li = $('<li>', {
+                class: 'list-group-item list-group-item-action',
+                html: `
+                    <strong>${place.name}</strong><br>
+                    ${place.formatted_address || ''}<br>
+                    <small>Rating: ${place.rating || '–'}</small>
+                `
+            })
+                .data('position', position)
+                .appendTo('#resultsList');
+
+            $li.on('click', function () {
+                const pos = $(this).data('position');
+                selectLatLng(pos);
+            });
+
+            // Create marker
             const m = new google.maps.Marker({
-                position: place.geometry.location,
+                position: position,
                 map,
                 icon: {
-                    url: '/path/to/your-pin-icon.svg', // or use default
+                    url: '/asset/geo-alt.svg',
                     scaledSize: new google.maps.Size(32, 32)
                 }
             });
-            m.addListener('click', () => selectPlace(place));
+
+            m.positionData = position;
+
+            m.addListener('click', function () {
+                selectLatLng(this.positionData);
+                // Bounce animation
+                m.setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(() => m.setAnimation(null), 700);
+            });
+
             markers.push(m);
         });
 
-        // 3) focus map on the first result
-        const firstLoc = places[0].geometry.location;
-        map.panTo(firstLoc);
-        map.setZoom(15);
+        // Center map to first result
+        if (places[0]) {
+            const firstLoc = places[0].geometry.location;
+            map.panTo(firstLoc);
+            map.setZoom(15);
+        }
     });
 }
 
-function selectPlace(place) {
-    // reposition main draggable marker
-    marker.setPosition(place.geometry.location);
-    map.panTo(place.geometry.location);
-    updateCoordinates(place.geometry.location);
+function selectLatLng(position) {
+    if (!position || typeof position.lat !== 'number' || typeof position.lng !== 'number') {
+        console.error('Invalid latlng selected');
+        return;
+    }
+
+    const loc = new google.maps.LatLng(position.lat, position.lng);
+    map.panTo(loc);
+    map.setZoom(17);
+    updateCoordinates(loc);
 }
 
 function clearMarkers() {
@@ -100,19 +120,41 @@ function clearMarkers() {
     markers = [];
 }
 
-// writes into your hidden inputs
 function updateCoordinates(latlng) {
-    // If latlng has methods lat() / lng(), use them...
     const get = x => (typeof x === 'function' ? x() : x);
     const lat = get(latlng.lat);
     const lng = get(latlng.lng);
 
-    const latEl = document.getElementById("latitude");
-    const lngEl = document.getElementById("longitude");
-    if (latEl) latEl.value = lat;
-    if (lngEl) lngEl.value = lng;
+    $('#latitude').val(lat);
+    $('#longitude').val(lng);
 }
 
+// jQuery ready for search input behavior
+$(document).ready(function () {
+    const $searchBox = $('#searchBox');
+    const $clearText = $('#clearText');
+    const $vertBar = $('#vertBar');
+    const $searchBtnIcon = $('#searchBtn');
 
-// Expose initMap globally (for callback)
+    $searchBox.on('input', function () {
+        if ($.trim($(this).val()) !== '') {
+            $clearText.removeClass('d-none');
+            $vertBar.removeClass('d-none');
+        } else {
+            $clearText.addClass('d-none');
+            $vertBar.addClass('d-none');
+        }
+    });
+
+    $clearText.on('click', function () {
+        $searchBox.val('');
+        $clearText.addClass('d-none');
+        $vertBar.addClass('d-none');
+        $('#resultsList').empty();
+        clearMarkers();
+        $searchBox.focus();
+    });
+});
+
+// Expose initMap globally
 window.initMap = initMap;
