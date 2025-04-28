@@ -95,24 +95,21 @@ class GatheringController
     {
         try {
             $searchTerm = $_POST['searchTerm'] ?? '';
-            error_log("Search term received: " . $searchTerm);
-
+            
             if ($searchTerm === '' || $searchTerm === null) {
                 $gatherings = $this->listGatherings();
-                error_log("Empty search term, returning all gatherings");
                 return include $this->fileHelper->getFilePath('GatheringList');
             } else {
                 $gatherings = $this->gatheringModel->searchGatherings($searchTerm);
-            }
-            if (!$gatherings) {
-                error_log("No gatherings found for search term: " . $searchTerm);
-                return [];
+                if (!$gatherings) {
+                    error_log("[GatheringController] Search returned no results for term: '" . $searchTerm . "', showing all gatherings");
+                    $gatherings = $this->listGatherings();
+                }
             }
 
-            error_log("Found " . count($gatherings) . " gatherings for search term: " . $searchTerm);
             return include $this->fileHelper->getFilePath('GatheringList');
         } catch (Exception $e) {
-            error_log("Error in searchGatherings: " . $e->getMessage());
+            error_log("[GatheringController] Error in searchGatherings: " . $e->getMessage());
             return [];
         }
     }

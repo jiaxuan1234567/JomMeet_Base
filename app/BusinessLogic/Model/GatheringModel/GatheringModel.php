@@ -27,7 +27,7 @@ class GatheringModel
             $results = $this->dao->searchGatherings($searchTerm);
             return $results ?: [];
         } catch (Exception $e) {
-            error_log("Error in searchGatherings: " . $e->getMessage());
+            error_log("[GatheringModel] Error in searchGatherings: " . $e->getMessage());
             return [];
         }
     }
@@ -45,7 +45,7 @@ class GatheringModel
 
         if (empty($gathering)) {
             // If no gatherings found for the user, log it
-            error_log("No gatherings found for user $userID.");
+            error_log("[GatheringModel] No gatherings found for user $userID.");
         }
 
         // Iterate through the gatherings
