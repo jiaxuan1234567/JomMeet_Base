@@ -2,9 +2,13 @@
 
 use Presentation\Controller\HomeController\HomeController;
 use Presentation\Controller\GatheringController\GatheringController;
+use Presentation\Controller\ReflectionController\ReflectionController;
 
 // home routes
 Route::get('/', [HomeController::class, 'home']);
+Route::get('/profile', [HomeController::class, 'profileHome']);
+Route::get('/reflection', [HomeController::class, 'reflectionHome']);
+Route::get('/gathering', [HomeController::class, 'gatheringHome']);
 
 // profile routes
 
@@ -13,7 +17,6 @@ Route::get('/', [HomeController::class, 'home']);
 
 
 // gathering routes
-Route::get('/gathering', [HomeController::class, 'gatheringHome']);
 Route::get('/gathering/view/{id}', [GatheringController::class, 'viewDetail']);
 Route::post('/gathering/search', [GatheringController::class, 'searchGatherings']);
 

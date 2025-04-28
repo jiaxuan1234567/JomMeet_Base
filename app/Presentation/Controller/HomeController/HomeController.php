@@ -25,6 +25,17 @@ class HomeController
         include $this->fileHelper->getFilePath('HomePage');
     }
 
+    public function profileHome()
+    {
+        include $this->fileHelper->getFilePath('Profile');
+    }
+
+    public function reflectionHome()
+    {
+        //$reflections = (new ReflectionModel())->getAllReflections();
+        include $this->fileHelper->getFilePath('ReflectionList');
+    }
+
     public function gatheringHome()
     {
         $gatherings = (new HomeModel())->getAllGatherings();
