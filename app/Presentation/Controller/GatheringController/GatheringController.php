@@ -50,6 +50,7 @@ class GatheringController
             if ($gatheringid != null && $userid != null) {
                 $result = $this->gatheringModel->addUserToGathering($userid, $gatheringid);
                 error_log("Join Result: " . ($result ? 'Success' : 'Failure'));
+                $gatherings = $this->gatheringModel->getAllGatherings();
                 return include $this->fileHelper->getFilePath('GatheringList');
             } else {
                 error_log("Missing gatheringid or userid");
@@ -86,6 +87,32 @@ class GatheringController
             return $gatherings;
         } catch (Exception $e) {
             error_log("Error in listAllGatherings: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function searchGatherings()
+    {
+        try {
+            $searchTerm = $_POST['searchTerm'] ?? '';
+            error_log("Search term received: " . $searchTerm);
+
+            if ($searchTerm === '' || $searchTerm === null) {
+                $gatherings = $this->listGatherings();
+                error_log("Empty search term, returning all gatherings");
+                return include $this->fileHelper->getFilePath('GatheringList');
+            } else {
+                $gatherings = $this->gatheringModel->searchGatherings($searchTerm);
+            }
+            if (!$gatherings) {
+                error_log("No gatherings found for search term: " . $searchTerm);
+                return [];
+            }
+
+            error_log("Found " . count($gatherings) . " gatherings for search term: " . $searchTerm);
+            return include $this->fileHelper->getFilePath('GatheringList');
+        } catch (Exception $e) {
+            error_log("Error in searchGatherings: " . $e->getMessage());
             return [];
         }
     }

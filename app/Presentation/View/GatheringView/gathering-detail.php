@@ -58,7 +58,7 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
                             <form method="POST" action="/gathering/join" style="width:200px;">
                                 <input type="hidden" name="userid" value="<?php echo htmlspecialchars($userid); ?>">
                                 <input type="hidden" name="gatheringid" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
-                                <button type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
+                                <button data-confirm type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
                                     Join
                                 </button>
                             </form>

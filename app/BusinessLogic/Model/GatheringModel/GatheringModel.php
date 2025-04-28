@@ -21,6 +21,17 @@ class GatheringModel
         return $this->dao->getAllGatherings();
     }
 
+    public function searchGatherings(string $searchTerm): array
+    {
+        try {
+            $results = $this->dao->searchGatherings($searchTerm);
+            return $results ?: [];
+        } catch (Exception $e) {
+            error_log("Error in searchGatherings: " . $e->getMessage());
+            return [];
+        }
+    }
+
     // Fetch a gathering by its ID
     public function getGatheringById(int $id): array
     {

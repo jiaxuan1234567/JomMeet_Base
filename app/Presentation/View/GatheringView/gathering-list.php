@@ -6,7 +6,6 @@ use Presentation\Controller\GatheringController\GatheringController;
 
 $asset = new FileHelper('asset');
 $controller = new GatheringController();
-$gatherings = $controller->listGatherings();
 //For testing purposes only
 $userid = 1;
 ?>
@@ -20,8 +19,9 @@ $userid = 1;
                 <h2>Gathering List</h2>
             </div>
             <div class="col">
-                <form class="d-flex" role="search" id="search" style="width: 750px;">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <form class="d-flex" id="search" style="width: 750px;" action="/gathering/search" method="POST">
+                    <input class="form-control me-2" name="searchTerm" type="search" placeholder="Search by theme, date, time, or preference" aria-label="Search" value="<?php echo htmlspecialchars($_POST['searchTerm'] ?? ''); ?>">
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
                 </form>
             </div>
             <div class="col">

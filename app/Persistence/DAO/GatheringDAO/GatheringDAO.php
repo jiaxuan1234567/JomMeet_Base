@@ -43,6 +43,26 @@ class GatheringDAO
         }
     }
 
+    public function searchGatherings($searchTerm)
+    {
+        try {
+            $searchTerm = "%{$searchTerm}%";
+            $stmt = $this->db->prepare("
+                SELECT * FROM gathering 
+                WHERE theme LIKE :searchTerm 
+                OR date LIKE :searchTerm 
+                OR startTime LIKE :searchTerm 
+                OR endTime LIKE :searchTerm 
+                OR preference LIKE :searchTerm
+            ");
+            $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error in searchGatherings: " . $e->getMessage());
+            return false;
+        }
+    }
 
     public function getGatheringById($id)
     {
