@@ -50,5 +50,5 @@ require_once __DIR__ . '/../HomeView/header.php';
         <button class="btn btn-outline-primary btn-sm mb-2">Nature</button>
     </div>
 </div>
-
+<!-- dfsfsd -->
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
