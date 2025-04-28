@@ -43,6 +43,57 @@ class GatheringDAO
         }
     }
 
+    public function searchGatherings($searchTerm)
+    {
+        try {
+            $searchTerm = "%{$searchTerm}%";
+            
+            // Handle date formats
+            $dateFormats = [
+                'Y-m-d',    // 2025-06-10
+                'd-m-Y',    // 10-06-2025
+                'm/d/Y',    // 06/10/2025
+                'd/m/Y',    // 10/06/2025
+                'Y/m/d',    // 2025/06/10
+            ];
+
+            // Handle time formats
+            $timeFormats = [
+                'H:i:s',    // 22:00:00
+                'H:i',      // 22:00
+                'g:i A',    // 10:00 PM
+                'g:i a',    // 10:00 pm
+                'g A',      // 10 PM
+                'g a',      // 10 pm
+            ];
+
+            $stmt = $this->db->prepare("
+                SELECT * FROM gathering 
+                WHERE theme LIKE :searchTerm 
+                OR preference LIKE :searchTerm
+                OR DATE_FORMAT(date, '%Y-%m-%d') LIKE :searchTerm
+                OR DATE_FORMAT(date, '%d-%m-%Y') LIKE :searchTerm
+                OR DATE_FORMAT(date, '%m/%d/%Y') LIKE :searchTerm
+                OR DATE_FORMAT(date, '%d/%m/%Y') LIKE :searchTerm
+                OR DATE_FORMAT(date, '%Y/%m/%d') LIKE :searchTerm
+                OR TIME_FORMAT(startTime, '%H:%i:%s') LIKE :searchTerm
+                OR TIME_FORMAT(startTime, '%H:%i') LIKE :searchTerm
+                OR TIME_FORMAT(startTime, '%h:%i %p') LIKE :searchTerm
+                OR TIME_FORMAT(startTime, '%h %p') LIKE :searchTerm
+                OR TIME_FORMAT(endTime, '%H:%i:%s') LIKE :searchTerm
+                OR TIME_FORMAT(endTime, '%H:%i') LIKE :searchTerm
+                OR TIME_FORMAT(endTime, '%h:%i %p') LIKE :searchTerm
+                OR TIME_FORMAT(endTime, '%h %p') LIKE :searchTerm
+            ");
+            
+            $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Database error in searchGatherings: " . $e->getMessage());
+            return false;
+        }
+    }
 
     public function getGatheringById($id)
     {
