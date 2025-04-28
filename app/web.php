@@ -16,7 +16,7 @@ Route::get('/', [HomeController::class, 'home']);
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);
 Route::get('/gathering/view/{id}', [GatheringController::class, 'viewDetail']);
 
-Route::post('/gathering/join/{userid}/{gatheringid}', [GatheringController::class, 'joinGathering']);
+Route::post('/gathering/join', [GatheringController::class, 'joinGathering']);
 
 // my-gathering routes
 Route::get('/my-gathering', [HomeController::class, 'myGatheringHome']);

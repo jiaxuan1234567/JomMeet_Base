@@ -41,9 +41,12 @@ class GatheringController
 
     // -- Join Gathering --
 
-    public function joinGathering($userid, $gatheringid)
+    public function joinGathering()
     {
         try {
+            $gatheringid = $_POST['gatheringid'] ?? null;
+            $userid = $_POST['userid'] ?? null;
+
             if ($gatheringid != null && $userid != null) {
                 $result = $this->gatheringModel->addUserToGathering($userid, $gatheringid);
                 error_log("Join Result: " . ($result ? 'Success' : 'Failure'));
