@@ -1,4 +1,5 @@
 <?php
+namespace Library;
 
 class SimplePager {
     public $limit;      // Page size
@@ -8,16 +9,14 @@ class SimplePager {
     public $result;     // Result set (array of records)
     public $count;      // Item count on the current page
 
-    public function __construct($query, $params, $limit, $page) {
-        global $_db;
-
+    public function __construct($db, $query, $params = [], $limit = 10, $page = 1) {
         // Set [limit] and [page]
-        $this->limit = ctype_digit($limit) ? max($limit, 1) : 10;
-        $this->page = ctype_digit($page) ? max($page, 1) : 1;
+        $this->limit = is_numeric($limit) ? max((int)$limit, 1) : 10;
+        $this->page = is_numeric($page) ? max((int)$page, 1) : 1;
 
         // Set [item count]
-        $q = preg_replace('/SELECT.+FROM/', 'SELECT COUNT(*) FROM', $query, 1);
-        $stm = $_db->prepare($q);
+        $countQuery = preg_replace('/SELECT.+FROM/', 'SELECT COUNT(*) FROM', $query, 1);
+        $stm = $db->prepare($countQuery);
         $stm->execute($params);
         $this->item_count = $stm->fetchColumn();
 
@@ -28,7 +27,7 @@ class SimplePager {
         $offset = ($this->page - 1) * $this->limit;
 
         // Set [result]
-        $stm = $_db->prepare($query . " LIMIT $offset, $this->limit");
+        $stm = $db->prepare($query . " LIMIT $offset, $this->limit");
         $stm->execute($params);
         $this->result = $stm->fetchAll();
 
