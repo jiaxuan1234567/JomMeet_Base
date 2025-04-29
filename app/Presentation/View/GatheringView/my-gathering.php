@@ -1,6 +1,6 @@
 <?php
 $_title = 'My Gathering';
-require_once __DIR__ . '/../../../FileHelper.php'; // adjust the path accordingly
+//require_once __DIR__ . '/../../../FileHelper.php'; // adjust the path accordingly
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
@@ -101,8 +101,6 @@ require_once __DIR__ . '/../HomeView/header.php';
 //     ],
 //     // More gatherings...
 // ];
-
-var_dump($myGatherings);
 ?>
 
 <div class="container-fluid my-5 mb-5">
