@@ -4,10 +4,10 @@ namespace BusinessLogic\Model\HomeModel;
 
 use BusinessLogic\Model\ReflectionModel\ReflectionModel;
 use BusinessLogic\Model\GatheringModel\GatheringModel;
+use BusinessLogic\Model\ProfileModel\ProfileModel;
 
 class HomeModel
 {
-
     public function __construct() {}
 
     public function getAllReflections()
@@ -19,5 +19,9 @@ class HomeModel
     public function getAllGatherings()
     {
         return (new GatheringModel())->getAllGatherings();
+    }
+
+    public function getAllProfiles(){
+        return (new ProfileModel())->getAllProfiles();
     }
 }

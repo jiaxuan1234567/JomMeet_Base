@@ -25,7 +25,7 @@ class FileHelper
             'Login' => "/Presentation/View/HomeView/login.php",
         ];
 
-        $profilePaths = [
+    $profilePaths = [
             'Profile' => "/Presentation/View/ProfileView/profile.php",
         ];
 
