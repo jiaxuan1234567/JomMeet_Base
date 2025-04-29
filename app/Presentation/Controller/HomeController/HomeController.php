@@ -48,4 +48,9 @@ class HomeController
         $myGatherings = (new HomeModel())->getMyGatherings($hostProfileId);
         include $this->fileHelper->getFilePath('MyGatheringList');
     }
+
+    public function loginHome()
+    {
+        include $this->fileHelper->getFilePath('Login');
+    }
 }

@@ -13,6 +13,8 @@ Route::get('/profile', [HomeController::class, 'profileHome']);
 Route::get('/reflection', [HomeController::class, 'reflectionHome']);
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);
 Route::get('/my-gathering', [HomeController::class, 'myGatheringHome']);
+Route::get('/login', [HomeController::class, 'loginHome']);
+Route::post('/login/process', [ProfileController::class, 'validateLogin']);
 
 // profile routes
 
@@ -29,7 +31,7 @@ Route::get('/gathering2', [GatheringController::class, 'gatheringPager']); // ->
 Route::get('/gathering/view/{id}', [GatheringController::class, 'viewDetail']);
 Route::post('/gathering/search', [GatheringController::class, 'searchGatherings']);
 Route::post('/gathering/join', [GatheringController::class, 'joinGathering']);
-
+Route::get('/gathering/match/{userid}', [GatheringController::class, 'matchGathering']);
 // my-gathering routes
 Route::get('/my-gathering/view/{id}', [GatheringController::class, 'viewMyGatheringDetails']);
 Route::get('/my-gathering/create', [GatheringController::class, 'viewCreate']);
