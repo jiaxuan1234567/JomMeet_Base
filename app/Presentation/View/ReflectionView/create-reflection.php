@@ -2,15 +2,47 @@
 require '../_base.php';
 $_title = 'Create Reflection';
 require_once __DIR__ . '/../HomeView/header.php';
+
+//---------------------------------------------------------------------------
 $GLOBALS['date'] = date("Y-m-d h:i:sa");
+
+if (is_post()) {
+    //Input
+    $date = req('date');
+    $title = req('title');
+    $content = req('content');
+
+    //Validation
+    if ($title == '') {
+        $_err['title'] = 'Required';
+    }
+    else if (strlen($title) > 255) {
+        $_err['title'] = 'Maximum length 255';
+    }
+
+    if ($content == '') {
+        $_err['content'] = 'Required';
+    }
+
+    //Saving
+    if (!$_err) {
+        $saveReflection;
+    }
+}
+
+//--------------------------------------------------------------
+
 ?>
+
 
 <div class="main">
     <div class="container-fluid py-3">
         <h4>
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-            </svg>
+            <a href="/reflection">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                </svg>
+            </a>
             Create Self-Reflection
         </h4>
     </div>
@@ -26,7 +58,7 @@ $GLOBALS['date'] = date("Y-m-d h:i:sa");
                     
                     <div class="my-3">
                         <h4><label for="title">Title</label></h4>
-                        <?= html_text('title','maxlength="256" placeholder="Write Your Self-Reflection Title Here!" style="width:500px;"') ?>
+                        <?= html_text('title','maxlength="255" placeholder="Write Your Self-Reflection Title Here!" style="width:500px;"') ?>
                     </div>
 
                     <div class="my-3">

@@ -19,4 +19,16 @@ class ReflectionModel
     {
         return $this->reflectionDAO->getAllReflections($profileId);
     }
+
+    public function getReflectionID($profileId)
+    {
+        return $this->reflectionDAO->getReflectionID($profileId);
+    }
+
+    public function saveReflections($profileId)
+    {
+        return $this->reflectionDAO->saveReflections($profileId);
+    }
+
+
 }
