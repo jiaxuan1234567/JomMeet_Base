@@ -32,6 +32,8 @@ class GatheringController
         $locationId  = $sel['locationId'];
         $address   = $sel['address'];
 
+        unset($_SESSION['selected_location']);
+
         include $this->fileHelper->getFilePath('CreateGathering');
     }
 
@@ -52,7 +54,7 @@ class GatheringController
             'maxParticipant'    => (int)($_POST['inputPax'] ?? 0),
             'minParticipant'    => (int)($_POST['minParticipant'] ?? 3),
             'currentParticipant' => 1,    // new gathering starts at zero
-            'date'              => $_POST['date'] ?? '',
+            'date'              => $_POST['inputDate'] ?? '',
             'startTime'         => $_POST['startTime'] ?? '',
             'endTime'           => $_POST['endTime'] ?? '',
             'status'            => 'NEW',
