@@ -248,4 +248,24 @@ class GatheringController
         header('Content-Type: application/json');
         echo json_encode(['updated' => $updated]);
     }
+
+    public function viewMyGatheringDetails($id)
+    {
+        // Get the gathering details by ID
+        $gathering = $this->gatheringModel->getGatheringById($id);
+
+        // Check if the gathering exists
+        if (!$gathering) {
+            // Optionally, you can handle the case where the gathering is not found, 
+            // maybe redirect to an error page or the list of gatherings
+            header("Location: /path-to-error-page.php");
+            exit();
+        }
+
+        // Perform any additional logic or processing if needed
+
+        // Redirect to the gathering details page
+        header("Location: my-gathering-details.php?id=" . urlencode($id));
+        exit();
+    }
 }

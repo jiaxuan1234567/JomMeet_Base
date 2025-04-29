@@ -1,5 +1,6 @@
 <?php
 $_title = 'My Gathering';
+require_once __DIR__ . '/../../../FileHelper.php'; // adjust the path accordingly
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
@@ -7,80 +8,210 @@ require_once __DIR__ . '/../HomeView/header.php';
 // dummy data
 $myGatherings = [
     [
-        "cover" => "image.jpg",
+        "cover" => "dinnerPic.png",
         "theme" => "Dinner",
-        "date" => "20 June 2025",
+        "date" => "17 June 2025",
         "startTime" => "6:00pm",
         "endTime" => "8:00pm",
-        "pax" => 5,
-        "venue" => "Anna Elizabeth Park"
+        "pax" => 4,
+        "venue" => "Anna Elizabeth Park",
+        "status" => "hosted"
     ],
     [
-        "cover" => "image.jpg",
+        "cover" => "gameboy.png",
         "theme" => "Dinner",
-        "date" => "20 June 2025",
+        "date" => "29 June 2025",
         "startTime" => "6:00pm",
         "endTime" => "8:00pm",
         "pax" => 5,
-        "venue" => "Anna Elizabeth Park"
+        "venue" => "Anna Elizabeth Park",
+        "status" => "hosted"
     ],
     [
-        "cover" => "image.jpg",
+        "cover" => "palm-tree.png",
         "theme" => "Dinner",
         "date" => "20 June 2025",
         "startTime" => "6:00pm",
         "endTime" => "8:00pm",
         "pax" => 5,
-        "venue" => "Anna Elizabeth Park"
+        "venue" => "Anna Elizabeth Park",
+        "status" => "upcoming"
+    ],
+
+    [
+        "cover" => "dinnerPic.png",
+        "theme" => "Dinner",
+        "date" => "20 June 2025",
+        "startTime" => "6:00pm",
+        "endTime" => "8:00pm",
+        "pax" => 5,
+        "venue" => "Anna Elizabeth Park",
+        "status" => "ongoing"
+    ],
+    [
+        "cover" => "dinnerPic.png",
+        "theme" => "Dinner",
+        "date" => "20 June 2025",
+        "startTime" => "6:00pm",
+        "endTime" => "8:00pm",
+        "pax" => 5,
+        "venue" => "Anna Elizabeth Park",
+        "status" => "cancelled"
+    ],
+    [
+        "cover" => "dinnerPic.png",
+        "theme" => "Dinner",
+        "date" => "20 June 2025",
+        "startTime" => "6:00pm",
+        "endTime" => "8:00pm",
+        "pax" => 5,
+        "venue" => "Anna Elizabeth Park",
+        "status" => "completed"
+    ],
+
+    [
+        "cover" => "dinnerPic.png",
+        "theme" => "Dinner",
+        "date" => "20 June 2025",
+        "startTime" => "6:00pm",
+        "endTime" => "8:00pm",
+        "pax" => 5,
+        "venue" => "Anna Elizabeth Park",
+        "status" => "completed"
+    ],
+    [
+        "cover" => "dinnerPic.png",
+        "theme" => "Dinner",
+        "date" => "20 June 2025",
+        "startTime" => "6:00pm",
+        "endTime" => "8:00pm",
+        "pax" => 5,
+        "venue" => "Anna Elizabeth Park",
+        "status" => "upcoming"
+    ],
+    [
+        "cover" => "dinnerPic.png",
+        "theme" => "Dinner",
+        "date" => "20 June 2025",
+        "startTime" => "6:00pm",
+        "endTime" => "8:00pm",
+        "pax" => 5,
+        "venue" => "Anna Elizabeth Park",
+        "status" => "hosted"
     ],
     // More gatherings...
 ];
 ?>
 
-<div class="container-fluid my-5">
+<div class="container-fluid my-5 mb-5">
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">My Gathering</h2>
-        <a href="/my-gathering/create" class="btn btn-primary px-4">Create</a>
+        <a href="/my-gathering/create" class="btn btn-primary px-4" 
+   style="background-color: #fff; color: #000; border: 2px solid #fff; transition: background-color 0.3s, color 0.3s, border 0.3s;" 
+   onmouseover="this.style.backgroundColor='#569FFF'; this.style.color='#fff'; this.style.border='2px solid #569FFF';" 
+   onmouseout="this.style.backgroundColor='#fff'; this.style.color='#000'; this.style.border='2px solid #fff';">Create</a>
+
+
     </div>
     <div class="container">
-        <!-- Tabs -->
         <ul class="nav justify-content-center nav-pills nav-justified mb-4" id="gatheringTabs" role="tablist">
             <li class="nav-item m-3" role="presentation">
-                <button class="nav-link border bg-blue-color" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All</button>
+                <button
+                    class="nav-link text-white"
+                    id="all-tab"
+                    data-status="all"
+                    type="button"
+                    role="tab"
+                    style="background-color: #569FFF; border-radius: 10px;">All</button>
             </li>
             <li class="nav-item m-3" role="presentation">
-                <button class="nav-link border border-black bg-white text-black" id="hosted-tab" data-bs-toggle="tab" data-bs-target="#hosted" type="button" role="tab">Hosted</button>
+                <button
+                    class="nav-link bg-white text-black border"
+                    id="hosted-tab"
+                    data-status="hosted"
+                    type="button"
+                    role="tab"
+                    style="border-radius: 10px;">Hosted</button>
             </li>
             <li class="nav-item m-3" role="presentation">
-                <button class="nav-link border border-black bg-white text-black" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">Up Coming</button>
+                <button
+                    class="nav-link bg-white text-black border"
+                    id="upcoming-tab"
+                    data-status="upcoming"
+                    type="button"
+                    role="tab"
+                    style="border-radius: 10px;">Up Coming</button>
             </li>
             <li class="nav-item m-3" role="presentation">
-                <button class="nav-link border border-black bg-white text-black" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab">Completed</button>
+                <button
+                    class="nav-link bg-white text-black border"
+                    id="ongoing-tab"
+                    data-status="ongoing"
+                    type="button"
+                    role="tab"
+                    style="border-radius: 10px;">On Going</button>
             </li>
             <li class="nav-item m-3" role="presentation">
-                <button class="nav-link border border-black bg-white text-black" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button" role="tab">Cancelled</button>
+                <button
+                    class="nav-link bg-white text-black border"
+                    id="completed-tab"
+                    data-status="completed"
+                    type="button"
+                    role="tab"
+                    style="border-radius: 10px;">Completed</button>
+            </li>
+            <li class="nav-item m-3" role="presentation">
+                <button
+                    class="nav-link bg-white text-black border"
+                    id="cancelled-tab"
+                    data-status="cancelled"
+                    type="button"
+                    role="tab"
+                    style="border-radius: 10px;">Cancelled</button>
             </li>
         </ul>
 
         <!-- Tab Contents -->
         <div class="tab-content" id="gatheringTabsContent">
             <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
-                <div class="row g-5 rounded bg-blue-color">
-                    <?php if (!empty($myGatherings)): ?>
-                        <?php foreach ($myGatherings as $myGathering): ?>
-                            <div class="col-6">
+
+
+                <div id="gatheringList" class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;">
+                    <?php
+                    // Filter gatherings based on the selected status
+                    $filteredGatherings = $myGatherings;
+                    if (isset($_GET['status'])) {
+                        $status = $_GET['status'];
+                        if ($status !== 'all') {
+                            $filteredGatherings = array_filter($myGatherings, function ($gathering) use ($status) {
+                                return $gathering['status'] === $status;
+                            });
+                        }
+                    }
+                    ?>
+
+                    <?php if (!empty($filteredGatherings)): ?>
+                        <?php foreach ($filteredGatherings as $myGathering): ?>
+                            <div class="col-6 mb-0 mt-4 pb-0">
                                 <div class="card border-0 rounded">
                                     <div class="row g-0 align-items-center">
                                         <!-- Left image section -->
                                         <div class="col-4 text-center p-2">
-                                            <img src="https://cdn-icons-png.flaticon.com/512/1161/1161388.png" class="img-fluid" alt="Event Image" style="max-height: 100px;">
+                                            <img src="<?php echo htmlspecialchars('../../../public/asset/' . $myGathering['cover'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                class="img-fluid"
+                                                alt="Event Image"
+                                                style="max-height: 100px;"
+                                                onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/512/1161/1161388.png';">
                                         </div>
 
                                         <!-- Right content section -->
                                         <div class="col-8">
                                             <div class="card-body py-2 px-3">
-                                                <div class="bg-blue-color card-text small px-3 py-2 mb-1 rounded">
+
+                                                <div class="bg-blue-color card-text small px-3 py-2 mb-1 rounded"
+                                                    style="background-color: #DEECFF;">
+
                                                     <h6 class="fw-bold mb-1"><?php echo htmlspecialchars($myGathering['theme']); ?></h6>
                                                     <p class="mb-0 small">Date: <?php echo htmlspecialchars($myGathering['date']); ?></p>
                                                     <p class="mb-0 small">Time: <?php echo htmlspecialchars($myGathering['startTime']) . ' - ' . htmlspecialchars($myGathering['endTime']); ?></p>
@@ -89,9 +220,9 @@ $myGatherings = [
                                                 </div>
 
                                                 <div class="d-flex gap-2">
-                                                    <a href="#" class="rounded border-0 btn btn-primary btn-sm w-100 px-3 fw-bold button-blue-color">View Details</a>
+                                                    <a href="my-gathering-details.php" class="btn btn-sm w-100 px-3 fw-bold text-white" style="background-color: #569FFF; border: none; border-radius: 20px;">View Details</a>
                                                     <div class="dropdown rounded border-0">
-                                                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
                                                             Action
                                                         </button>
                                                         <ul class="dropdown-menu">
@@ -107,8 +238,6 @@ $myGatherings = [
                                     </div>
                                 </div>
                             </div>
-
-
                         <?php endforeach; ?>
                     <?php else: ?>
                         <p class="text-center text-muted">No gatherings found.</p>
@@ -116,9 +245,166 @@ $myGatherings = [
                 </div>
             </div>
 
-            <!-- Other tab panes can be added here -->
+            <!-- Other tab panes can be added here, similarly filtered -->
         </div>
     </div>
+    <div style="height: 300px;"></div>
 </div>
+
+
+<script>
+    const allGatherings = <?php echo json_encode($myGatherings); ?>;
+    const gatheringContainer = document.querySelector('.row.g-5'); // Container for gatherings
+    const tabButtons = document.querySelectorAll('#gatheringTabs button');
+
+    function renderGatherings(gatherings) {
+        let html = '';
+        if (gatherings.length === 0) {
+            html = '<p class="text-center text-muted">No gatherings found.</p>';
+        } else {
+            gatherings.forEach(g => {
+                html += `
+                <div class="col-6 mb-0 mt-4 pb-0">
+                    <div class="card border-0 rounded">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-4 text-center p-2">
+                                <img src="../../../public/asset/${g.cover}"
+                                    class="img-fluid"
+                                    alt="Event Image"
+                                    style="max-height: 100px;"
+                                    onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/512/1161/1161388.png';">
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body py-2 px-3">
+                                    <div class="bg-blue-color card-text small px-3 py-2 mb-1 rounded" style="background-color: #DEECFF;">
+                                        <h6 class="fw-bold mb-1">${g.theme}</h6>
+                                        <p class="mb-0 small">Date: ${g.date}</p>
+                                        <p class="mb-0 small">Time: ${g.startTime} - ${g.endTime}</p>
+                                        <p class="mb-0 small">Venue: ${g.venue}</p>
+                                        <p class="mb-0 small">Pax: ${g.pax}/5</p>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                    <a href="my-gathering-details.php" class="btn btn-sm w-100 px-3 fw-bold text-white"
+                       style="background-color: #569FFF; border: none; border-radius: 20px;">
+                      View Details
+                    </a>
+
+                    ${g.status === 'cancelled'
+                      ? ''
+                      : `<div class="dropdown">
+                      <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
+                                                            Action
+                                                        </button>
+                          <ul class="dropdown-menu">
+                            ${g.status === 'hosted' ? `
+                              <li><a class="dropdown-item" href="#">Send Reminder</a></li>
+                              <li><a class="dropdown-item" href="#">Edit Gathering</a></li>
+                              <li><a class="dropdown-item text-danger" href="#">Cancel Gathering</a></li>
+                            ` : g.status === 'upcoming' ? `
+                              <li><a class="dropdown-item" href="#">Reply Reminder</a></li>
+                              <li><a class="dropdown-item text-danger" href="#">Leave Gathering</a></li>
+                            ` : g.status === 'ongoing' ? `
+                              <li><a class="dropdown-item" href="#">Reply Reminder</a></li>
+                            ` : g.status === 'completed' ? `
+                            <li><a class="dropdown-item" href="gathering-feedback.php?status=completed">Gathering Feedback</a></li>
+                              <li><a class="dropdown-item" href="location-feedback.php?status=completed">Location Feedback</a></li>
+                            ` : ''}
+                          </ul>
+                        </div>`}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+            });
+        }
+        gatheringContainer.innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1) pick up any hash (or default to "all")
+        const status = window.location.hash.substring(1) || 'all';
+
+        // 2) style the correct tab (you already have code for that in your click handler,
+        //    but you can factor it out into a function, or just duplicate it here)
+        tabButtons.forEach(btn => {
+            btn.classList.remove('text-white');
+            btn.classList.add('bg-white', 'text-black');
+            btn.style.backgroundColor = '';
+        });
+        const activeBtn = document.querySelector(`#gatheringTabs button[data-status="${status}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('text-white');
+            activeBtn.classList.remove('bg-white', 'text-black');
+            activeBtn.style.backgroundColor = '#569FFF';
+        }
+
+        // 3) do the render
+        const dataToShow = status === 'all' ?
+            allGatherings :
+            allGatherings.filter(g => g.status === status);
+
+        renderGatherings(dataToShow);
+    });
+
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all tabs
+            tabButtons.forEach(btn => {
+                btn.classList.remove('text-white');
+                btn.classList.remove('bg-primary');
+                btn.classList.add('bg-white', 'text-black');
+            });
+
+            // Add active class to the clicked tab
+            this.classList.add('text-white');
+            this.classList.remove('bg-white', 'text-black');
+            this.style.backgroundColor = "#569FFF";
+
+            const status = this.getAttribute('data-status');
+            if (status === 'all') {
+                renderGatherings(allGatherings);
+                // clear the hash (go back to base URL)
+                history.replaceState(null, '', 'my-gathering.php');
+                return;
+            }
+
+            // otherwise filter & render
+            const filtered = allGatherings.filter(g => g.status === status);
+            renderGatherings(filtered);
+
+            // set the fragment for non-all
+            history.replaceState(null, '', '#' + status);
+        });
+    });
+
+
+    document.querySelectorAll('.nav-link').forEach(button => {
+        button.addEventListener('click', function() {
+            const status = this.getAttribute('data-status');
+            if (status !== 'all') {
+                window.location.hash = status;
+            } else {
+                // clear any fragment
+                history.replaceState(null, '', 'my-gathering.php');
+            }
+        });
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const status = window.location.hash.substring(1); // e.g., "joined"
+
+        if (status) {
+            const tabTrigger = document.querySelector(`[data-bs-toggle="tab"][href="#${status}"]`);
+            if (tabTrigger) {
+                new bootstrap.Tab(tabTrigger).show();
+            }
+        }
+    });
+</script>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

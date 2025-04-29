@@ -1,8 +1,13 @@
 <?php
-$_title = 'Gathering Details';
-require_once __DIR__ . '/../HomeView/header.php';
+$_title = 'Joined Gathering Details';
 
 use Presentation\Controller\GatheringController\GatheringController;
+
+require_once __DIR__ . '/../../../FileHelper.php'; // adjust the path accordingly
+require_once __DIR__ . '/../HomeView/header.php';
+require_once __DIR__ . '/../../Controller/GatheringController/GatheringController.php'; // adjust based on file structure
+
+
 
 //For testing purposes only
 $userid = 1;
@@ -13,6 +18,9 @@ error_log("Gathering ID: " . $gatheringid);
 // Call the method to check if the user has joined
 $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
 ?>
+?>
+
+
 <div class="container-sm mt-4">
     <div class="row">
         <div class="col">
@@ -25,7 +33,9 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
     <div class="container justify-content-between p-3 mt-7 border rounded bg-blue-color border-light-blue">
         <div class="row">
             <div class="col align-self-start">
-                <img src="<?= $asset->getFilePath('map') ?>" alt="" style="width: 470px; height: 470px;">
+                <img src=" <?= $asset->getFilePath('map') ?>" alt="" style="width: 470px; height: 470px;">
+                <!--use the image for test-->
+                <!-- <img src="../../../public/asset/map.png" alt="" style="width: 470px; height: 470px;"> -->
             </div>
             <div class="col align-self-start">
                 <div class="row">
