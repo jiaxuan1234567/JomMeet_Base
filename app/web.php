@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Presentation\Controller\HomeController\HomeController;
 use Presentation\Controller\GatheringController\GatheringController;
 use Presentation\Controller\ReflectionController\ReflectionController;

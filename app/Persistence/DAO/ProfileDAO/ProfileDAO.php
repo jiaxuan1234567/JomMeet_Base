@@ -16,9 +16,10 @@ class ProfileDAO
         $this->db = Database::getConnection();
     }
 
-    public function getAllProfiles(){
+    public function getAllProfiles()
+    {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM profile");
+            $stmt = $this->db->prepare("SELECT * FROM `profile`");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
