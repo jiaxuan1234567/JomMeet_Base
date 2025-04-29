@@ -1,5 +1,5 @@
 <?php
-$_title = 'Create Gathering';
+$_title = 'Selecet Location';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
@@ -16,6 +16,11 @@ require_once __DIR__ . '/../HomeView/header.php';
         display: none;
     }
 </style>
+
+<script>
+    // so JS knows where to send the user back
+    window.redirectUrl = '<?= addslashes($redirectUrl) ?>';
+</script>
 
 <div class="row vh-100 g-0">
     <div class="col-md-4 bg-light d-flex flex-column p-2">

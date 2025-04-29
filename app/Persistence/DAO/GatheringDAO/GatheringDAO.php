@@ -177,4 +177,26 @@ class GatheringDAO
             return false;
         }
     }
+
+    // my-gathering
+    public function createGathering(array $d): int
+    {
+        $sql = "INSERT INTO `gathering` (locationID, theme, maxParticipant, minParticipant, currentParticipant, date, startTime, endTime, status, preference) 
+        VALUES (:locationID, :theme, :max, :min, :current, :date, :start, :end, :status, :preference)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':locationID'   => $d['locationId'],
+            ':theme'        => $d['theme'],
+            ':max'          => $d['maxParticipant'],
+            ':min'          => $d['minParticipant'],
+            ':current'      => $d['currentParticipant'] ?? 0,
+            ':date'         => $d['date'],
+            ':start'        => $d['startTime'],
+            ':end'          => $d['endTime'],
+            ':status'       => $d['status'],
+            ':preference'   => $d['preference'],
+        ]);
+
+        return (int)$this->db->lastInsertId();
+    }
 }

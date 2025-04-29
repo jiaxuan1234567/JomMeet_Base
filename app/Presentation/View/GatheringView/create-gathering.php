@@ -16,7 +16,7 @@ require_once __DIR__ . '/../HomeView/header.php';
         </div>
 
         <div class="container">
-            <form class="row g-4 my-4">
+            <form class="row g-4 my-4" action="/my-gathering/create" method="post">
 
                 <!-- Image + Gathering Tag -->
                 <div class="col-12 text-center mb-4">
@@ -30,14 +30,14 @@ require_once __DIR__ . '/../HomeView/header.php';
                         <label for="inputTheme" class="col-form-label fw-semibold">Theme</label>
                     </div>
                     <div class="col-sm-5">
-                        <input type="text" class="form-control" id="inputTheme">
+                        <input type="text" class="form-control" id="inputTheme" name="inputTheme">
                     </div>
 
                     <div class="col-sm-1 text-sm-end">
                         <label for="inputDate" class="col-form-label fw-semibold">Date</label>
                     </div>
                     <div class="col-sm-5">
-                        <input type="date" class="form-control" id="inputDate">
+                        <input type="date" class="form-control" id="inputDate" name="inputDate">
                     </div>
                 </div>
 
@@ -49,7 +49,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                     <div class="col-sm-5">
                         <div class="input-group">
                             <button class="btn btn-outline-secondary" type="button" onclick="adjustPax(-1)">-</button>
-                            <input type="number" class="form-control text-center" id="inputPax" value="1" min="1">
+                            <input type="number" class="form-control text-center" id="inputPax" name="inputPax" value="1" min="1">
                             <button class="btn btn-outline-secondary" type="button" onclick="adjustPax(1)">+</button>
                         </div>
                     </div>
@@ -58,8 +58,8 @@ require_once __DIR__ . '/../HomeView/header.php';
                         <label for="startTime" class="col-form-label fw-semibold">Time</label>
                     </div>
                     <div class="col-sm-5 d-flex gap-2">
-                        <input type="time" class="form-control" id="startTime">
-                        <input type="time" class="form-control" id="endTime">
+                        <input type="time" class="form-control" id="startTime" name="startTime">
+                        <input type="time" class="form-control" id="endTime" name="endTime">
                     </div>
                 </div>
 
@@ -70,7 +70,8 @@ require_once __DIR__ . '/../HomeView/header.php';
                     </div>
                     <div class="col-sm-11">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="inputLocation" placeholder="Select a location" readonly>
+                            <input type="text" class="form-control" id="inputLocation" name="inputLocation" placeholder="Select a location" value="<?= htmlspecialchars($address) ?>" readonly>
+                            <input type="hidden" name="locationId" value="<?= htmlspecialchars($locationId) ?>">
                             <button type="button" class="btn btn-outline-primary" id="chooseLocationBtn">Choose</button>
                         </div>
                     </div>

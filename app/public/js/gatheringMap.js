@@ -232,7 +232,22 @@ function showDetailPanel(loc, pos, liElem) {
 
     // hook up Select
     $panel.find('#selectBtn').on('click', () => {
-        selectSavedLocation(loc, pos);
+        //selectSavedLocation(loc, pos);
+
+        // build a mini‐form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/my-gathering/create/location';
+        // add the two hidden fields
+        ['locationId', 'address'].forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = key === 'locationId' ? loc.id : loc.address;
+            form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
     });
 
     // center and bounce

@@ -28,20 +28,76 @@ class GatheringController
     // -- My Gathering --
     public function viewCreate()
     {
+        $sel = $_SESSION['selected_location'] ?? ['locationId' => '', 'address' => ''];
+        $locationId  = $sel['locationId'];
+        $address   = $sel['address'];
+
         include $this->fileHelper->getFilePath('CreateGathering');
     }
 
-    public function createGathering() {}
+    public function createGathering()
+    {
+        $data = [
+            'theme'          => $_POST['inputTheme'] ?? '',
+            'inputPax' => $_POST['inputPax'] ?? '',
+            'date'       => $_POST['inputDate'] ?? '',
+            'startTime' => $_POST['startTime'] ?? '',
+            'endTime' => $_POST['endTime'] ?? '',
+            'locationId'     => $_POST['locationId'] ?? '',
+        ];
+
+        $data = [
+            'locationId'        => (int)($_POST['locationId'] ?? 0),
+            'theme'             => trim($_POST['inputTheme'] ?? ''),
+            'maxParticipant'    => (int)($_POST['inputPax'] ?? 0),
+            'minParticipant'    => (int)($_POST['minParticipant'] ?? 3),
+            'currentParticipant' => 1,    // new gathering starts at zero
+            'date'              => $_POST['date'] ?? '',
+            'startTime'         => $_POST['startTime'] ?? '',
+            'endTime'           => $_POST['endTime'] ?? '',
+            'status'            => 'NEW',
+            'preference'        => $_POST['preference'] ?? 'ENTERTAINMENT',
+        ];
+
+        try {
+            $newId = $this->gatheringModel->createGathering($data);
+            // 3) Redirect to a “view” page or index
+            header("Location: /gathering/view/{$newId}");
+            exit;
+        } catch (Exception $e) {
+            // on error, you could re-render the form with $e->getMessage()
+            http_response_code(500);
+            echo "Error creating gathering: " . htmlspecialchars($e->getMessage());
+        }
+    }
+
+    public function viewSelectLocation()
+    {
+        $redirectUrl = $_GET['redirect'] ?? '/my-gathering/create';
+        require_once $this->fileHelper->getFilePath('SelectLocation');
+    }
+
+    public function selectLocationSubmit()
+    {
+        $id      = $_POST['locationId']  ?? null;
+        $address = $_POST['address']     ?? null;
+
+        if ($id && $address) {
+            $_SESSION['selected_location'] = [
+                'locationId' => $id,
+                'address'    => $address,
+            ];
+        }
+
+        // Redirect back to the create‐form
+        header('Location: /my-gathering/create');
+        exit;
+    }
 
     public function viewDetail($id)
     {
         $gathering = $this->gatheringModel->getGatheringById($id);
         include $this->fileHelper->getFilePath('GatheringDetail');
-    }
-
-    public function viewSelectLocation()
-    {
-        require_once $this->fileHelper->getFilePath('SelectLocation');
     }
 
     public function apiSavedLocations()
