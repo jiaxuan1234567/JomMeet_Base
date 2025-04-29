@@ -26,6 +26,7 @@ class GatheringController
     }
 
     // -- My Gathering --
+
     public function viewCreate()
     {
         $sel = $_SESSION['selected_location'] ?? ['locationId' => '', 'address' => ''];
@@ -63,7 +64,7 @@ class GatheringController
 
         try {
             $newId = $this->gatheringModel->createGathering($data);
-            // 3) Redirect to a “view” page or index
+            // 3) Redirect to a "view" page or index
             header("Location: /gathering/view/{$newId}");
             exit;
         } catch (Exception $e) {
@@ -214,7 +215,8 @@ class GatheringController
 
             if ($searchTerm === '' || $searchTerm === null) {
                 $gatherings = $this->listGatherings();
-                return include $this->fileHelper->getFilePath('GatheringList');
+                header("Location: /gathering");
+                // return include $this->fileHelper->getFilePath('GatheringList');
             } else {
                 $gatherings = $this->gatheringModel->searchGatherings($searchTerm);
                 if (!$gatherings) {
@@ -254,18 +256,31 @@ class GatheringController
         // Get the gathering details by ID
         $gathering = $this->gatheringModel->getGatheringById($id);
 
-        // Check if the gathering exists
-        if (!$gathering) {
-            // Optionally, you can handle the case where the gathering is not found, 
-            // maybe redirect to an error page or the list of gatherings
-            header("Location: /path-to-error-page.php");
-            exit();
+        include $this->fileHelper->getFilePath('MyGatheringDetails');
+    }
+
+    public function matchGathering($userid)
+    {
+        try {
+            error_log("[GatheringController] ===== MATCH BUTTON CLICKED =====");
+            error_log("[GatheringController] User ID received: " . $userid);
+
+            error_log("[GatheringController] Calling matchGathering model...");
+            $gatherings = $this->gatheringModel->matchGathering($userid);
+            error_log("[GatheringController] Model execution completed");
+            error_log("[GatheringController] Number of matched gatherings: " . count($gatherings));
+
+            if (empty($gatherings)) {
+                error_log("[GatheringController] No gatherings matched user preferences");
+            } else {
+                error_log("[GatheringController] Displaying matched gatherings");
+            }
+
+            return include $this->fileHelper->getFilePath('GatheringList');
+        } catch (Exception $e) {
+            error_log("[GatheringController] ERROR in matchGathering: " . $e->getMessage());
+            error_log("[GatheringController] Stack trace: " . $e->getTraceAsString());
+            return include $this->fileHelper->getFilePath('GatheringList');
         }
-
-        // Perform any additional logic or processing if needed
-
-        // Redirect to the gathering details page
-        header("Location: my-gathering-details.php?id=" . urlencode($id));
-        exit();
     }
 }

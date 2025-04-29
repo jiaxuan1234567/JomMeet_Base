@@ -1,6 +1,7 @@
 <?php
 $_title = 'Profile';
 require_once __DIR__ . '/../HomeView/header.php';
+$userid = $_SESSION['profile_id'] ?? null;
 ?>
 
 <div class="container my-5">

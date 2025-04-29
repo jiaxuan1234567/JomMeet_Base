@@ -6,8 +6,10 @@ use Presentation\Controller\GatheringController\GatheringController;
 
 $asset = new FileHelper('asset');
 $controller = new GatheringController();
+
 //For testing purposes only
 $userid = 1;
+
 ?>
 
 <script src="/js/gatheringlist.js"></script>
@@ -25,10 +27,10 @@ $userid = 1;
                 </form>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-light border border-secondary d-flex align-items-center gap-2" id="create-gathering">
+                <a href="/gathering/match/<?= $userid ?>" class="btn btn-light border border-secondary d-flex align-items-center gap-2" style="width:100px;">
                     <img src="<?= $asset->getFilePath('match') ?>" alt="Icon" style="width: 20px; height: 20px;">
                     <span>Match</span>
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -68,15 +70,14 @@ $userid = 1;
                                     </div>
                                 </div>
                             </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </div>
         <?php endif; ?>
-    <?php endif; ?>
-<?php endforeach; ?>
     </div>
-<?php endif; ?>
-</div>
 
-<?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
+    <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
 </body>
 
 </html>

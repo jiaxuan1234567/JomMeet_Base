@@ -45,7 +45,11 @@
                     <li class="nav-item"><a class="nav-link fw-bold" href="/my-gathering">My Gathering</a></li>
                 </ul>
                 <div class="d-flex gap-2">
-                    <a href="/profile" class="btn btn-outline-secondary rounded-pill">Profile</a>
+                    <?php if ($_SESSION['profile_id']): ?>
+                        <a href="/profile" class="btn btn-outline-secondary rounded-pill"><?= $_SESSION['name'] ?></a>
+                    <?php else: ?>
+                        <a href="/login" class="btn btn-outline-secondary rounded-pill">Profile</a>
+                    <?php endif; ?>
                     <a href="#" class="btn btn-light rounded-pill">Log out</a>
                 </div>
             </div>

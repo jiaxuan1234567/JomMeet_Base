@@ -7,6 +7,9 @@ use Exception;
 use FileHelper;
 use DateTime;
 
+date_default_timezone_set('Asia/Kuala_Lumpur'); // or whatever matches your system
+
+
 class GatheringModel
 {
     private $dao;
@@ -44,11 +47,6 @@ class GatheringModel
         // Get the gatherings for the user
         $gathering = $this->dao->getProfileGatheringByUserId($userID);
 
-        if (empty($gathering)) {
-            // If no gatherings found for the user, log it
-            error_log("[GatheringModel] No gatherings found for user $userID.");
-        }
-
         // Iterate through the gatherings
         foreach ($gathering as $g) {
             // Check if this gathering matches the user and the gathering ID
@@ -62,34 +60,41 @@ class GatheringModel
 
     public function isBeforeStartTime($gatheringID)
     {
-        $currentTime = new DateTime();  // Current system time (including date and time)
-
-        // Get the specific gathering by gatheringID
-        $gathering = $this->dao->getGatheringById($gatheringID);
-
-        if (!$gathering) {
-            // error_log("Gathering with ID $gatheringID not found.");
-            return false;  // Gathering not found
+        try {
+            error_log("[GatheringModel] Starting isBeforeStartTime check for gathering ID: " . $gatheringID);
+            
+            // Get the specific gathering by gatheringID
+            $gathering = $this->dao->getGatheringById($gatheringID);
+            if (!$gathering) {
+                error_log("[GatheringModel] Gathering not found for ID: " . $gatheringID);
+                return false;
+            }
+            
+            // Get current system time
+            $currentTime = new DateTime();
+            error_log("[GatheringModel] Current system time: " . $currentTime->format('Y-m-d H:i:s'));
+            
+            // Create DateTime object for gathering
+            $gatheringDateTime = DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                $gathering['date'] . ' ' . $gathering['startTime']
+            );
+            
+            error_log("[GatheringModel] Gathering time: " . $gatheringDateTime->format('Y-m-d H:i:s'));
+            
+            // Compare current time with gathering time
+            if ($currentTime > $gatheringDateTime) {
+                error_log("[GatheringModel] Gathering has already started. Returning false");
+                return false;
+            }
+            
+            error_log("[GatheringModel] Gathering is in the future. Returning true");
+            return true;
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error in isBeforeStartTime: " . $e->getMessage());
+            error_log("[GatheringModel] Stack trace: " . $e->getTraceAsString());
+            return false;
         }
-
-        // Combine the date (from 'date') and time (from 'startTime')
-        $startDateTimeString = $gathering['date'] . ' ' . $gathering['startTime'];  // Concatenate date and time
-
-        // Convert the combined date and time string into a DateTime object
-        $startDateTime = new DateTime($startDateTimeString);  // Gathering start datetime
-
-        // Log the comparison for debugging
-        // error_log("Comparing current time: " . $currentTime->format('Y-m-d H:i:s') . " with gathering start time: " . $startDateTime->format('Y-m-d H:i:s'));
-
-        // Check if the current time is before the gathering start datetime
-        if ($currentTime < $startDateTime) {
-            // Log if gathering has not started yet
-            // error_log("Gathering with ID: " . $gathering['gatheringID'] . " has not started yet. Start Date/Time: " . $startDateTime->format('Y-m-d H:i:s'));
-            return true; // Gathering has not started yet
-        }
-
-        // Gathering has already started
-        return false;
     }
 
     // Add a user to a gathering (Join gathering)
@@ -162,6 +167,32 @@ class GatheringModel
 
 
     // my-gathering
+    public function getMyGatherings($profileId)
+    {
+        try {
+            $rows = $this->dao->getMyGatherings($profileId);
+            return array_map(function (array $g) {
+                return [
+                    'id'        => (int)$g['gatheringID'],
+                    'cover'     => $g['image'],
+                    'theme'     => $g['theme'],
+                    'date'      => date('d F Y', strtotime($g['date'])),
+                    'startTime' => date('g:i A',   strtotime($g['startTime'])),
+                    'endTime'   => date('g:i A',   strtotime($g['endTime'])),
+                    'pax'       => (int)$g['currentParticipant'],
+                    'maxPax'       => (int)$g['maxParticipant'],
+                    'venue'     => $g['venue'],
+                    'status'    => strtolower($g['status']),    // 'new','start','end','cancelled'
+                    'isHost'    => (bool)$g['isHost'],
+                    'isJoined'  => (bool)$g['isJoined'],
+                ];
+            }, $rows ?: []);
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error in getMyGatherings: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function createGathering($data)
     {
         // --- 1) basic validation ---
@@ -173,10 +204,86 @@ class GatheringModel
         // --- 2) call the DAO to insert & get new PK ---
         try {
             $newId = $this->dao->createGathering($data);
+            $profileId = $_SESSION['profile_id'];
+            $this->dao->addUserToGathering($profileId, $newId);
             return $newId;
         } catch (Exception $e) {
             error_log("[GatheringModel] Error creating gathering: " . $e->getMessage());
             throw $e;
+        }
+    }
+
+    public function matchGathering(int $userID): array
+    {
+        try {
+            // Get user's profile to access their preferences
+            $userProfile = $this->dao->getProfileByUserId($userID);
+            if (!$userProfile) {
+                error_log("[GatheringModel] User profile not found for userID: $userID");
+                return [];
+            }
+
+            // Get all available gatherings
+            $allGatherings = $this->getAllGatherings();
+            if (empty($allGatherings)) {
+                error_log("[GatheringModel] No gatherings available for matching");
+                return [];
+            }
+
+            // Get gatherings the user has already joined
+            $joinedGatherings = $this->getJoinedGatheringByUserId($userID);
+            $joinedGatheringIds = array_column($joinedGatherings, 'gatheringID');
+
+            // Filter and score gatherings based on preferences
+            $matchedGatherings = [];
+            foreach ($allGatherings as $gathering) {
+                // Skip gatherings the user has already joined
+                if (in_array($gathering['gatheringID'], $joinedGatheringIds)) {
+                    continue;
+                }
+
+                // Skip gatherings that are full
+                if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
+                    continue;
+                }
+
+                // Skip gatherings that have already started
+                if (!$this->isBeforeStartTime($gathering['gatheringID'])) {
+                    continue;
+                }
+
+                // Calculate matching score based on preferences
+                $score = 0;
+
+                // Basic preference matching
+                if (isset($userProfile['preference']) && $userProfile['preference'] === $gathering['preference']) {
+                    $score += 10;
+                }
+
+                // Add more matching criteria here in the future
+                // For example:
+                // - Location proximity
+                // - Time of day preference
+                // - Group size preference
+                // - Theme matching
+                // - MBTI compatibility
+                // - Hobbies matching
+
+                if ($score > 0) {
+                    $gathering['matchScore'] = $score;
+                    $matchedGatherings[] = $gathering;
+                }
+            }
+
+            // Sort gatherings by match score in descending order
+            usort($matchedGatherings, function ($a, $b) {
+                return $b['matchScore'] <=> $a['matchScore'];
+            });
+
+            return $matchedGatherings;
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error in matchGathering: " . $e->getMessage());
+            return [];
         }
     }
 }
