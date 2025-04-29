@@ -7,6 +7,9 @@ use Exception;
 use FileHelper;
 use DateTime;
 
+date_default_timezone_set('Asia/Kuala_Lumpur'); // or whatever matches your system
+
+
 class GatheringModel
 {
     private $dao;
@@ -57,34 +60,41 @@ class GatheringModel
 
     public function isBeforeStartTime($gatheringID)
     {
-        $currentTime = new DateTime();  // Current system time (including date and time)
-
-        // Get the specific gathering by gatheringID
-        $gathering = $this->dao->getGatheringById($gatheringID);
-
-        if (!$gathering) {
-            // error_log("Gathering with ID $gatheringID not found.");
-            return false;  // Gathering not found
+        try {
+            error_log("[GatheringModel] Starting isBeforeStartTime check for gathering ID: " . $gatheringID);
+            
+            // Get the specific gathering by gatheringID
+            $gathering = $this->dao->getGatheringById($gatheringID);
+            if (!$gathering) {
+                error_log("[GatheringModel] Gathering not found for ID: " . $gatheringID);
+                return false;
+            }
+            
+            // Get current system time
+            $currentTime = new DateTime();
+            error_log("[GatheringModel] Current system time: " . $currentTime->format('Y-m-d H:i:s'));
+            
+            // Create DateTime object for gathering
+            $gatheringDateTime = DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                $gathering['date'] . ' ' . $gathering['startTime']
+            );
+            
+            error_log("[GatheringModel] Gathering time: " . $gatheringDateTime->format('Y-m-d H:i:s'));
+            
+            // Compare current time with gathering time
+            if ($currentTime > $gatheringDateTime) {
+                error_log("[GatheringModel] Gathering has already started. Returning false");
+                return false;
+            }
+            
+            error_log("[GatheringModel] Gathering is in the future. Returning true");
+            return true;
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error in isBeforeStartTime: " . $e->getMessage());
+            error_log("[GatheringModel] Stack trace: " . $e->getTraceAsString());
+            return false;
         }
-
-        // Combine the date (from 'date') and time (from 'startTime')
-        $startDateTimeString = $gathering['date'] . ' ' . $gathering['startTime'];  // Concatenate date and time
-
-        // Convert the combined date and time string into a DateTime object
-        $startDateTime = new DateTime($startDateTimeString);  // Gathering start datetime
-
-        // Log the comparison for debugging
-        // error_log("Comparing current time: " . $currentTime->format('Y-m-d H:i:s') . " with gathering start time: " . $startDateTime->format('Y-m-d H:i:s'));
-
-        // Check if the current time is before the gathering start datetime
-        if ($currentTime < $startDateTime) {
-            // Log if gathering has not started yet
-            // error_log("Gathering with ID: " . $gathering['gatheringID'] . " has not started yet. Start Date/Time: " . $startDateTime->format('Y-m-d H:i:s'));
-            return true; // Gathering has not started yet
-        }
-
-        // Gathering has already started
-        return false;
     }
 
     // Add a user to a gathering (Join gathering)

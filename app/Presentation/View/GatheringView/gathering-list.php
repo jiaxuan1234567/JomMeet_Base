@@ -47,9 +47,8 @@ $userid = 1;
 
                     <?php if (
                         $gathering['currentParticipant'] < $gathering['maxParticipant']
-                        || $controller->isBeforeStartTime($gathering['gatheringID'])
-                        || !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])
-                    ): ?>
+                        && $controller->isBeforeStartTime($gathering['gatheringID'])
+                        && !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])): ?>
                         <?php if ($notJoined): ?>
                             <div class="col-md-6">
                                 <div class="d-flex border rounded shadow-sm p-2 bg-white">
