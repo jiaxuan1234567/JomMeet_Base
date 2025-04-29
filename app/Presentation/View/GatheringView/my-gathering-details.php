@@ -1,22 +1,8 @@
 <?php
 $_title = 'Joined Gathering Details';
 
-use Presentation\Controller\GatheringController\GatheringController;
-
 require_once __DIR__ . '/../../../FileHelper.php'; // adjust the path accordingly
 require_once __DIR__ . '/../HomeView/header.php';
-require_once __DIR__ . '/../../Controller/GatheringController/GatheringController.php'; // adjust based on file structure
-
-
-
-//For testing purposes only
-$userid = 1;
-$controller = new GatheringController();
-$asset = new FileHelper('asset');
-$gatheringid = $gathering['gatheringID'];
-error_log("Gathering ID: " . $gatheringid);
-// Call the method to check if the user has joined
-$notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
 ?>
 
 
@@ -33,8 +19,6 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
         <div class="row">
             <div class="col align-self-start">
                 <img src=" <?= $asset->getFilePath('map') ?>" alt="" style="width: 470px; height: 470px;">
-                <!--use the image for test-->
-                <!-- <img src="../../../public/asset/map.png" alt="" style="width: 470px; height: 470px;"> -->
             </div>
             <div class="col align-self-start">
                 <div class="row">
@@ -53,8 +37,7 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
                         <p class="fs-5 mb-0"><?php echo date('g.ia', strtotime($gathering['endTime'])); ?></p>
                     </div>
                 </div>
-                <div class="row my-3">
-                </div>
+                <div class="row my-3"></div>
                 <div class="row align-items-center justify-content-center my-5">
                     <p class="fs-4 fw-bolder mb-1">Current Pax</p>
                     <p class="fs-7 mb-0"><?php echo $gathering['currentParticipant'] . '/' . $gathering['maxParticipant']; ?></p>
@@ -62,17 +45,13 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
                 <div class="row justify-content-center">
                     <a href="/gathering" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Back</a>
 
-                    <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant']): ?>
-                        <?php if ($notJoined): ?> <!-- Only show the form if the user has not joined -->
-                            <form method="POST" action="/gathering/join" style="width:200px;">
-                                <input type="hidden" name="userid" value="<?php echo htmlspecialchars($userid); ?>">
-                                <input type="hidden" name="gatheringid" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
-                                <button data-confirm type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
-                                    Join Gathering
-                                </button>
-                            </form>
-                        <?php endif; ?>
-                    <?php endif; ?>
+                    <form method="POST" action="/gathering/join" style="width:200px;">
+                        <input type="hidden" name="userid" value="<?php echo htmlspecialchars($userid); ?>">
+                        <input type="hidden" name="gatheringid" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
+                        <button data-confirm type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
+                            Join Gathering
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
