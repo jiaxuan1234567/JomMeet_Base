@@ -13,7 +13,7 @@ Route::get('/gathering', [HomeController::class, 'gatheringHome']);
 Route::get('/my-gathering', [HomeController::class, 'myGatheringHome']);
 
 // profile routes
-
+Route::get('/profile/edit', [ProfileController::class, 'editProfile']);
 
 // self-reflection routes
 Route::get('/reflection/create', [ReflectionController::class, 'createReflection']);

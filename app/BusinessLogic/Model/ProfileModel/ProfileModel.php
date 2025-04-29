@@ -14,4 +14,15 @@ class ProfileModel
     {
         $this->profileDAO = new ProfileDAO();
     }
+
+    public function getProfileDetails($profileId)
+    {
+        return $this->profileDAO->getProfileDetails($profileId);
+    }
+
+    // // Fetch a gathering by its ID
+    // public function getProfileById(int $id): array
+    // {
+    //     return $this->profileDAO->getProfileById($id);
+    // }
 }

@@ -27,6 +27,7 @@ class FileHelper
 
         $profilePaths = [
             'Profile' => "/Presentation/View/ProfileView/profile.php",
+            'EditProfile' => "/Presentation/View/ProfileView/edit-profile.php",
         ];
 
         $reflectionPaths = [
