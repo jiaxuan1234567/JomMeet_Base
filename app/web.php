@@ -20,8 +20,8 @@ Route::get('/reflection/create', [ReflectionController::class, 'createReflection
 
 // gathering routes
 Route::get('/gathering/view/{id}', [GatheringController::class, 'viewDetail']);
-
-Route::post('/gathering/join/{userid}/{gatheringid}', [GatheringController::class, 'joinGathering']);
+Route::post('/gathering/search', [GatheringController::class, 'searchGatherings']);
+Route::post('/gathering/join', [GatheringController::class, 'joinGathering']);
 
 // my-gathering routes
 Route::get('/my-gathering/create', [GatheringController::class, 'viewCreate']);
