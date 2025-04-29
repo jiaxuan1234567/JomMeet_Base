@@ -20,14 +20,25 @@ class ReflectionModel
         return $this->reflectionDAO->getAllReflections($profileId);
     }
 
-    public function getReflectionID($profileId)
+    public function saveReflection($profileId,$reflectionDate,$reflectionTitle,$reflectionContent)
     {
-        return $this->reflectionDAO->getReflectionID($profileId);
-    }
+        // businesss logic validation
+        if ($reflectionTitle == '') {
+            $_err['reflectionTitle'] = 'Required';
+        }
+        else if (strlen($reflectionTitle) > 255) {
+            $_err['reflectionTitle'] = 'Maximum length 255';
+        }
+    
+        if ($reflectionContent == '') {
+            $_err['reflectionContent'] = 'Required';
+        }
 
-    public function saveReflections($profileId)
-    {
-        return $this->reflectionDAO->saveReflections($profileId);
+        if (!$_err) {
+            return $this->reflectionDAO->saveReflection($profileId,$reflectionDate,$reflectionTitle,$reflectionContent);
+        } else {
+            header("Location: /reflection/create");
+        }
     }
 
 

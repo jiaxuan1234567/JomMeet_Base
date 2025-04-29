@@ -21,6 +21,17 @@ class ReflectionController
         include $this->fileHelper->getFilePath('CreateReflection');
     }
 
+    public function saveReflection()
+    {
+        $profileId = $_SESSION['profile_id'];
+        $reflectionDate = $_POST['reflectionDate'];
+        $reflectionTitle = $_POST['reflectionTitle'];
+        $reflectionContent = $_POST['reflectionContent'];
+
+        $this->reflectionModel->saveReflection($profileId,$reflectionDate,$reflectionTitle,$reflectionContent);
+        header("Location: /reflection");
+    }
+
     public function editReflection()
     {
         include $this->fileHelper->getFilePath('EditReflection');

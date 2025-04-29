@@ -1,37 +1,7 @@
 <?php
-require '../_base.php';
+date_default_timezone_set("Asia/Kuala_Lumpur");
 $_title = 'Create Reflection';
 require_once __DIR__ . '/../HomeView/header.php';
-
-//---------------------------------------------------------------------------
-$GLOBALS['date'] = date("Y-m-d h:i:sa");
-
-if (is_post()) {
-    //Input
-    $date = req('date');
-    $title = req('title');
-    $content = req('content');
-
-    //Validation
-    if ($title == '') {
-        $_err['title'] = 'Required';
-    }
-    else if (strlen($title) > 255) {
-        $_err['title'] = 'Maximum length 255';
-    }
-
-    if ($content == '') {
-        $_err['content'] = 'Required';
-    }
-
-    //Saving
-    if (!$_err) {
-        $saveReflection;
-    }
-}
-
-//--------------------------------------------------------------
-
 ?>
 
 
@@ -49,24 +19,24 @@ if (is_post()) {
     <div class="container mb-5">
         <div class="container border border-2 rounded-3 m-2 align-content-center" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
             <div class="container d-flex align-item-center justify-content-center">
-                <form method="post" class="form">
+                <form method="post" action="/reflection/create" class="form">
                     <div class="my-3">
                         <h4><label for="date">Date</label></h4>
-                        <?= html_text('date', 'readonly style="width:500px;"') ?>
+                        <input type="text" id="reflectionDate" name="reflectionDate" value="<?= date("Y-m-d h:i") ?>" style="width:500px;" readonly>
 
                     </div>
                     
                     <div class="my-3">
                         <h4><label for="title">Title</label></h4>
-                        <?= html_text('title','maxlength="255" placeholder="Write Your Self-Reflection Title Here!" style="width:500px;"') ?>
+                        <input type="text" id="reflectionTitle" name="reflectionTitle" maxlength="255" placeholder="Write Your Self-Reflection Title Here!" style="width:500px;">
                     </div>
 
                     <div class="my-3">
                     <h4><label for="content">Content</label></h4>
-                    <?= html_textarea('title','placeholder="Share how was your day!" style="width:500px;height:200px;"') ?>
+                        <textarea id="reflectionContent" name="reflectionContent" placeholder="Share how was your day!" style="width:500px;height:200px;"></textarea>
                     </div>
 
-                    <section class="d-flex justify-content-center">
+                    <section class="d-flex justify-content-center my-3">
                         <button class="btn btn-primary rounded-pill" type="submit" style="width:300px;">Submit</button>
                     </section>
                 </form>

@@ -8,7 +8,7 @@ require_once __DIR__ . '/../HomeView/header.php';
         <div class="container">
             <div class="row">
                 <div class="col-md-10 order-2 order-md-1 align-self-center p-static my-3">
-                    <h1 data-title-border>Self-Reflection</h1>
+                    <h2 data-title-border>Self-Reflection</h2>
                 </div>
                 <div class="col-md-2 order-1 order-md-2 align-self-center my-3 justify-content-center">
                     <ul class="breadcrumb d-block text-md-end">
@@ -18,7 +18,6 @@ require_once __DIR__ . '/../HomeView/header.php';
             </div>
         </div>
     </section>
-    <hr class="border border-black border-1 w-auto m-auto"><br />
     <div class="container">
         <div class="row">
             <div class="container">
@@ -28,7 +27,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                             <div class="col-md-10">
                                 <a href="/reflection/view" class="text-decoration-none text-reset">
                                 <div>
-                                    <h4 class="font-weight-medium mb-0" data-asw-orgfontsize="24" style="font-size: 24px;padding: 10px 0;"><?php echo $reflection['date']; ?></h4>
+                                    <h4 class="font-weight-medium mb-0" data-asw-orgfontsize="24" style="font-size: 24px;padding: 10px 0;"><?php echo date('j F Y g:ia', strtotime($reflection['date'])); ?></h4>
                                     <p><b><?php echo $reflection['title']; ?></b></p>
                                 </div>
                                 <div>
