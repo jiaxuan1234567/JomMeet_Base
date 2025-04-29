@@ -23,23 +23,58 @@ class ReflectionModel
     public function saveReflection($profileId,$reflectionDate,$reflectionTitle,$reflectionContent)
     {
         // businesss logic validation
-        if ($reflectionTitle == '') {
+        if (empty($reflectionTitle)) {
             $_err['reflectionTitle'] = 'Required';
+        } elseif (strlen($reflectionTitle) > 255) {
+            $_err['reflectionTitle'] = 'Maximum length 255 characters';
         }
-        else if (strlen($reflectionTitle) > 255) {
-            $_err['reflectionTitle'] = 'Maximum length 255';
-        }
-    
-        if ($reflectionContent == '') {
+        
+        if (empty($reflectionContent)) {
             $_err['reflectionContent'] = 'Required';
         }
-
-        if (!$_err) {
-            return $this->reflectionDAO->saveReflection($profileId,$reflectionDate,$reflectionTitle,$reflectionContent);
-        } else {
+        
+        if (!empty($_err)) {
+            $_SESSION['reflectionErrors'] = $_err;
+            $_SESSION['old'] = [
+                'reflectionTitle' => $reflectionTitle,
+                'reflectionContent' => $reflectionContent,
+            ];
             header("Location: /reflection/create");
+            exit;
         }
+        
+        return $this->reflectionDAO->saveReflection($profileId, $reflectionDate, $reflectionTitle, $reflectionContent);
     }
 
+    public function getReflectionById($reflectionId) 
+    {
+        return $this->reflectionDAO->getReflectionById($reflectionId);
+    }
+
+    public function editSaveReflection($reflectionId,$reflectionTitle,$reflectionContent)
+    {
+        // businesss logic validation
+        if (empty($reflectionTitle)) {
+            $_err['reflectionTitle'] = 'Required';
+        } elseif (strlen($reflectionTitle) > 255) {
+            $_err['reflectionTitle'] = 'Maximum length 255 characters';
+        }
+        
+        if (empty($reflectionContent)) {
+            $_err['reflectionContent'] = 'Required';
+        }
+        
+        if (!empty($_err)) {
+            $_SESSION['reflectionErrors'] = $_err;
+            $_SESSION['old'] = [
+                'reflectionTitle' => $reflectionTitle,
+                'reflectionContent' => $reflectionContent,
+            ];
+            header("Location: /reflection/edit");
+            exit;
+        }
+        
+        return $this->reflectionDAO->editSaveReflection($reflectionId,$reflectionTitle, $reflectionContent);
+    }
 
 }

@@ -32,9 +32,19 @@ class ReflectionController
         header("Location: /reflection");
     }
 
-    public function editReflection()
+    public function editReflection($reflectionId)
     {
+        $reflectionSelected = $this->reflectionModel->getReflectionById($reflectionId);
         include $this->fileHelper->getFilePath('EditReflection');
+    }
+
+    public function editSaveReflection($reflectionId)
+    {
+        $reflectionTitle = $_POST['reflectionTitle'];
+        $reflectionContent = $_POST['reflectionContent'];
+
+        $this->reflectionModel->editSaveReflection($reflectionId,$reflectionTitle,$reflectionContent);
+        header("Location: /reflection");
     }
 
     public function viewReflection()

@@ -2,6 +2,14 @@
 date_default_timezone_set("Asia/Kuala_Lumpur");
 $_title = 'Create Reflection';
 require_once __DIR__ . '/../HomeView/header.php';
+
+$errors = $_SESSION['reflectionErrors'] ?? [];
+$old = $_SESSION['old'] ?? [];
+
+// Clear after use
+unset($_SESSION['reflectionErrors']);
+unset($_SESSION['old']);
+
 ?>
 
 
@@ -23,7 +31,6 @@ require_once __DIR__ . '/../HomeView/header.php';
                     <div class="my-3">
                         <h4><label for="date">Date</label></h4>
                         <input type="text" id="reflectionDate" name="reflectionDate" value="<?= date("Y-m-d h:i") ?>" style="width:500px;" readonly>
-
                     </div>
                     
                     <div class="my-3">

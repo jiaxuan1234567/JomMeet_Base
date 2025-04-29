@@ -40,4 +40,29 @@ class ReflectionDAO
             return false;
         }
     }
+
+    public function getReflectionById($reflectionId) 
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM self_reflect WHERE selfreflectID = $reflectionId");
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error in getReflectionById: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function editSaveReflection($reflectionId,$reflectionTitle,$reflectionContent) 
+    {
+        try {
+            $stm = $this->db->prepare('UPDATE self_reflect
+            SET title=?, content=?
+            WHERE selfreflectID = ?');
+            $stm->execute([$reflectionTitle,$reflectionContent,$reflectionId]);
+        } catch (PDOException $e) {
+            error_log("Error in saveReflection: " . $e->getMessage());
+            return false;
+        }
+    }
 }
