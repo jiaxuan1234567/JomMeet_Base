@@ -53,8 +53,14 @@ require_once __DIR__ . '/../HomeView/header.php';
             <!-- JS will inject <li> items here -->
         </ul>
     </div>
-    <div class="col-md-8 p-0">
-        <div id="map" style="width:100%;height:100%"></div>
+    <div class="col-md-8 p-0 position-relative">
+        <div id="map" class="w-100 h-100"></div>
+
+        <!-- move the detailPanel here -->
+        <div
+            id="detailPanel"
+            class="position-absolute ms-3 bg-white shadow rounded p-3 w-50"
+            style="display: none;"></div>
     </div>
 </div>
 

@@ -2,6 +2,7 @@
 
 let map;
 let markers = [];
+let savedLocations = null;
 
 // 1) Dynamically load Maps + Places libraries
 async function loadLibraries() {
@@ -24,16 +25,18 @@ async function initMap() {
         streetViewControl: false,
     });
 
-    // for field-mask billing (if you use fetchFields or autocomplete)
-    window.sessionToken = new AutocompleteSessionToken();
+    // one InfoWindow for the whole page
+    infoWindow = new google.maps.InfoWindow();
+
+    // then fetch and wire up your savedLocations…
+    savedLocations = await $.getJSON('/api/savedLocations');
 
     // wire up your search UI
     $('#searchBtn').on('click', performSearch);
     $('#searchBox').on('keydown', e => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            performSearch();
-        }
+        //e.preventDefault();
+        performSearch();
+
     });
     $('#backToForm').on('click', () => history.back());
 
@@ -98,41 +101,81 @@ async function initMap() {
 //         map.setZoom(15);
 //     }
 // }
+// async function selectPlace(place) {
+//     // pan & zoom
+//     map.panTo(place.location);
+//     map.setZoom(17);
+
+//     // update hidden coords
+//     updateCoordinates(place.location.toJSON());
+
+//     // if you need more fields than your initial search, you can do:
+//     // const detailer = new Place({ id: place.placeId });
+//     // await detailer.fetchFields({ fields:['displayName','formattedAddress','openingHours','rating'] });
+//     // then read detailer.displayName, etc. :contentReference[oaicite:1]{index=1}
+
+//     const payload = {
+//         place_id: place.id,
+//         name: place.displayName,
+//         address: place.formattedAddress,
+//         latitude: place.location.lat(),
+//         longitude: place.location.lng()
+//     };
+//     console.log('About to save:', payload);
+
+//     // POST back to your server
+//     $.ajax({
+//         url: '/gathering/location/save',
+//         method: 'POST',
+//         contentType: 'application/json',
+//         data: JSON.stringify(payload),
+//         success: e => console.log('Location saved!', e),
+//         error: e => console.error('Save failed', e)
+//     });
+// }
 
 
 /* ------------------------ performSearch start ---------------------------------------- */
-let savedLocations = null;
-
-// on page load, fetch the full list once
-$(document).ready(async () => {
-    savedLocations = await $.getJSON('/api/savedLocations');
-});
 
 async function performSearch() {
+    const raw = $('#searchBox').val();
     const query = $('#searchBox').val().trim().toLowerCase();
-    if (!query || !savedLocations) return;
 
+    // 1) Always clear UI if the box is empty
+    if (!query) {
+        clearMarkers();
+        $('#resultsList').empty();
+        $('#detailPanel').hide();
+        return;
+    }
+
+    // 2) Otherwise, do your normal search/filtering…
     clearMarkers();
     $('#resultsList').empty();
+    $('#detailPanel').hide();
 
-    // filter only your saved ones
     const results = savedLocations.filter(loc =>
         loc.name.toLowerCase().includes(query) ||
         (loc.address && loc.address.toLowerCase().includes(query))
     );
 
-    // for each hit, place a marker + list item
     results.forEach(loc => {
-        const pos = { lat: parseFloat(loc.latitude), lng: parseFloat(loc.longitude) };
+        // parseFloat ensures lat & lng are real numbers
+        const pos = {
+            lat: parseFloat(loc.latitude),
+            lng: parseFloat(loc.longitude)
+        };
 
-        // list entry
+        // list item
         $('<li>')
             .addClass('list-group-item list-group-item-action')
             .html(`<strong>${loc.name}</strong><br>${loc.address || ''}`)
             .appendTo('#resultsList')
-            .on('click', () => selectSavedLocation(loc, pos));
+            .on('click', function () {
+                showDetailPanel(loc, pos, this);
+            });
 
-        // marker
+        // marker on map
         const marker = new google.maps.Marker({
             position: pos,
             map,
@@ -141,14 +184,69 @@ async function performSearch() {
                 scaledSize: new google.maps.Size(32, 32)
             }
         });
-        marker.addListener('click', () => selectSavedLocation(loc, pos));
+        marker.placeData = loc;
+        marker.addListener('click', () => showDetailPanel(loc, pos, null));
         markers.push(marker);
     });
 
     if (results[0]) {
-        map.panTo({ lat: parseFloat(results[0].latitude), lng: parseFloat(results[0].longitude) });
+        // convert to numbers here too
+        const firstPos = {
+            lat: parseFloat(results[0].latitude),
+            lng: parseFloat(results[0].longitude)
+        };
+        map.panTo(firstPos);
         map.setZoom(15);
     }
+}
+
+function showDetailPanel(loc, pos, liElem) {
+    const html = `
+      <div class="card border-0">
+        ${loc.image ? `<img src="${loc.image}" class="card-img-top">` : ''}
+        <div class="card-body p-3">
+          <h5 class="card-title mb-1">${loc.name}</h5>
+          <p class="mb-1">${loc.address || ''}</p>
+          ${loc.closeTime ? `<p class="mb-1"><small>Close: ${loc.closeTime}</small></p>` : ''}
+          ${typeof loc.commentCount !== 'undefined'
+            ? `<p class="mb-2"><small>Comment(${loc.commentCount})</small></p>`
+            : ''
+        }
+          <button id="selectBtn" class="btn btn-primary btn-sm">Select</button>
+        </div>
+      </div>
+    `;
+    const $panel = $('#detailPanel')
+        .html(html)
+        .show();
+
+    if (liElem) {
+        // panel is absolutely positioned within its parent (.col-md-8.position-relative)
+        const parentTop = $panel.parent().offset().top;
+        const liTop = $(liElem).offset().top;
+        $panel.css('top', (liTop - parentTop) + 'px');
+    } else {
+        // fallback if marker clicked
+        $panel.css('top', '10px');
+    }
+
+    // hook up Select
+    $panel.find('#selectBtn').on('click', () => {
+        selectSavedLocation(loc, pos);
+    });
+
+    // center and bounce
+    map.panTo(pos);
+    map.setZoom(17);
+    markers.forEach(m => {
+        if (m.placeData.placeId === loc.placeId) {
+            m.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(() => m.setAnimation(null), 700);
+        }
+    });
+    // const panelWidth = $('#detailPanel').outerWidth(true);
+    // map.panBy(-panelWidth / 2, 0);
+    // map.setZoom(17);
 }
 
 function selectSavedLocation(loc, pos) {
@@ -159,40 +257,6 @@ function selectSavedLocation(loc, pos) {
     // if you want to re-save, you already have it in DB—no need to POST again
 }
 /* ------------------------ performSearch end ---------------------------------------- */
-
-// 4) Handle selection: pan, zoom, update form, and save
-async function selectPlace(place) {
-    // pan & zoom
-    map.panTo(place.location);
-    map.setZoom(17);
-
-    // update hidden coords
-    updateCoordinates(place.location.toJSON());
-
-    // if you need more fields than your initial search, you can do:
-    // const detailer = new Place({ id: place.placeId });
-    // await detailer.fetchFields({ fields:['displayName','formattedAddress','openingHours','rating'] });
-    // then read detailer.displayName, etc. :contentReference[oaicite:1]{index=1}
-
-    const payload = {
-        place_id: place.id,
-        name: place.displayName,
-        address: place.formattedAddress,
-        latitude: place.location.lat(),
-        longitude: place.location.lng()
-    };
-    console.log('About to save:', payload);
-
-    // POST back to your server
-    $.ajax({
-        url: '/gathering/location/save',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(payload),
-        success: e => console.log('Location saved!', e),
-        error: e => console.error('Save failed', e)
-    });
-}
 
 // remove old markers from the map
 function clearMarkers() {
@@ -206,13 +270,22 @@ function updateCoordinates({ lat, lng }) {
     $('#longitude').val(lng);
 }
 
-// // jQuery ready for search input behavior
+// 1) A small debounce helper:
+function debounce(fn, wait) {
+    let t;
+    return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), wait);
+    };
+}
+
+// 2) Replace your keydown handler with an input handler:
 $(document).ready(function () {
     const $searchBox = $('#searchBox');
     const $clearText = $('#clearText');
     const $vertBar = $('#vertBar');
-    const $searchBtnIcon = $('#searchBtn');
 
+    // show/hide the clear button as before
     $searchBox.on('input', function () {
         if ($.trim($(this).val()) !== '') {
             $clearText.removeClass('d-none');
@@ -223,14 +296,22 @@ $(document).ready(function () {
         }
     });
 
+    // clear behavior as before
     $clearText.on('click', function () {
         $searchBox.val('');
         $clearText.addClass('d-none');
         $vertBar.addClass('d-none');
         $('#resultsList').empty();
+        $('#detailPanel').hide();
         clearMarkers();
         $searchBox.focus();
     });
+
+    // 3) Debounced live search on each input
+    const liveSearch = debounce(performSearch, 150);
+    $('#searchBox')
+        .off('keydown')
+        .on('input', liveSearch);
 });
 
 // expose initMap for the API loader callback
