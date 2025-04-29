@@ -1,6 +1,6 @@
 <?php
 $_title = "Join a Gathering";
-include __DIR__ . '../../../View/HomeView/header.php';
+include __DIR__ . '/Users/tojiaxuan/Documents/GitHub/JomMeet_Base/app/Presentation/View/HomeView/header.php';
 
 use Presentation\Controller\GatheringController\GatheringController;
 
@@ -77,7 +77,7 @@ $userid = 1;
 <?php endif; ?>
 </div>
 
-    <?php include __DIR__ . '../../../View/HomeView/footer.php'; ?>
+    <?php include __DIR__ . '/Users/tojiaxuan/Documents/GitHub/JomMeet_Base/app/Presentation/View/HomeView/footer.php'; ?>
 </body>
 
 </html>

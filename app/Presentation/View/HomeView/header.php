@@ -20,10 +20,10 @@
     <link rel="stylesheet" href="<?php echo (new FileHelper('asset'))->getFilePath('AppCSS') ?>">
 
     <!-- Global JS -->
-    <script src="/js/app.js"></script>
+    <script src="../../../public/js/app.js"></script>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="asset/bubble.png">
+    <link rel="icon" type="image/x-icon" href="../../public/asset/bubble.png">
 
     <!-- Tab Title -->
     <title><?php echo $_title ?? 'Jom Meet' ?></title>

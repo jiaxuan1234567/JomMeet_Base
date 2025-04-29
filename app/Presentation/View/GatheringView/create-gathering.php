@@ -1,6 +1,6 @@
 <?php
 $_title = 'Create Gathering';
-require_once __DIR__ . '/../HomeView/header.php';
+require_once __DIR__ . '/Users/tojiaxuan/Documents/GitHub/JomMeet_Base/app/Presentation/View/HomeView/header.php';
 ?>
 
 <div class="container-fluid" id="mainContent">
@@ -193,4 +193,4 @@ require_once __DIR__ . '/../HomeView/header.php';
     });
 </script>
 
-<?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
+<?php require_once __DIR__ . '/Users/tojiaxuan/Documents/GitHub/JomMeet_Base/app/Presentation/View/HomeView/footer.php'; ?>
