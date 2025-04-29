@@ -45,7 +45,8 @@ class ProfileModel
             error_log("Checking profile: " . print_r($p, true));
             if ($p['phone'] == $phoneNumber && $p['password'] == $password) {
                 $_SESSION['profile_id'] = $p['profileID'];
-                $_SESSION['phoneNumber'] = $p['phoneNumber'];
+            $_SESSION['name'] = $p['nickname'];
+                $_SESSION['phone'] = $p['phone'];
                 $_SESSION['password'] = $p['password'];
                 return true;
             }
