@@ -42,14 +42,14 @@ class ProfileModel
 
         // Here you would typically check the credentials against a database
         foreach ($profiles as $p) {
+            error_log("Checking profile: " . print_r($p, true));
             if ($p['phone'] == $phoneNumber && $p['password'] == $password) {
                 $_SESSION['profile_id'] = $p['profileID'];
                 $_SESSION['phoneNumber'] = $p['phoneNumber'];
                 $_SESSION['password'] = $p['password'];
                 return true;
-            } else {
-                return false;
             }
         }
+        return false;
     }
 }
