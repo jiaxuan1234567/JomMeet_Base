@@ -60,21 +60,6 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
                     <p class="fs-4 fw-bolder mb-1">Current Pax</p>
                     <p class="fs-7 mb-0"><?php echo $gathering['currentParticipant'] . '/' . $gathering['maxParticipant']; ?></p>
                 </div>
-                <div class="row justify-content-center">
-                    <a href="/gathering" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Cancel</a>
-
-                    <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant']): ?>
-                        <?php if ($notJoined): ?> <!-- Only show the form if the user has not joined -->
-                            <form method="POST" action="/gathering/join" style="width:200px;">
-                                <input type="hidden" name="userid" value="<?php echo htmlspecialchars($userid); ?>">
-                                <input type="hidden" name="gatheringid" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
-                                <button data-confirm type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
-                                    Join
-                                </button>
-                            </form>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                </div>
             </div>
         </div>
     </div>

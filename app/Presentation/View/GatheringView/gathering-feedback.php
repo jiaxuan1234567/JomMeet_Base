@@ -50,6 +50,35 @@ require_once __DIR__ . '/../HomeView/header.php';
       </div>
     </div>
 
+    <div id="jomAlert" style="
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f8f8f8;
+    border: 1px solid #888;
+    border-radius: 6px;
+    width: 300px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    padding: 0;
+    font-family: system-ui, sans-serif;
+    z-index: 9999;
+    display: none;
+">
+  <div style="background-color: #569FFF; color: white; padding: 10px 15px; border-top-left-radius: 6px; border-top-right-radius: 6px;">
+    JomMeet says
+  </div>
+  <div style="padding: 15px; font-size: 14px; color: #000;">
+    Your feedback has been successfully submitted.
+  </div>
+  <div style="padding: 10px; text-align: right;">
+    <button onclick="document.getElementById('jomAlert').style.display='none';"
+      style="padding: 5px 12px; font-size: 13px; border: none; background-color: #569FFF; color: white; border-radius: 4px; cursor: pointer;">
+      OK
+    </button>
+  </div>
+</div>
+
 
 </body>
 
@@ -118,7 +147,7 @@ postBtn.addEventListener('click', function() {
     hasPostedFeedback = true;
 
     // Optional: Show a message indicating that only one feedback can be posted
-    alert('You have already posted your feedback. You cannot submit another one.');
+    document.getElementById('jomAlert').style.display = 'block';
   }
 });
 
@@ -126,3 +155,4 @@ postBtn.addEventListener('click', function() {
 </script>
 
 </html>
+
