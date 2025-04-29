@@ -241,7 +241,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                             <p class="mb-0 small">Date: ${g.date}</p>
                             <p class="mb-0 small">Time: ${g.startTime}–${g.endTime}</p>
                             <p class="mb-0 small">Venue: ${g.venue}</p>
-                            <p class="mb-0 small">Pax: ${g.pax}/${g.maxParticipant}</p>
+                            <p class="mb-0 small">Pax: ${g.pax}/${g.maxPax}</p>
                         </div>
                         <div class="d-flex gap-2">
                             <a href="/my-gathering/view/${g.id}" class="btn btn-sm w-100 px-3 fw-bold text-white" style="background-color: #569FFF; border: none; border-radius: 20px;">View Details</a>

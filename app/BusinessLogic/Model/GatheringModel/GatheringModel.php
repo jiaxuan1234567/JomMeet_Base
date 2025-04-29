@@ -169,12 +169,13 @@ class GatheringModel
             return array_map(function (array $g) {
                 return [
                     'id'        => (int)$g['gatheringID'],
-                    'cover'     => $g['cover'],
+                    'cover'     => $g['image'],
                     'theme'     => $g['theme'],
                     'date'      => date('d F Y', strtotime($g['date'])),
                     'startTime' => date('g:i A',   strtotime($g['startTime'])),
                     'endTime'   => date('g:i A',   strtotime($g['endTime'])),
                     'pax'       => (int)$g['currentParticipant'],
+                    'maxPax'       => (int)$g['maxParticipant'],
                     'venue'     => $g['venue'],
                     'status'    => strtolower($g['status']),    // 'new','start','end','cancelled'
                     'isHost'    => (bool)$g['isHost'],
@@ -198,6 +199,8 @@ class GatheringModel
         // --- 2) call the DAO to insert & get new PK ---
         try {
             $newId = $this->dao->createGathering($data);
+            $profileId = $_SESSION['profile_id'];
+            $this->dao->addUserToGathering($profileId, $newId);
             return $newId;
         } catch (Exception $e) {
             error_log("[GatheringModel] Error creating gathering: " . $e->getMessage());

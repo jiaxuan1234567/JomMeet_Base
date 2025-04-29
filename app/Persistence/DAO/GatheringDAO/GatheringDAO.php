@@ -182,7 +182,23 @@ class GatheringDAO
     public function getMyGatherings($profileId)
     {
         try {
-            $sql = "SELECT * FROM gathering WHERE hostProfileID = :pid";
+            //$sql = "SELECT * FROM gathering WHERE hostProfileID = :pid";
+            $sql = "SELECT 
+                g.gatheringID, 
+                g.theme, 
+                g.currentParticipant, 
+                g.maxParticipant, 
+                g.date, 
+                g.startTime, 
+                g.endTime, 
+                g.status, 
+                l.locationName AS venue, 
+                l.image, (g.hostProfileID = :pid) AS isHost, 
+                (p.profileID IS NOT NULL) AS isJoined
+                FROM `location` l
+                JOIN gathering g ON l.locationID = g.locationID
+                JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
+                WHERE (g.hostProfileID = :pid) OR (p.profileID = :pid)";
             // $sql = "
             //   SELECT
             //     g.gatheringID,
