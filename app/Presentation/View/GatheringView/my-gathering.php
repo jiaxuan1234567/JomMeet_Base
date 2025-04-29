@@ -251,117 +251,84 @@ require_once __DIR__ . '/../HomeView/header.php';
 
 <script>
     $(function() {
-        // 1) grab the data
-        var allGatherings = <?php echo json_encode($myGatherings); ?>;
-        var $container = $('.row.g-5'); // where we inject cards
-        var $tabs = $('#gatheringTabs button'); // status tabs
+        // 1) grab the data & refs
+        var allGatherings = <?= json_encode($myGatherings) ?>;
+        var $container = $('#gatheringList');
+        var $tabs = $('#gatheringTabs button');
 
-        // 2) render function
+        // 2) render cards into the container
         function renderGatherings(list) {
-            var html = '';
             if (!list.length) {
-                html = '<p class="text-center text-muted">No gatherings found.</p>';
-            } else {
-                $.each(list, function(_, g) {
-                    html += '' +
-                        '<div class="col-6 mb-0 mt-4 pb-0">' +
-                        '  <div class="card border-0 rounded">' +
-                        '    <div class="row g-0 align-items-center">' +
-                        '      <div class="col-4 text-center p-2">' +
-                        '        <img src="/asset/' + g.cover + '"' +
-                        '             class="img-fluid"' +
-                        '             alt="Event Image"' +
-                        '             style="max-height:100px;"' +
-                        '             onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/1161/1161388.png\'">' +
-                        '      </div>' +
-                        '      <div class="col-8">' +
-                        '        <div class="card-body py-2 px-3">' +
-                        '          <div class="bg-blue-color card-text small px-3 py-2 mb-1 rounded" style="background-color:#DEECFF;">' +
-                        '            <h6 class="fw-bold mb-1">' + g.theme + '</h6>' +
-                        '            <p class="mb-0 small">Date: ' + g.date + '</p>' +
-                        '            <p class="mb-0 small">Time: ' + g.startTime + ' - ' + g.endTime + '</p>' +
-                        '            <p class="mb-0 small">Venue: ' + g.venue + '</p>' +
-                        '            <p class="mb-0 small">Pax: ' + g.pax + '/5</p>' +
-                        '          </div>' +
-                        '          <div class="d-flex gap-2">' +
-                        '            <a href="/my-gathering/view/' + (g.id || 0) + '"' +
-                        '               class="btn btn-sm w-100 px-3 fw-bold text-white"' +
-                        '               style="background-color:#569FFF;border:none;border-radius:20px;">' +
-                        '              View Details' +
-                        '            </a>' +
-                        (g.status === 'cancelled' ?
-                            '' :
-                            '<div class="dropdown">' +
-                            '  <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold"' +
-                            '          type="button" data-bs-toggle="dropdown" aria-expanded="false"' +
-                            '          style="border-radius:20px;">Action</button>' +
-                            '  <ul class="dropdown-menu">' +
-                            (g.status === 'hosted' ?
-                                '<li><a class="dropdown-item">Send Reminder</a></li>' +
-                                '<li><a class="dropdown-item">Edit Gathering</a></li>' +
-                                '<li><a class="dropdown-item text-danger">Cancel Gathering</a></li>' :
-                                g.status === 'upcoming' ?
-                                '<li><a class="dropdown-item">Reply Reminder</a></li>' +
-                                '<li><a class="dropdown-item text-danger">Leave Gathering</a></li>' :
-                                g.status === 'ongoing' ?
-                                '<li><a class="dropdown-item">Reply Reminder</a></li>' :
-                                g.status === 'completed' ?
-                                '<li><a class="dropdown-item" href="gathering-feedback.php?status=completed">Gathering Feedback</a></li>' +
-                                '<li><a class="dropdown-item" href="location-feedback.php?status=completed">Location Feedback</a></li>' :
-                                '') +
-                            '  </ul>' +
-                            '</div>') +
-                        '          </div>' +
-                        '        </div>' +
-                        '      </div>' +
-                        '    </div>' +
-                        '  </div>' +
-                        '</div>';
-                });
+                return $container.html('<p class="text-center text-muted mt-4">No gatherings found.</p>');
             }
+            var html = '';
+            list.forEach(function(g) {
+                html += `
+        <div class="col-6 mb-4">
+          <div class="card border-0 rounded">
+            <div class="row g-0 align-items-center">
+              <div class="col-4 p-2 text-center">
+                <img src="/asset/${g.cover}" class="img-fluid" style="max-height:100px;"
+                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/1161/1161388.png'">
+              </div>
+              <div class="col-8">
+                <div class="card-body py-2 px-3">
+                  <h6 class="fw-bold mb-1">${g.theme}</h6>
+                  <p class="small mb-1">${g.date} | ${g.startTime} - ${g.endTime}</p>
+                  <p class="small mb-1">Venue: ${g.venue}</p>
+                  <p class="small mb-3">Pax: ${g.pax}/${g.maxParticipant}</p>
+                  <a href="/my-gathering/view/${g.id}" class="btn btn-sm btn-primary me-2">Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+            });
             $container.html(html);
         }
 
-        // 3) switch‐tab helper
+        // 3) highlight the active tab
         function setActiveTab(status) {
             $tabs.each(function() {
-                var $b = $(this);
-                if ($b.data('status') === status) {
-                    $b.removeClass('bg-white text-black')
-                        .addClass('text-white')
-                        .css('background-color', '#569FFF');
-                } else {
-                    $b.removeClass('text-white')
-                        .addClass('bg-white text-black')
-                        .css('background-color', '');
-                }
+                var $btn = $(this);
+                $btn.toggleClass('active', $btn.data('status') === status);
             });
         }
 
-        // 4) on load: pick hash or all, then render + style
-        var initStatus = window.location.hash.slice(1) || 'all';
-        setActiveTab(initStatus);
-        renderGatherings(
-            initStatus === 'all' ?
-            allGatherings :
-            $.grep(allGatherings, function(g) {
-                return g.status === initStatus;
-            })
-        );
+        // 4) filter logic per tab: 
+        // All = created OR joined; Hosted = created; 
+        // Up Coming = NEW; On Going = START; Completed = END; 
+        // Cancelled = created & CANCELLED
+        function filterByTab(tab) {
+            switch (tab) {
+                case 'all':
+                    return allGatherings.filter(g => g.isHost || g.isJoined);
+                case 'hosted':
+                    return allGatherings.filter(g => g.isHost);
+                case 'upcoming':
+                    return allGatherings.filter(g => g.status === 'new');
+                case 'ongoing':
+                    return allGatherings.filter(g => g.status === 'start');
+                case 'completed':
+                    return allGatherings.filter(g => g.status === 'end');
+                case 'cancelled':
+                    return allGatherings.filter(g => g.isHost && g.status === 'cancelled');
+                default:
+                    return [];
+            }
+        }
 
-        // 5) tab click binding
+        // 5) on page load: pick hash or default to "all"
+        var init = window.location.hash.slice(1) || 'all';
+        setActiveTab(init);
+        renderGatherings(filterByTab(init));
+
+        // 6) on tab click: restyle, re-render, update URL
         $tabs.on('click', function(e) {
             e.preventDefault();
             var st = $(this).data('status');
             setActiveTab(st);
-
-            var subset = (st === 'all') ?
-                allGatherings :
-                $.grep(allGatherings, function(g) {
-                    return g.status === st;
-                });
-            renderGatherings(subset);
-
+            renderGatherings(filterByTab(st));
             if (st === 'all') {
                 history.replaceState(null, '', '/my-gathering');
             } else {
@@ -370,5 +337,7 @@ require_once __DIR__ . '/../HomeView/header.php';
         });
     });
 </script>
+
+
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

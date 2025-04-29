@@ -162,21 +162,23 @@ class GatheringModel
 
 
     // my-gathering
-    public function getMyGatherings($hostProfileId)
+    public function getMyGatherings($profileId)
     {
         try {
-            $rows = $this->dao->getMyGatherings($hostProfileId);
+            $rows = $this->dao->getMyGatherings($profileId);
             return array_map(function (array $g) {
                 return [
-                    'id'         => (int)   $g['gatheringID'],
-                    'cover'      => $g['cover'],
-                    'theme'      => $g['theme'],
-                    'date'       => date('d F Y',   strtotime($g['date'])),
-                    'startTime'  => date('g:i A',   strtotime($g['startTime'])),
-                    'endTime'    => date('g:i A',   strtotime($g['endTime'])),
-                    'pax'        => (int)   $g['currentParticipant'],
-                    'venue'      => $g['venue'],
-                    'status'     => strtolower($g['status']),
+                    'id'        => (int)$g['gatheringID'],
+                    'cover'     => $g['cover'],
+                    'theme'     => $g['theme'],
+                    'date'      => date('d F Y', strtotime($g['date'])),
+                    'startTime' => date('g:i A',   strtotime($g['startTime'])),
+                    'endTime'   => date('g:i A',   strtotime($g['endTime'])),
+                    'pax'       => (int)$g['currentParticipant'],
+                    'venue'     => $g['venue'],
+                    'status'    => strtolower($g['status']),    // 'new','start','end','cancelled'
+                    'isHost'    => (bool)$g['isHost'],
+                    'isJoined'  => (bool)$g['isJoined'],
                 ];
             }, $rows ?: []);
         } catch (Exception $e) {
