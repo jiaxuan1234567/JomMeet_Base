@@ -63,7 +63,7 @@ class GatheringController
 
         try {
             $newId = $this->gatheringModel->createGathering($data);
-            // 3) Redirect to a “view” page or index
+            // 3) Redirect to a "view" page or index
             header("Location: /gathering/view/{$newId}");
             exit;
         } catch (Exception $e) {
@@ -247,5 +247,29 @@ class GatheringController
 
         header('Content-Type: application/json');
         echo json_encode(['updated' => $updated]);
+    }
+
+    public function matchGathering($userid){
+        try{
+            error_log("[GatheringController] ===== MATCH BUTTON CLICKED =====");
+            error_log("[GatheringController] User ID received: " . $userid);
+            
+            error_log("[GatheringController] Calling matchGathering model...");
+            $gatherings = $this->gatheringModel->matchGathering($userid);
+            error_log("[GatheringController] Model execution completed");
+            error_log("[GatheringController] Number of matched gatherings: " . count($gatherings));
+            
+            if (empty($gatherings)) {
+                error_log("[GatheringController] No gatherings matched user preferences");
+            } else {
+                error_log("[GatheringController] Displaying matched gatherings");
+            }
+            
+            return include $this->fileHelper->getFilePath('GatheringList');
+        } catch(Exception $e) {
+            error_log("[GatheringController] ERROR in matchGathering: " . $e->getMessage());
+            error_log("[GatheringController] Stack trace: " . $e->getTraceAsString());
+            return include $this->fileHelper->getFilePath('GatheringList');
+        }
     }
 }

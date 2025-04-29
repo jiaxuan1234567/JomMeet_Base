@@ -6,8 +6,10 @@ use Presentation\Controller\GatheringController\GatheringController;
 
 $asset = new FileHelper('asset');
 $controller = new GatheringController();
+
 //For testing purposes only
 $userid = 1;
+
 ?>
 
 <script src="/js/gatheringlist.js"></script>
@@ -25,10 +27,10 @@ $userid = 1;
                 </form>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-light border border-secondary d-flex align-items-center gap-2" id="create-gathering">
+                <a href="/gathering/match/<?= $userid ?>" class="btn btn-light border border-secondary d-flex align-items-center gap-2" style="width:100px;">
                     <img src="<?= $asset->getFilePath('match') ?>" alt="Icon" style="width: 20px; height: 20px;">
                     <span>Match</span>
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -43,9 +45,11 @@ $userid = 1;
                 <?php foreach ($gatherings as $gathering): ?>
                     <?php $notJoined = $controller->verifyUserInGathering($userid, $gathering['gatheringID']); ?>
 
-                    <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant'] 
-                    || $controller->isBeforeStartTime($gathering['gatheringID']) 
-                    || !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])): ?>
+                    <?php if (
+                        $gathering['currentParticipant'] < $gathering['maxParticipant']
+                        || $controller->isBeforeStartTime($gathering['gatheringID'])
+                        || !$controller->isNewGatheringConflicting($userid, $gathering['gatheringID'])
+                    ): ?>
                         <?php if ($notJoined): ?>
                             <div class="col-md-6">
                                 <div class="d-flex border rounded shadow-sm p-2 bg-white">

@@ -44,11 +44,6 @@ class GatheringModel
         // Get the gatherings for the user
         $gathering = $this->dao->getProfileGatheringByUserId($userID);
 
-        if (empty($gathering)) {
-            // If no gatherings found for the user, log it
-            error_log("[GatheringModel] No gatherings found for user $userID.");
-        }
-
         // Iterate through the gatherings
         foreach ($gathering as $g) {
             // Check if this gathering matches the user and the gathering ID
@@ -177,6 +172,80 @@ class GatheringModel
         } catch (Exception $e) {
             error_log("[GatheringModel] Error creating gathering: " . $e->getMessage());
             throw $e;
+        }
+    }
+
+    public function matchGathering(int $userID): array
+    {
+        try {
+            // Get user's profile to access their preferences
+            $userProfile = $this->dao->getProfileByUserId($userID);
+            if (!$userProfile) {
+                error_log("[GatheringModel] User profile not found for userID: $userID");
+                return [];
+            }
+
+            // Get all available gatherings
+            $allGatherings = $this->getAllGatherings();
+            if (empty($allGatherings)) {
+                error_log("[GatheringModel] No gatherings available for matching");
+                return [];
+            }
+
+            // Get gatherings the user has already joined
+            $joinedGatherings = $this->getJoinedGatheringByUserId($userID);
+            $joinedGatheringIds = array_column($joinedGatherings, 'gatheringID');
+
+            // Filter and score gatherings based on preferences
+            $matchedGatherings = [];
+            foreach ($allGatherings as $gathering) {
+                // Skip gatherings the user has already joined
+                if (in_array($gathering['gatheringID'], $joinedGatheringIds)) {
+                    continue;
+                }
+
+                // Skip gatherings that are full
+                if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
+                    continue;
+                }
+
+                // Skip gatherings that have already started
+                if (!$this->isBeforeStartTime($gathering['gatheringID'])) {
+                    continue;
+                }
+
+                // Calculate matching score based on preferences
+                $score = 0;
+
+                // Basic preference matching
+                if (isset($userProfile['preference']) && $userProfile['preference'] === $gathering['preference']) {
+                    $score += 10;
+                }
+
+                // Add more matching criteria here in the future
+                // For example:
+                // - Location proximity
+                // - Time of day preference
+                // - Group size preference
+                // - Theme matching
+                // - MBTI compatibility
+                // - Hobbies matching
+
+                if ($score > 0) {
+                    $gathering['matchScore'] = $score;
+                    $matchedGatherings[] = $gathering;
+                }
+            }
+
+            // Sort gatherings by match score in descending order
+            usort($matchedGatherings, function ($a, $b) {
+                return $b['matchScore'] <=> $a['matchScore'];
+            });
+
+            return $matchedGatherings;
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error in matchGathering: " . $e->getMessage());
+            return [];
         }
     }
 }
