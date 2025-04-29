@@ -18,7 +18,6 @@ error_log("Gathering ID: " . $gatheringid);
 // Call the method to check if the user has joined
 $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
 ?>
-?>
 
 
 <div class="container-sm mt-4">

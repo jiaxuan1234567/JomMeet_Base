@@ -182,29 +182,30 @@ class GatheringDAO
     public function getMyGatherings($profileId)
     {
         try {
-            $sql = "
-              SELECT
-                g.gatheringID,
-                g.theme,
-                g.currentParticipant,
-                g.maxParticipant,
-                g.date,
-                g.startTime,
-                g.endTime,
-                g.status,
-                l.name     AS venue,
-                l.coverImg AS cover,
-                (g.hostProfileID = :pid)        AS isHost,
-                (p.profileID       IS NOT NULL) AS isJoined
-              FROM gathering g
-              JOIN location  l ON g.locationID = l.locationID
-              LEFT JOIN participation p
-                ON g.gatheringID = p.gatheringID
-               AND p.profileID  = :pid
-              WHERE g.hostProfileID = :pid
-                 OR p.profileID    = :pid
-              ORDER BY g.date DESC, g.startTime
-            ";
+            $sql = "SELECT * FROM gathering WHERE hostProfileID = :pid";
+            // $sql = "
+            //   SELECT
+            //     g.gatheringID,
+            //     g.theme,
+            //     g.currentParticipant,
+            //     g.maxParticipant,
+            //     g.date,
+            //     g.startTime,
+            //     g.endTime,
+            //     g.status,
+            //     l.name     AS venue,
+            //     l.coverImg AS cover,
+            //     (g.hostProfileID = :pid)        AS isHost,
+            //     (p.profileID       IS NOT NULL) AS isJoined
+            //   FROM gathering g
+            //   JOIN location  l ON g.locationID = l.locationID
+            //   LEFT JOIN participation p
+            //     ON g.gatheringID = p.gatheringID
+            //    AND p.profileID  = :pid
+            //   WHERE g.hostProfileID = :pid
+            //      OR p.profileID    = :pid
+            //   ORDER BY g.date DESC, g.startTime
+            // ";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

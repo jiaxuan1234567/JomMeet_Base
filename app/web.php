@@ -31,7 +31,7 @@ Route::post('/gathering/search', [GatheringController::class, 'searchGatherings'
 Route::post('/gathering/join', [GatheringController::class, 'joinGathering']);
 
 // my-gathering routes
-//Route::get('/my-gathering/view/{id}', [GatheringController::class, 'viewGathering']);
+Route::get('/my-gathering/view/{id}', [GatheringController::class, 'viewMyGatheringDetails']);
 Route::get('/my-gathering/create', [GatheringController::class, 'viewCreate']);
 Route::post('/my-gathering/create', [GatheringController::class, 'createGathering']);
 Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSelectLocation']);

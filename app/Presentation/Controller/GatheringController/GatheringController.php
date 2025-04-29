@@ -26,6 +26,7 @@ class GatheringController
     }
 
     // -- My Gathering --
+
     public function viewCreate()
     {
         $sel = $_SESSION['selected_location'] ?? ['locationId' => '', 'address' => ''];
@@ -261,11 +262,6 @@ class GatheringController
             header("Location: /path-to-error-page.php");
             exit();
         }
-
-        // Perform any additional logic or processing if needed
-
-        // Redirect to the gathering details page
-        header("Location: my-gathering-details.php?id=" . urlencode($id));
-        exit();
+        include $this->fileHelper->getFilePath('MyGatheringDetails');
     }
 }
