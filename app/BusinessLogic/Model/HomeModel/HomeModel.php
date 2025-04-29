@@ -20,4 +20,9 @@ class HomeModel
     {
         return (new GatheringModel())->getAllGatherings();
     }
+
+    public function getMyGatherings($hostProfileId)
+    {
+        return (new GatheringModel())->getMyGatherings($hostProfileId);
+    }
 }

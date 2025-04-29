@@ -162,6 +162,29 @@ class GatheringModel
 
 
     // my-gathering
+    public function getMyGatherings($hostProfileId)
+    {
+        try {
+            $rows = $this->dao->getMyGatherings($hostProfileId);
+            return array_map(function (array $g) {
+                return [
+                    'id'         => (int)   $g['gatheringID'],
+                    'cover'      => $g['cover'],
+                    'theme'      => $g['theme'],
+                    'date'       => date('d F Y',   strtotime($g['date'])),
+                    'startTime'  => date('g:i A',   strtotime($g['startTime'])),
+                    'endTime'    => date('g:i A',   strtotime($g['endTime'])),
+                    'pax'        => (int)   $g['currentParticipant'],
+                    'venue'      => $g['venue'],
+                    'status'     => strtolower($g['status']),
+                ];
+            }, $rows ?: []);
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error in getMyGatherings: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function createGathering($data)
     {
         // --- 1) basic validation ---

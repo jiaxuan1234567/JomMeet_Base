@@ -179,6 +179,35 @@ class GatheringDAO
     }
 
     // my-gathering
+    public function getMyGatherings($hostProfileId)
+    {
+        try {
+            $sql = "
+            SELECT
+              g.gatheringID,
+              g.theme,
+              g.currentParticipant,
+              g.maxParticipant,
+              g.date,
+              g.startTime,
+              g.endTime,
+              g.status,
+              l.name     AS venue,
+              l.coverImg AS cover
+            FROM gathering AS g
+            JOIN location  AS l ON g.locationID = l.locationID
+            WHERE g.hostProfileID = :hostId
+            ORDER BY g.date DESC, g.startTime
+        ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':hostId' => $hostProfileId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] getMyGatherings error: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function createGathering(array $d): int
     {
         $sql = "INSERT INTO `gathering` (locationID, theme, maxParticipant, minParticipant, currentParticipant, date, startTime, endTime, status, preference) 

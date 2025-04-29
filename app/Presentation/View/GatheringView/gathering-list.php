@@ -68,15 +68,14 @@ $userid = 1;
                                     </div>
                                 </div>
                             </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </div>
         <?php endif; ?>
-    <?php endif; ?>
-<?php endforeach; ?>
     </div>
-<?php endif; ?>
-</div>
 
-<?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
+    <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
 </body>
 
 </html>

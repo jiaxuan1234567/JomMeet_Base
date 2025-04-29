@@ -44,6 +44,8 @@ class HomeController
 
     public function myGatheringHome()
     {
+        $hostProfileId = $_SESSION['profile_id'];
+        $myGatherings = (new HomeModel())->getMyGatherings($hostProfileId);
         include $this->fileHelper->getFilePath('MyGatheringList');
     }
 }
