@@ -1,4 +1,5 @@
 <?php
+
 namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
@@ -11,7 +12,7 @@ class GatheringModel
     private $dao;
 
     public function __construct()
-   {
+    {
         $this->dao = new GatheringDAO();
     }
 
@@ -91,7 +92,6 @@ class GatheringModel
         return false;
     }
 
-
     // Add a user to a gathering (Join gathering)
     public function addUserToGathering(int $userID, int $gatheringID): bool
     {
@@ -115,7 +115,6 @@ class GatheringModel
     {
         return $this->dao->getJoinedGatheringByUserId($userID);
     }
-
 
     public function isNewGatheringConflicting($userID, $gatheringID)
     {
@@ -159,5 +158,25 @@ class GatheringModel
         error_log("No conflict found for user $userID and gathering $gatheringID.");
         // If no conflicts, return false
         return false;
+    }
+
+
+    // my-gathering
+    public function createGathering($data)
+    {
+        // --- 1) basic validation ---
+        if (empty($data['locationId']) || empty($data['theme'])) {
+            throw new Exception("Missing required fields");
+        }
+        // you can add more validation here (e.g. date format, time logic, etc.)
+
+        // --- 2) call the DAO to insert & get new PK ---
+        try {
+            $newId = $this->dao->createGathering($data);
+            return $newId;
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error creating gathering: " . $e->getMessage());
+            throw $e;
+        }
     }
 }

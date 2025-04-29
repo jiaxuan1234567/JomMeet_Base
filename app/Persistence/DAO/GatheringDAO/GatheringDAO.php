@@ -6,7 +6,6 @@ use PDO;
 use PDOException;
 use Database;
 
-
 class GatheringDAO
 {
     private $db;
@@ -30,7 +29,6 @@ class GatheringDAO
         }
     }
 
-
     public function getAllGatherings()
     {
         try {
@@ -47,7 +45,7 @@ class GatheringDAO
     {
         try {
             $searchTerm = "%{$searchTerm}%";
-            
+
             // Handle date formats
             $dateFormats = [
                 'Y-m-d',    // 2025-06-10
@@ -85,7 +83,7 @@ class GatheringDAO
                 OR TIME_FORMAT(endTime, '%h:%i %p') LIKE :searchTerm
                 OR TIME_FORMAT(endTime, '%h %p') LIKE :searchTerm
             ");
-            
+
             $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -150,8 +148,6 @@ class GatheringDAO
         }
     }
 
-
-
     public function addUserToGathering($userID, $gatheringID)
     {
         try {
@@ -180,5 +176,27 @@ class GatheringDAO
             error_log("Error in addUserToGathering: " . $e->getMessage());
             return false;
         }
+    }
+
+    // my-gathering
+    public function createGathering(array $d): int
+    {
+        $sql = "INSERT INTO `gathering` (locationID, theme, maxParticipant, minParticipant, currentParticipant, date, startTime, endTime, status, preference) 
+        VALUES (:locationID, :theme, :max, :min, :current, :date, :start, :end, :status, :preference)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':locationID'   => $d['locationId'],
+            ':theme'        => $d['theme'],
+            ':max'          => $d['maxParticipant'],
+            ':min'          => $d['minParticipant'],
+            ':current'      => $d['currentParticipant'] ?? 0,
+            ':date'         => $d['date'],
+            ':start'        => $d['startTime'],
+            ':end'          => $d['endTime'],
+            ':status'       => $d['status'],
+            ':preference'   => $d['preference'],
+        ]);
+
+        return (int)$this->db->lastInsertId();
     }
 }
