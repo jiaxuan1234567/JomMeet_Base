@@ -36,14 +36,4 @@ class HomeModel
     {
         return (new ProfileModel())->logout();
     }
-
-    public function getMyGatherings($hostProfileId)
-    {
-        return (new GatheringModel())->getMyGatherings($hostProfileId);
-    }
-
-    public function getAllProfiles()
-    {
-        return (new ProfileModel())->getAllProfiles();
-    }
 }
