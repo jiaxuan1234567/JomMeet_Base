@@ -131,6 +131,39 @@ require_once __DIR__ . '/../HomeView/header.php';
         var $container = $('#gatheringList');
         var $tabs = $('#gatheringTabs button');
 
+        function buildActionMenu(g) {
+            if (g.status === 'cancelled') return ''; // No actions
+
+            let items = [];
+
+            if (g.isHost) {
+                // Host-specific actions
+                items.push('<li><a class="dropdown-item" href="#">Send Reminder</a></li>');
+                items.push('<li><a class="dropdown-item" href="#">Edit Gathering</a></li>');
+                items.push('<li><a class="dropdown-item text-danger" href="#">Cancel Gathering</a></li>');
+            } else if (g.status === 'new') {
+                items.push('<li><a class="dropdown-item" href="#">Reply Reminder</a></li>');
+                items.push('<li><a class="dropdown-item text-danger" href="#">Leave Gathering</a></li>');
+            } else if (g.status === 'start') {
+                items.push('<li><a class="dropdown-item" href="#">Reply Reminder</a></li>');
+            } else if (g.status === 'end') {
+                items.push('<li><a class="dropdown-item" href="gathering-feedback.php?status=completed">Gathering Feedback</a></li>');
+                items.push('<li><a class="dropdown-item" href="location-feedback.php?status=completed">Location Feedback</a></li>');
+            }
+
+            if (!items.length) return '';
+
+            return `
+                <div class="dropdown rounded border-0">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
+                        Action
+                    </button>
+                    <ul class="dropdown-menu">
+                        ${items.join('')}
+                    </ul>
+                </div>`;
+        }
+
         function renderGatherings(list) {
             if (!list.length) {
                 return $container.html('<p class="text-center text-muted mt-4">No gatherings found.</p>');
@@ -160,17 +193,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                         </div>
                         <div class="d-flex gap-2">
                             <a href="/my-gathering/view/${g.id}" class="btn btn-sm w-100 px-3 fw-bold text-white" style="background-color: #569FFF; border: none; border-radius: 20px;">View Details</a>
-
-                            <div class="dropdown rounded border-0">
-                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
-                                    Action
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Send Reminder</a></li>
-                                    <li><a class="dropdown-item" href="#">Edit Gathering</a></li>
-                                    <li><a class="dropdown-item" href="#">Cancel Gathering</a></li>
-                                </ul>
-                            </div>
+            ${buildActionMenu(g)}
                         </div>
                     </div>
                 </div>
