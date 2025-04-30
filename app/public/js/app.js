@@ -5,10 +5,10 @@
 // flash Message
 $(function () {
     const $msg = $('#flashMessage');
-    if (!$msg.length) return;
-
     const type = $msg.data('type');
-    if (type !== 'sucess' && type !== 'error') return;
+    const text = $msg.data('msg');
+
+    if ((type !== 'sucess' && type !== 'error') || !text) return;
 
     // Add Bootstrap Icon before the text
     const icons = {
@@ -17,7 +17,7 @@ $(function () {
     };
 
     const iconClass = icons[type];
-    $msg.prepend(`<i class="bi ${iconClass} me-2" style="font-size: 35px;"></i>`);
+    $msg.prepend(`<i class="bi ${iconClass} me-2" style="font-size: 35px;"></i> ${text}`);
 
     // Base styles
     $msg.css({

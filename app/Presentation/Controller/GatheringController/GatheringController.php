@@ -57,7 +57,7 @@ class GatheringController
         try {
             $newId = $this->gatheringModel->createGathering($data);
             $_SESSION['flash_message'] = 'Gathering has been created successfully!';
-            $_SESSION['flash_type'] = 'success'; // can be: success, error, warning, info
+            $_SESSION['flash_type'] = 'success';
 
             header("Location: /my-gathering#hosted");
             exit;
