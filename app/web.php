@@ -33,6 +33,7 @@ Route::get('/gathering/view/{id}', [GatheringController::class, 'viewDetail']);
 Route::post('/gathering/search', [GatheringController::class, 'searchGatherings']);
 Route::post('/gathering/join', [GatheringController::class, 'joinGathering']);
 Route::get('/gathering/match/{userid}', [GatheringController::class, 'matchGathering']);
+
 // my-gathering routes
 Route::get('/my-gathering/view/{id}', [GatheringController::class, 'viewMyGatheringDetail']);
 Route::get('/my-gathering/create', [GatheringController::class, 'viewCreate']);
@@ -40,6 +41,7 @@ Route::post('/my-gathering/create', [GatheringController::class, 'createGatherin
 Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSelectLocation']);
 // before you dispatch
 Route::post('/my-gathering/create/location', [GatheringController::class, 'selectLocationSubmit']);
+Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGathering']);
 
 //AJAX
 Route::get('/api/check-gathering-status', [GatheringController::class, 'checkGatheringStatus']);

@@ -235,20 +235,35 @@ function showDetailPanel(loc, pos, liElem) {
 
     // hook up Select
     $panel.find('#selectBtn').on('click', () => {
-        //selectSavedLocation(loc, pos);
-
-        // build a mini‐form
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '/my-gathering/create/location';
-        // add the two hidden fields
-        ['locationID', 'locationName'].forEach(key => {
+
+        // Location values
+        const locationFields = {
+            locationID: loc.locationID,
+            locationName: loc.locationName
+        };
+
+        // Previous form values from query string
+        const urlParams = new URLSearchParams(window.location.search);
+        const keysToKeep = ['inputTheme', 'inputPax', 'inputDate', 'startTime', 'endTime'];
+
+        keysToKeep.forEach(key => {
+            if (urlParams.has(key)) {
+                locationFields[key] = urlParams.get(key);
+            }
+        });
+
+        // Append all as hidden fields
+        for (const key in locationFields) {
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = key;
-            input.value = key === 'locationID' ? loc.locationID : loc.locationName;
+            input.value = locationFields[key];
             form.appendChild(input);
-        });
+        }
+
         document.body.appendChild(form);
         form.submit();
     });

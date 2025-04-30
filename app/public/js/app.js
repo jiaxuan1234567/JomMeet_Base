@@ -8,7 +8,7 @@ $(function () {
     const type = $msg.data('type');
     const text = $msg.data('msg');
 
-    if ((type !== 'sucess' && type !== 'error') || !text) return;
+    if ((type !== 'success' && type !== 'error') || !text) return;
 
     // Add Bootstrap Icon before the text
     const icons = {

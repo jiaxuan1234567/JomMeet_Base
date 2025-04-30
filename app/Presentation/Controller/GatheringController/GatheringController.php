@@ -27,17 +27,19 @@ class GatheringController
 
     // -- My Gathering --
 
+    // GET: create-gathering
     public function viewCreate()
     {
-        $sel = $_SESSION['selected_location'] ?? ['locationID' => '', 'locationName' => ''];
-        $locationId  = $sel['locationID'];
-        $locationName   = $sel['locationName'];
+        // $sel = $_SESSION['selected_location'] ?? ['locationID' => '', 'locationName' => ''];
+        // $locationId  = $sel['locationID'];
+        // $locationName   = $sel['locationName'];
 
-        unset($_SESSION['selected_location']);
+        // unset($_SESSION['selected_location']);
 
         include $this->fileHelper->getFilePath('CreateGathering');
     }
 
+    // POST: create-gathering
     public function createGathering()
     {
         $data = [
@@ -68,26 +70,36 @@ class GatheringController
         }
     }
 
+    // GET: select-location
     public function viewSelectLocation()
     {
         $redirectUrl = $_GET['redirect'] ?? '/my-gathering/create';
         require_once $this->fileHelper->getFilePath('SelectLocation');
     }
 
+    // POST: select-location
     public function selectLocationSubmit()
     {
-        $locationId = $_POST['locationID'] ?? '';
-        $locationName = $_POST['locationName'] ?? '';
+        $query = http_build_query([
+            'locationID' => $_POST['locationID'],
+            'locationName' => $_POST['locationName'],
+            'inputTheme' => $_POST['inputTheme'] ?? '',
+            'inputPax' => $_POST['inputPax'] ?? '',
+            'inputDate' => $_POST['inputDate'] ?? '',
+            'startTime' => $_POST['startTime'] ?? '',
+            'endTime' => $_POST['endTime'] ?? '',
+        ]);
 
-        if ($locationId && $locationName) {
-            $_SESSION['selected_location'] = [
-                'locationID' => $locationId,
-                'locationName'    => $locationName,
-            ];
-        }
+        header("Location: /my-gathering/create?$query");
+        exit;
+    }
 
-        // Redirect back to the create‐form
-        header('Location: /my-gathering/create');
+    // POST: cancel-gathering
+    public function cancelGathering($id)
+    {
+        $result = $this->gatheringModel->cancelGathering($id);
+
+        header("Location: " . ($result ? "/my-gathering#cancelled" : '/my-gathering'));
         exit;
     }
 

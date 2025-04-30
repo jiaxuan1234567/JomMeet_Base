@@ -220,6 +220,36 @@ class GatheringModel
         }
     }
 
+    // Host Cancel Gathering
+    public function cancelGathering($id)
+    {
+        $profileID = $_SESSION['profile']['profileID'];
+        $gathering = $this->dao->getGatheringById($id);
+
+        // validate user is host
+        if ($profileID != $gathering['hostProfileID']) {
+            $_SESSION['flash_message'] = "Unauthorized action.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
+        // validate time constraint
+        $start = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+        $hoursDiff = ($start->getTimestamp() - (new DateTime())->getTimestamp()) / 3600;
+        if ($hoursDiff < 3) {
+            $_SESSION['flash_message'] = "Gathering can only be cancelled at least 3 hours before it starts.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
+        $result = $this->dao->updateStatus($id, 'CANCELLED');
+
+        $_SESSION['flash_message'] = $result ? "Gathering cancelled successfully." : "Something went wrong.";
+        $_SESSION['flash_type'] = $result ? "success" : "error";
+
+        return $result;
+    }
+
     public function matchGathering(int $userID): array
     {
         try {

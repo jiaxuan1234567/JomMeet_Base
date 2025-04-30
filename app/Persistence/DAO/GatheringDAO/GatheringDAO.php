@@ -284,4 +284,18 @@ class GatheringDAO
 
         return (int)$this->db->lastInsertId();
     }
+
+    public function updateStatus($gathiringID, $status)
+    {
+        try {
+            $stmt = $this->db->prepare("UPDATE `gathering` SET status = :status WHERE gatheringID = :id");
+            return $stmt->execute([
+                ':status' => $status,
+                ':id' => $gathiringID
+            ]);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] updateStatus error: " . $e->getMessage());
+            return false;
+        }
+    }
 }

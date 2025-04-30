@@ -3,29 +3,24 @@ $_title = 'My Gathering';
 
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
-
-<?php if (!empty($_SESSION['flash_message'])): ?>
-    <div id="flashMessage"
-        class="flash-message"
-        data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
-        data-msg="<?= $_SESSION['flash_message'] ?>">
-    </div>
-    <?php
-    unset($_SESSION['flash_message']);
-    unset($_SESSION['flash_type']);
-    ?>
-<?php endif; ?>
-
-
+<style>
+    .action-dropdown a:hover,
+    .action-dropdown button:hover {
+        background-color: #569FFF;
+        color: #F5F5F7;
+    }
+</style>
 
 <div class="container-fluid my-5 mb-5">
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
         <h2 class="fw-bold">My Gathering</h2>
-        <a href="/my-gathering/create" class="btn btn-primary px-4"
-            style="background-color: #fff; color: #000; border: 2px solid #fff; transition: background-color 0.3s, color 0.3s, border 0.3s;"
-            onmouseover="this.style.backgroundColor='#569FFF'; this.style.color='#fff'; this.style.border='2px solid #569FFF';"
-            onmouseout="this.style.backgroundColor='#fff'; this.style.color='#000'; this.style.border='2px solid #fff';">Create</a>
+        <a href="/my-gathering/create" class="btn btn-outline-dark d-flex align-items-center py-1 px-2 rounded ">
+            <span class="d-inline-block bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;">
+                <i class="bi bi-plus" style="font-size: 1.25rem;"></i>
+            </span>
+            <span class="fw-bold me-1">Create</span>
+        </a>
     </div>
     <div class="container">
         <ul class="nav justify-content-center nav-pills nav-justified mb-4" id="gatheringTabs" role="tablist">
@@ -124,12 +119,36 @@ require_once __DIR__ . '/../HomeView/header.php';
 
     </div>
     <div style="height: 300px;"></div>
+
+    <?php
+    if (!empty($_SESSION['flash_message'])):
+    ?>
+        <div id="flashMessage"
+            class="flash-message"
+            data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
+            data-msg="<?= $_SESSION['flash_message'] ?>">
+        </div>
+        <?php
+        unset($_SESSION['flash_message']);
+        unset($_SESSION['flash_type']);
+        ?>
+    <?php endif; ?>
 </div>
 <script>
     $(function() {
         var allGatherings = <?= json_encode($myGatherings) ?>;
         var $container = $('#gatheringList');
         var $tabs = $('#gatheringTabs button');
+
+        function renderPostList(url, btnTitle, cfmTitle) {
+            return `
+                <li>
+                    <form method="POST" action="${url}" onsubmit="return confirm('${cfmTitle}')" style="margin:0;">
+                        <button type="submit" class="dropdown-item fw-bold">${btnTitle}</button>
+                    </form>
+                </li>
+            `;
+        }
 
         function buildActionMenu(g) {
             if (g.status === 'cancelled') return ''; // No actions
@@ -138,17 +157,17 @@ require_once __DIR__ . '/../HomeView/header.php';
 
             if (g.isHost) {
                 // Host-specific actions
-                items.push('<li><a class="dropdown-item" href="#">Send Reminder</a></li>');
-                items.push('<li><a class="dropdown-item" href="#">Edit Gathering</a></li>');
-                items.push('<li><a class="dropdown-item text-danger" href="#">Cancel Gathering</a></li>');
+                items.push('<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>');
+                items.push('<li><a class="dropdown-item fw-bold" href="#">Edit Gathering</a></li>');
+                items.push(renderPostList(`my-gathering/cancel/${g.id}`, 'Cancel Gathering', 'Confirm to cancel the gathering?'));
             } else if (g.status === 'new') {
-                items.push('<li><a class="dropdown-item" href="#">Reply Reminder</a></li>');
-                items.push('<li><a class="dropdown-item text-danger" href="#">Leave Gathering</a></li>');
+                items.push('<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>');
+                items.push(renderPostList(`gathering/leave/${g.id}`, 'Cancel Gathering', 'Confirm to leave the gathering?'));
             } else if (g.status === 'start') {
-                items.push('<li><a class="dropdown-item" href="#">Reply Reminder</a></li>');
+                items.push('<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>');
             } else if (g.status === 'end') {
-                items.push('<li><a class="dropdown-item" href="gathering-feedback.php?status=completed">Gathering Feedback</a></li>');
-                items.push('<li><a class="dropdown-item" href="location-feedback.php?status=completed">Location Feedback</a></li>');
+                items.push('<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>');
+                items.push('<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>');
             }
 
             if (!items.length) return '';
@@ -158,7 +177,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                     <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
                         Action
                     </button>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
                         ${items.join('')}
                     </ul>
                 </div>`;
