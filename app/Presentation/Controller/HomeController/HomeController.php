@@ -27,7 +27,7 @@ class HomeController
 
     public function profileHome()
     {
-        $profile = (new HomeModel())->getProfileDetails();
+        $profile = $_SESSION['profile'];
         include $this->fileHelper->getFilePath('Profile');
     }
 
