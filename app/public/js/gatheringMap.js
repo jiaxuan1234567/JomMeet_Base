@@ -4,19 +4,20 @@ let map;
 let markers = [];
 let savedLocations = null;
 const markerMap = {};
+let currentActiveMarker = null;
 
 // 1) Dynamically load Maps + Places libraries
 async function loadLibraries() {
     const [mapsLib, placesLib] = await Promise.all([
-        google.maps.importLibrary("maps"),    // core Map, Marker, LatLng, etc.
-        google.maps.importLibrary("places"),  // Place, AutocompleteSessionToken
+        google.maps.importLibrary("maps"),
+        google.maps.importLibrary("places"),
     ]);
     return { ...mapsLib, ...placesLib };
 }
 
 // 2) Initialize map & session token
 async function initMap() {
-    const { Map, AutocompleteSessionToken } = await loadLibraries();
+    const { Map } = await loadLibraries();
 
     map = new Map(document.getElementById("map"), {
         center: { lat: 3.1390, lng: 101.6869 },
@@ -32,9 +33,6 @@ async function initMap() {
             }
         ]
     });
-
-    // one InfoWindow for the whole page
-    infoWindow = new google.maps.InfoWindow();
 
     // then fetch and wire up your savedLocations…
     savedLocations = await $.getJSON('/api/savedLocations');
@@ -69,11 +67,6 @@ async function initMap() {
 
     // wire up your search UI
     $('#searchBtn').on('click', performSearch);
-    $('#searchBox').on('keydown', e => {
-        //e.preventDefault();
-        performSearch();
-
-    });
 
     // seed hidden lat/lng inputs
     updateCoordinates(map.getCenter().toJSON());
@@ -84,7 +77,6 @@ async function initMap() {
 //     const query = $('#searchBox').val().trim();
 //     if (!query) return;
 
-//     clearMarkers();
 //     $('#resultsList').empty();
 
 //     const { Place, Marker, LatLng, Size, Animation } = await loadLibraries();
@@ -173,7 +165,6 @@ async function initMap() {
 /* ------------------------ performSearch start ---------------------------------------- */
 
 async function performSearch() {
-    const raw = $('#searchBox').val();
     const query = $('#searchBox').val().trim().toLowerCase();
 
     // 1) Always clear UI if the box is empty
@@ -319,12 +310,26 @@ function showDetailPanel(loc, pos, liElem) {
     // center and bounce
     map.panTo(pos);
     map.setZoom(17);
-    markers.forEach(m => {
-        if (m.placeData.placeId === loc.placeID) {
-            m.setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(() => m.setAnimation(null), 700);
-        }
-    });
+
+    if (currentActiveMarker) {
+        currentActiveMarker.setIcon({
+            url: '/asset/geo-alt.svg',
+            scaledSize: new google.maps.Size(32, 32)
+        });
+    }
+
+    // Highlight new marker
+    const activeMarker = markers.find(m => m.placeData.locationID === loc.locationID);
+    if (activeMarker) {
+        activeMarker.setIcon({
+            url: '/asset/geo-alt.svg',
+            scaledSize: new google.maps.Size(48, 48) // enlarge it
+        });
+
+        currentActiveMarker = activeMarker;
+    }
+    activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(() => activeMarker.setAnimation(null), 700);
 }
 
 $(document).on('click', '#detailOverlay', function (e) {
@@ -332,8 +337,19 @@ $(document).on('click', '#detailOverlay', function (e) {
     if (e.target.id === 'detailOverlay') {
         $('#detailOverlay').hide();
         $('#detailPanel').hide();
+        resetActiveMarker();
     }
 });
+
+function resetActiveMarker() {
+    if (currentActiveMarker) {
+        currentActiveMarker.setIcon({
+            url: '/asset/geo-alt.svg',
+            scaledSize: new google.maps.Size(32, 32)
+        });
+        currentActiveMarker = null;
+    }
+}
 
 function selectSavedLocation(loc, pos) {
     map.panTo(pos);
@@ -341,13 +357,6 @@ function selectSavedLocation(loc, pos) {
     $('#latitude').val(pos.lat);
     $('#longitude').val(pos.lng);
     // if you want to re-save, you already have it in DB—no need to POST again
-}
-/* ------------------------ performSearch end ---------------------------------------- */
-
-// remove old markers from the map
-function clearMarkers() {
-    markers.forEach(m => m.setMap(null));
-    markers = [];
 }
 
 // update your hidden <input>s with the given coords
@@ -389,6 +398,7 @@ $(document).ready(function () {
         $vertBar.addClass('d-none');
         $('#resultsList').empty();
         $('#detailPanel').hide();
+        resetActiveMarker();
         $searchBox.focus();
     });
 
