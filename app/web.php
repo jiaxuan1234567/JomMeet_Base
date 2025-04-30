@@ -23,7 +23,7 @@ Route::post('/reflection/create', [ReflectionController::class, 'saveReflection'
 Route::get('/reflection/edit/{id}', [ReflectionController::class, 'editReflection']);
 Route::post('/reflection/edit/{id}', [ReflectionController::class, 'editSaveReflection']);
 Route::get('/reflection/delete', [ReflectionController::class, 'deleteReflection']);
-Route::get('/reflection/view', [ReflectionController::class, 'viewReflection']);
+Route::get('/reflection/view/{id}', [ReflectionController::class, 'viewReflection']);
 
 // gathering routes
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);

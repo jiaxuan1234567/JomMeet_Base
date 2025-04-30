@@ -9,12 +9,6 @@ $old = $_SESSION['old'] ?? [];
 // Clear after use
 unset($_SESSION['reflectionErrors']);
 unset($_SESSION['old']); //user no need to redo
-
-
-?>
-
-<?php
-var_dump($reflectionSelected); // Debugging the data
 ?>
 
 <div class="main">

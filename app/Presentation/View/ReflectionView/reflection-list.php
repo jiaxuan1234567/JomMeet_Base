@@ -25,7 +25,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                     <?php foreach ($reflections as $reflection): ?>
                         <div class="row container border border-2 rounded-3 m-2" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
                             <div class="col-md-10">
-                                <a href="/reflection/view" class="text-decoration-none text-reset">
+                                <a href="/reflection/view/<?= $reflection['selfreflectID'] ?>" class="text-decoration-none text-reset">
                                 <div>
                                     <h4 class="font-weight-medium mb-0" data-asw-orgfontsize="24" style="font-size: 24px;padding: 10px 0;"><?php echo htmlspecialchars(date('j F Y g:ia', strtotime($reflection['date']))); ?></h4>
                                     <p><b><?php echo htmlspecialchars($reflection['title']); ?></b></p>
