@@ -19,7 +19,12 @@ $asset = new FileHelper('asset');
     <div class="container justify-content-between p-3 mt-7 border rounded bg-blue-color border-light-blue">
         <div class="row">
             <div class="col align-self-start">
-                <img src=" <?= $asset->getFilePath('map') ?>" alt="" style="width: 470px; height: 470px;">
+                <div
+                    id="map"
+                    data-lat="<?= htmlspecialchars($gathering['latitude']) ?>"
+                    data-lng="<?= htmlspecialchars($gathering['longitude']) ?>"
+                    style="width: 100%; height: 470px; border-radius: 10px;">
+                </div>
             </div>
             <div class="col align-self-start">
                 <div class="row">
@@ -46,5 +51,9 @@ $asset = new FileHelper('asset');
         </div>
     </div>
 </div>
+
+<script src="/js/displayMap.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIm3LWq0gbsblgi0kmbEscuFq9zUoERD4&v=beta&libraries=places&loading=async&callback=initMap">
+</script>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
