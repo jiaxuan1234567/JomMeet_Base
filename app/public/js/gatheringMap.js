@@ -38,7 +38,6 @@ async function initMap() {
         performSearch();
 
     });
-    $('#backToForm').on('click', () => history.back());
 
     // seed hidden lat/lng inputs
     updateCoordinates(map.getCenter().toJSON());

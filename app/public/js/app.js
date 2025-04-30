@@ -51,6 +51,14 @@ $(function () {
     setTimeout(() => $msg.fadeOut(500), 3000);
 });
 
+// back button
+$(function () {
+    $('#backToLastPage').on('click', function (e) {
+        e.preventDefault();
+        window.history.back();
+    });
+});
+
 
 // ============================================================================
 // Page Load (jQuery)

@@ -6,10 +6,13 @@ require_once __DIR__ . '/../HomeView/header.php';
 
 
 <div class="container-sm mt-4">
-    <div class="row">
-        <div class="col">
-            <h2>Gathering Detail</h2>
-        </div>
+    <div class="d-flex align-items-center">
+        <!-- back arrow -->
+        <button id="backToLastPage" class="btn p-0 me-2" style="width: auto; height: auto;">
+            <i class="bi bi-arrow-left h3 m-0"></i>
+        </button>
+        <!-- title -->
+        <h2 class="h5 fw-bold mb-0">Gathering Details</h2>
     </div>
 </div>
 

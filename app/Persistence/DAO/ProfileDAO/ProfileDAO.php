@@ -45,7 +45,7 @@ class ProfileDAO
             $profile = [
                 'profileID'     => (int)$base['profileID'],
                 'nickname'      => $base['nickname'],
-                'aboutMe'       => $base['aboutme'],
+                'aboutme'       => $base['aboutme'],
                 'mbti'          => $base['mbti'],
                 'profileStatus' => $base['profileStatus'],
                 'phone'         => $base['phone'],

@@ -162,7 +162,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                 items.push(renderPostList(`my-gathering/cancel/${g.id}`, 'Cancel Gathering', 'Confirm to cancel the gathering?'));
             } else if (g.status === 'new') {
                 items.push('<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>');
-                items.push(renderPostList(`gathering/leave/${g.id}`, 'Cancel Gathering', 'Confirm to leave the gathering?'));
+                items.push(renderPostList(`gathering/leave/${g.id}`, 'Leave Gathering', 'Confirm to leave the gathering?'));
             } else if (g.status === 'start') {
                 items.push('<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>');
             } else if (g.status === 'end') {
@@ -248,7 +248,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                     return allGatherings;
                     //return allGatherings.filter(g => g.isHost || g.isJoined);
                 case 'hosted':
-                    return allGatherings.filter(g => g.isHost);
+                    return allGatherings.filter(g => g.isHost && g.status !== 'cancelled');
                 case 'upcoming':
                     return allGatherings.filter(g => g.status === 'new');
                 case 'ongoing':

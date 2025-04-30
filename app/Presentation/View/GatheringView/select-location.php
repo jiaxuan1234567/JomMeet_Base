@@ -27,7 +27,7 @@ require_once __DIR__ . '/../HomeView/header.php';
         <!-- Back + Search Bar -->
         <div class="input-group mb-3 border border-black rounded align-items-center flex-nowrap">
             <span class="input-group-text border-0 bg-white d-flex align-items-center justify-content-center">
-                <i class="bi bi-arrow-left h5 m-0" id="backToForm" style="cursor:pointer;"></i>
+                <i class="bi bi-arrow-left h5 m-0" id="backToLastPage" style="cursor:pointer;"></i>
             </span>
 
             <div class="position-relative flex-grow-1">

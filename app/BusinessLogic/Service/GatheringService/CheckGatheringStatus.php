@@ -1,12 +1,11 @@
 <?php
 
 namespace BusinessLogic\Service\GatheringService;
+
 require_once __DIR__ . '/../../../autoload.php';
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
 use DateTime;
-
-date_default_timezone_set('Asia/Kuala_Lumpur'); // or whatever matches your system
 
 class CheckGatheringStatus
 {
