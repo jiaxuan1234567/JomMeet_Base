@@ -187,7 +187,9 @@ unset($_SESSION['flash_type']);
 
         function setActiveTab(status) {
             $tabs.each(function() {
-                var $b = $(this);
+                var $b = $(this); <<
+                <<
+                << < HEAD
                 if ($b.data('status') === status) {
                     $b
                         .removeClass('bg-white text-black')
@@ -198,7 +200,13 @@ unset($_SESSION['flash_type']);
                         .removeClass('text-white')
                         .addClass('bg-white text-black')
                         .css('background-color', '');
-                }
+                } ===
+                ===
+                =
+                $b.toggleClass('active', $b.data('status') === status)
+                    .toggleClass('bg-white text-black', $b.data('status') !== status); >>>
+                >>>
+                > main
             });
         }
 

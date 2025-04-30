@@ -70,7 +70,6 @@ class GatheringModel
     {
         try {
             error_log("[GatheringModel] Starting isBeforeStartTime check for gathering ID: " . $gatheringID);
-
             // Get the specific gathering by gatheringID
             $gathering = $this->dao->getGatheringById($gatheringID);
             if (!$gathering) {
@@ -95,7 +94,6 @@ class GatheringModel
                 error_log("[GatheringModel] Gathering has already started. Returning false");
                 return false;
             }
-
             error_log("[GatheringModel] Gathering is in the future. Returning true");
             return true;
         } catch (Exception $e) {
