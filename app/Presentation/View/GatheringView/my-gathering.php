@@ -141,7 +141,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                             <h6 class="fw-bold mb-1">${g.theme}</h6>
                             <p class="mb-0 small">Date: ${g.date}</p>
                             <p class="mb-0 small">Time: ${g.startTime}–${g.endTime}</p>
-                            <p class="mb-0 small">Venue: ${g.venue}</p>
+                            <p class="mb-0 small text-truncate">Venue: ${g.venue}</p>
                             <p class="mb-0 small">Pax: ${g.pax}/${g.maxPax}</p>
                         </div>
                         <div class="d-flex gap-2">

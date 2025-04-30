@@ -1,9 +1,7 @@
 <?php
 $_title = 'Joined Gathering Details';
 
-require_once __DIR__ . '/../../../FileHelper.php'; // adjust the path accordingly
 require_once __DIR__ . '/../HomeView/header.php';
-$asset = new FileHelper('asset');
 ?>
 
 
