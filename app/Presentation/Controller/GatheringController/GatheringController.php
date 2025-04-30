@@ -92,8 +92,16 @@ class GatheringController
     public function viewDetail($id)
     {
         $gathering = $this->gatheringModel->getGatheringById($id);
+
+        $userID = $_SESSION['profile']['profileID'] ?? null;
+        $isJoined = $this->gatheringModel->verifyUserInGathering($userID, $id);
+        $isHost = ($gathering['hostProfileID'] ?? null) == $userID;
+
         include $this->fileHelper->getFilePath('GatheringDetail');
     }
+
+    // wait
+    public function viewMyGatheringDetail($id) {}
 
     public function apiSavedLocations()
     {
@@ -241,14 +249,6 @@ class GatheringController
 
         header('Content-Type: application/json');
         echo json_encode(['updated' => $updated]);
-    }
-
-    public function viewMyGatheringDetails($id)
-    {
-        // Get the gathering details by ID
-        $gathering = $this->gatheringModel->getGatheringById($id);
-
-        include $this->fileHelper->getFilePath('MyGatheringDetails');
     }
 
     public function matchGathering($userid)

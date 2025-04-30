@@ -38,7 +38,7 @@ class HomeController
 
     public function gatheringHome()
     {
-        $gatherings = (new HomeModel())->getAllGatherings();
+        $gatherings = (new HomeModel())->getAvailableGatherings();
         include $this->fileHelper->getFilePath('GatheringList');
     }
 

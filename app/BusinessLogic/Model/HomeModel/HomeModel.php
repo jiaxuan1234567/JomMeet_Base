@@ -16,9 +16,10 @@ class HomeModel
         return (new ReflectionModel())->getAllReflections($profileId);
     }
 
-    public function getAllGatherings()
+    public function getAvailableGatherings()
     {
-        return (new GatheringModel())->getAllGatherings();
+        $profileId = $_SESSION['profile']['profileID'];
+        return (new GatheringModel())->getAvailableGatherings($profileId);
     }
 
     public function getMyGatherings($hostProfileId)

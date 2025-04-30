@@ -129,6 +129,19 @@ class GatheringDAO
         }
     }
 
+    // 
+    public function verifyUserInGathering($userID, $gatheringID)
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM profilegathering WHERE profileID = :pid AND gatheringID = :gid");
+            $stmt->execute([':pid' => $userID, ':gid' => $gatheringID]);
+            return (bool) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("userJoined error: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function getProfileByUserId($userID)
     {
         try {
@@ -196,6 +209,27 @@ class GatheringDAO
         }
     }
 
+    // vs ----
+    public function getAvailableGatherings($profileId)
+    {
+        try {
+            $sql = "
+                SELECT g.*, l.* 
+                FROM location l
+                JOIN gathering g ON g.locationID = l.locationID
+                LEFT JOIN profilegathering p ON g.gatheringID = p.gatheringID AND p.profileID = :pid
+                WHERE (g.hostProfileID != :pid)
+                AND (g.maxParticipant > g.currentParticipant)
+                AND g.status IN ('NEW', 'START')";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':pid' => $profileId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] getUserGatherings: " . $e->getMessage());
+            return [];
+        }
+    }
+
     // my-gathering
     public function getMyGatherings($profileId)
     {
@@ -217,29 +251,6 @@ class GatheringDAO
                 JOIN gathering g ON l.locationID = g.locationID
                 JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
                 WHERE (g.hostProfileID = :pid) OR (p.profileID = :pid)";
-            // $sql = "
-            //   SELECT
-            //     g.gatheringID,
-            //     g.theme,
-            //     g.currentParticipant,
-            //     g.maxParticipant,
-            //     g.date,
-            //     g.startTime,
-            //     g.endTime,
-            //     g.status,
-            //     l.name     AS venue,
-            //     l.coverImg AS cover,
-            //     (g.hostProfileID = :pid)        AS isHost,
-            //     (p.profileID       IS NOT NULL) AS isJoined
-            //   FROM gathering g
-            //   JOIN location  l ON g.locationID = l.locationID
-            //   LEFT JOIN participation p
-            //     ON g.gatheringID = p.gatheringID
-            //    AND p.profileID  = :pid
-            //   WHERE g.hostProfileID = :pid
-            //      OR p.profileID    = :pid
-            //   ORDER BY g.date DESC, g.startTime
-            // ";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

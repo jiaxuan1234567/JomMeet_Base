@@ -25,6 +25,12 @@ class GatheringModel
         return $this->dao->getAllGatherings();
     }
 
+    // get getAvailableGatherings
+    public function getAvailableGatherings($profileId)
+    {
+        return $this->dao->getAvailableGatherings($profileId);
+    }
+
     public function searchGatherings(string $searchTerm): array
     {
         try {
@@ -44,18 +50,20 @@ class GatheringModel
 
     public function verifyUserInGathering($userID, $gatheringID)
     {
-        // Get the gatherings for the user
-        $gathering = $this->dao->getProfileGatheringByUserId($userID);
+        return $this->dao->verifyUserInGathering($userID, $gatheringID);
 
-        // Iterate through the gatherings
-        foreach ($gathering as $g) {
-            // Check if this gathering matches the user and the gathering ID
-            if ($g['gatheringID'] == $gatheringID && $g['profileID'] == $userID) {
-                error_log("User $userID is already part of gathering $gatheringID.");
-                return false; // The user is already part of this gathering
-            }
-        }
-        return true; // User has not joined this gathering
+        // // Get the gatherings for the user
+        // $gathering = $this->dao->getProfileGatheringByUserId($userID);
+
+        // // Iterate through the gatherings
+        // foreach ($gathering as $g) {
+        //     // Check if this gathering matches the user and the gathering ID
+        //     if ($g['gatheringID'] == $gatheringID && $g['profileID'] == $userID) {
+        //         error_log("User $userID is already part of gathering $gatheringID.");
+        //         return false; // The user is already part of this gathering
+        //     }
+        // }
+        // return true; // User has not joined this gathering
     }
 
     public function isBeforeStartTime($gatheringID)

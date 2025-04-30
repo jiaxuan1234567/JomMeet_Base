@@ -57,16 +57,12 @@ $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
                 <div class="row justify-content-center">
                     <a href="/gathering" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Back</a>
 
-                    <?php if ($gathering['currentParticipant'] < $gathering['maxParticipant']): ?>
-                        <?php if ($notJoined): ?> <!-- Only show the form if the user has not joined -->
-                            <form method="POST" action="/gathering/join" style="width:200px;">
-                                <input type="hidden" name="userid" value="<?php echo htmlspecialchars($userid); ?>">
-                                <input type="hidden" name="gatheringid" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
-                                <button data-confirm type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">
-                                    Join Gathering
-                                </button>
-                            </form>
-                        <?php endif; ?>
+                    <?php if (!$isHost && !$isJoined && ($gathering['currentParticipant'] < $gathering['maxParticipant'])): ?>
+                        <form method="POST" action="/gathering/join" style="width:200px;">
+                            <input type="hidden" name="userid" value="<?php echo htmlspecialchars($userid); ?>">
+                            <input type="hidden" name="gatheringid" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
+                            <button data-confirm type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">Join Gathering</button>
+                        </form>
                     <?php endif; ?>
                 </div>
             </div>
