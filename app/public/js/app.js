@@ -1,6 +1,22 @@
 // ============================================================================
 // General Functions
 // ============================================================================
+// header active nav
+$(document).ready(function () {
+    const currentPath = window.location.pathname;
+
+    $('.navbar .nav-link').each(function () {
+        const href = $(this).attr('href');
+
+        if (
+            href === currentPath ||
+            (currentPath.startsWith('/gathering') && href === '/gathering' && !currentPath.startsWith('/my-gathering')) ||
+            (currentPath.startsWith('/my-gathering') && href === '/my-gathering')
+        ) {
+            $(this).addClass('active');
+        }
+    });
+});
 
 // flash Message
 $(function () {

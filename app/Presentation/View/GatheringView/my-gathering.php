@@ -2,6 +2,7 @@
 $_title = 'My Gathering';
 
 require_once __DIR__ . '/../HomeView/header.php';
+$asset = new FileHelper('asset');
 ?>
 <style>
     .action-dropdown a:hover,
@@ -23,10 +24,10 @@ require_once __DIR__ . '/../HomeView/header.php';
         </a>
     </div>
     <div class="container">
-        <ul class="nav justify-content-center nav-pills nav-justified mb-4" id="gatheringTabs" role="tablist">
+        <ul class="nav justify-content-center nav-pills nav-justified mb-4 fw-semibold" id="gatheringTabs" role="tablist">
             <li class="nav-item m-3" role="presentation">
                 <button
-                    class="nav-link text-white"
+                    class="nav-link text-white border border-black"
                     id="all-tab"
                     data-status="all"
                     type="button"
@@ -35,7 +36,7 @@ require_once __DIR__ . '/../HomeView/header.php';
             </li>
             <li class="nav-item m-3" role="presentation">
                 <button
-                    class="nav-link bg-white text-black border"
+                    class="nav-link bg-white text-black border border-black"
                     id="hosted-tab"
                     data-status="hosted"
                     type="button"
@@ -44,7 +45,7 @@ require_once __DIR__ . '/../HomeView/header.php';
             </li>
             <li class="nav-item m-3" role="presentation">
                 <button
-                    class="nav-link bg-white text-black border"
+                    class="nav-link bg-white text-black border border-black"
                     id="upcoming-tab"
                     data-status="upcoming"
                     type="button"
@@ -53,7 +54,7 @@ require_once __DIR__ . '/../HomeView/header.php';
             </li>
             <li class="nav-item m-3" role="presentation">
                 <button
-                    class="nav-link bg-white text-black border"
+                    class="nav-link bg-white text-black border border-black"
                     id="ongoing-tab"
                     data-status="ongoing"
                     type="button"
@@ -62,7 +63,7 @@ require_once __DIR__ . '/../HomeView/header.php';
             </li>
             <li class="nav-item m-3" role="presentation">
                 <button
-                    class="nav-link bg-white text-black border"
+                    class="nav-link bg-white text-black border border-black"
                     id="completed-tab"
                     data-status="completed"
                     type="button"
@@ -71,7 +72,7 @@ require_once __DIR__ . '/../HomeView/header.php';
             </li>
             <li class="nav-item m-3" role="presentation">
                 <button
-                    class="nav-link bg-white text-black border"
+                    class="nav-link bg-white text-black border border-black"
                     id="cancelled-tab"
                     data-status="cancelled"
                     type="button"
@@ -185,7 +186,10 @@ require_once __DIR__ . '/../HomeView/header.php';
 
         function renderGatherings(list) {
             if (!list.length) {
-                return $container.html('<p class="text-center text-muted mt-4">No gatherings found.</p>');
+                return $container.html(`
+                <img src="<?= $asset->getFilePath('iconPNG'); ?>" alt="" class="mx-auto d-block w-25">
+                <p class="text-center text-black fw-semibold mt-4">No gatherings found.</p>
+                `);
             }
             var html = '';
             list.forEach(function(g) {
@@ -228,13 +232,13 @@ require_once __DIR__ . '/../HomeView/header.php';
                 var $b = $(this);
                 if ($b.data('status') === status) {
                     $b
-                        .removeClass('bg-white text-black')
+                        .removeClass('bg-white text-black border border-black')
                         .addClass('text-white')
                         .css('background-color', '#569FFF');
                 } else {
                     $b
                         .removeClass('text-white')
-                        .addClass('bg-white text-black')
+                        .addClass('bg-white text-black border border-black')
                         .css('background-color', '');
                 }
                 // $b.toggleClass('active', $b.data('status') === status)

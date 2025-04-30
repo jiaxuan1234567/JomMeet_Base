@@ -62,3 +62,7 @@ body {
 .button-blue-color {
     background-color: #569FFF;
 }
+
+.navbar .nav-link.active {
+    color: #569FFF;
+}
