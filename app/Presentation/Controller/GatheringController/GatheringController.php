@@ -29,9 +29,9 @@ class GatheringController
 
     public function viewCreate()
     {
-        $sel = $_SESSION['selected_location'] ?? ['locationId' => '', 'address' => ''];
-        $locationId  = $sel['locationId'];
-        $address   = $sel['address'];
+        $sel = $_SESSION['selected_location'] ?? ['locationID' => '', 'locationName' => ''];
+        $locationId  = $sel['locationID'];
+        $locationName   = $sel['locationName'];
 
         unset($_SESSION['selected_location']);
 
@@ -41,31 +41,23 @@ class GatheringController
     public function createGathering()
     {
         $data = [
-            'theme'          => $_POST['inputTheme'] ?? '',
-            'inputPax' => $_POST['inputPax'] ?? '',
-            'date'       => $_POST['inputDate'] ?? '',
-            'startTime' => $_POST['startTime'] ?? '',
-            'endTime' => $_POST['endTime'] ?? '',
-            'locationId'     => $_POST['locationId'] ?? '',
-        ];
-
-        $data = [
             'locationId'        => (int)($_POST['locationId'] ?? 0),
             'theme'             => trim($_POST['inputTheme'] ?? ''),
             'maxParticipant'    => (int)($_POST['inputPax'] ?? 0),
             'minParticipant'    => (int)($_POST['minParticipant'] ?? 3),
-            'currentParticipant' => 1,    // new gathering starts at zero
+            'currentParticipant' => 1,
             'date'              => $_POST['inputDate'] ?? '',
             'startTime'         => $_POST['startTime'] ?? '',
             'endTime'           => $_POST['endTime'] ?? '',
             'status'            => 'NEW',
             'preference'        => $_POST['preference'] ?? 'ENTERTAINMENT',
+            'hostProfileID' => $_SESSION['profile']['profileID']
         ];
 
         try {
             $newId = $this->gatheringModel->createGathering($data);
             // 3) Redirect to a "view" page or index
-            header("Location: /gathering/view/{$newId}");
+            header("Location: /my-gathering/view/{$newId}");
             exit;
         } catch (Exception $e) {
             // on error, you could re-render the form with $e->getMessage()
@@ -82,13 +74,13 @@ class GatheringController
 
     public function selectLocationSubmit()
     {
-        $id      = $_POST['locationId']  ?? null;
-        $address = $_POST['address']     ?? null;
+        $locationId = $_POST['locationID'] ?? '';
+        $locationName = $_POST['locationName'] ?? '';
 
-        if ($id && $address) {
+        if ($locationId && $locationName) {
             $_SESSION['selected_location'] = [
-                'locationId' => $id,
-                'address'    => $address,
+                'locationID' => $locationId,
+                'locationName'    => $locationName,
             ];
         }
 
@@ -107,7 +99,6 @@ class GatheringController
     {
         header('Content-Type: application/json');
         $svc = new LocationService();
-        // returns array of ['placeId'=>…, 'name'=>…, 'address'=>…, 'latitude'=>…, 'longitude'=>…]
         echo json_encode($svc->getAllLocations());
     }
 

@@ -62,32 +62,32 @@ class GatheringModel
     {
         try {
             error_log("[GatheringModel] Starting isBeforeStartTime check for gathering ID: " . $gatheringID);
-            
+
             // Get the specific gathering by gatheringID
             $gathering = $this->dao->getGatheringById($gatheringID);
             if (!$gathering) {
                 error_log("[GatheringModel] Gathering not found for ID: " . $gatheringID);
                 return false;
             }
-            
+
             // Get current system time
             $currentTime = new DateTime();
             error_log("[GatheringModel] Current system time: " . $currentTime->format('Y-m-d H:i:s'));
-            
+
             // Create DateTime object for gathering
             $gatheringDateTime = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $gathering['date'] . ' ' . $gathering['startTime']
             );
-            
+
             error_log("[GatheringModel] Gathering time: " . $gatheringDateTime->format('Y-m-d H:i:s'));
-            
+
             // Compare current time with gathering time
             if ($currentTime > $gatheringDateTime) {
                 error_log("[GatheringModel] Gathering has already started. Returning false");
                 return false;
             }
-            
+
             error_log("[GatheringModel] Gathering is in the future. Returning true");
             return true;
         } catch (Exception $e) {
@@ -196,9 +196,10 @@ class GatheringModel
     public function createGathering($data)
     {
         // --- 1) basic validation ---
-        if (empty($data['locationId']) || empty($data['theme'])) {
-            throw new Exception("Missing required fields");
-        }
+        // if (empty($data['locationId']) || empty($data['theme'])) {
+        //     throw new Exception("Missing required fields");
+        // }
+        error_log(print_r($data));
         // you can add more validation here (e.g. date format, time logic, etc.)
 
         // --- 2) call the DAO to insert & get new PK ---

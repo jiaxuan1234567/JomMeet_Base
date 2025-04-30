@@ -16,16 +16,7 @@ class LocationDAO
 
   public function fetchAll()
   {
-    $sql = "
-          SELECT
-            locationID AS id,
-            placeID   AS placeId,
-            locationName AS name,
-            address,
-            latitude,
-            longitude
-          FROM `location`
-        ";
+    $sql = "SELECT * FROM `location`";
     $stmt = $this->db->query($sql);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }

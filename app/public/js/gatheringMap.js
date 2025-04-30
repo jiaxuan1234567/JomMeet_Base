@@ -154,8 +154,9 @@ async function performSearch() {
     $('#resultsList').empty();
     $('#detailPanel').hide();
 
+    // search location logic
     const results = savedLocations.filter(loc =>
-        loc.name.toLowerCase().includes(query) ||
+        loc.locationName.toLowerCase().includes(query) ||
         (loc.address && loc.address.toLowerCase().includes(query))
     );
 
@@ -169,7 +170,7 @@ async function performSearch() {
         // list item
         $('<li>')
             .addClass('list-group-item list-group-item-action')
-            .html(`<strong>${loc.name}</strong><br>${loc.address || ''}`)
+            .html(`<strong>${loc.locationName}</strong><br>${loc.address || ''}`)
             .appendTo('#resultsList')
             .on('click', function () {
                 showDetailPanel(loc, pos, this);
@@ -200,13 +201,15 @@ async function performSearch() {
     }
 }
 
+// location details
 function showDetailPanel(loc, pos, liElem) {
     const html = `
       <div class="card border-0">
         ${loc.image ? `<img src="${loc.image}" class="card-img-top">` : ''}
         <div class="card-body p-3">
-          <h5 class="card-title mb-1">${loc.name}</h5>
+          <h5 class="card-title mb-1">${loc.locationName}</h5>
           <p class="mb-1">${loc.address || ''}</p>
+
           ${loc.closeTime ? `<p class="mb-1"><small>Close: ${loc.closeTime}</small></p>` : ''}
           ${typeof loc.commentCount !== 'undefined'
             ? `<p class="mb-2"><small>Comment(${loc.commentCount})</small></p>`
@@ -239,11 +242,11 @@ function showDetailPanel(loc, pos, liElem) {
         form.method = 'POST';
         form.action = '/my-gathering/create/location';
         // add the two hidden fields
-        ['locationId', 'address'].forEach(key => {
+        ['locationID', 'locationName'].forEach(key => {
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = key;
-            input.value = key === 'locationId' ? loc.id : loc.address;
+            input.value = key === 'locationID' ? loc.locationID : loc.locationName;
             form.appendChild(input);
         });
         document.body.appendChild(form);
@@ -254,7 +257,7 @@ function showDetailPanel(loc, pos, liElem) {
     map.panTo(pos);
     map.setZoom(17);
     markers.forEach(m => {
-        if (m.placeData.placeId === loc.placeId) {
+        if (m.placeData.placeId === loc.placeID) {
             m.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(() => m.setAnimation(null), 700);
         }

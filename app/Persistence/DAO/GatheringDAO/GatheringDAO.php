@@ -249,10 +249,10 @@ class GatheringDAO
         }
     }
 
-    public function createGathering(array $d): int
+    public function createGathering(array $d)
     {
-        $sql = "INSERT INTO `gathering` (locationID, theme, maxParticipant, minParticipant, currentParticipant, date, startTime, endTime, status, preference) 
-        VALUES (:locationID, :theme, :max, :min, :current, :date, :start, :end, :status, :preference)";
+        $sql = "INSERT INTO `gathering` (locationID, theme, maxParticipant, minParticipant, currentParticipant, date, startTime, endTime, status, preference, hostProfileID) 
+        VALUES (:locationID, :theme, :max, :min, :current, :date, :start, :end, :status, :preference, :hostProfileID)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':locationID'   => $d['locationId'],
@@ -265,6 +265,7 @@ class GatheringDAO
             ':end'          => $d['endTime'],
             ':status'       => $d['status'],
             ':preference'   => $d['preference'],
+            ':hostProfileID' => $d['hostProfileID']
         ]);
 
         return (int)$this->db->lastInsertId();

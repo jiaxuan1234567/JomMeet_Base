@@ -40,7 +40,7 @@ class ProfileController
         //     error_log("[ProfileController] Stack trace: " . $e->getTraceAsString());
         // }
 
-        session_start();
+        //session_start();
 
         // Get submitted credentials
         $phoneNumber = $_POST['phoneNumber'] ?? '';

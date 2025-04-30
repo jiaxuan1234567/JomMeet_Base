@@ -13,7 +13,7 @@ class LocationService
         $this->locationDAO = new LocationDAO();
     }
 
-    public function getAllLocations(): array
+    public function getAllLocations()
     {
         return $this->locationDAO->fetchAll();
     }

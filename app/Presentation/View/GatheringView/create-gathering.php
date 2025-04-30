@@ -70,8 +70,10 @@ require_once __DIR__ . '/../HomeView/header.php';
                     </div>
                     <div class="col-sm-11">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="inputLocation" name="inputLocation" placeholder="Select a location" value="<?= htmlspecialchars($address) ?>" readonly>
+                            <input type="text" class="form-control" id="inputLocation" name="inputLocation" placeholder="Select a location" value="<?= htmlspecialchars($locationName) ?>" readonly>
+
                             <input type="hidden" name="locationId" value="<?= htmlspecialchars($locationId) ?>">
+
                             <button type="button" class="btn btn-outline-primary" id="chooseLocationBtn">Choose</button>
                         </div>
                     </div>
