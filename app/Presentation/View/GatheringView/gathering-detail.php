@@ -9,6 +9,8 @@ require_once __DIR__ . '/../HomeView/header.php';
 // $gatheringid = $gathering['gatheringID'];
 // // Call the method to check if the user has joined
 // $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
+
+$userid = $_SESSION['profile']['profileID'];
 ?>
 <div class="container-sm mt-4">
     <div class="row">

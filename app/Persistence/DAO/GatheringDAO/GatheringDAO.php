@@ -186,15 +186,15 @@ class GatheringDAO
             $this->db->beginTransaction();
 
             // First query: Add user to the profileGathering table
-            $stmt1 = $this->db->prepare("INSERT INTO profileGathering (profileID, gatheringID) VALUES (:profileID, :gatheringID)");
-            $stmt1->bindParam(':profileID', $userID, PDO::PARAM_INT);
-            $stmt1->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
-            $stmt1->execute();
+            $stmt1 = $this->db->prepare("INSERT INTO `profilegathering` (profileID, gatheringID) VALUES (:profileID, :gatheringID)");
+            $stmt1->execute([
+                ':profileID' => $userID,
+                ':gatheringID' =>  $gatheringID
+            ]);
 
             // Second query: Increment the currentParticipant in the gathering table
-            $stmt2 = $this->db->prepare("UPDATE gathering SET currentParticipant = currentParticipant + 1 WHERE gatheringID = :gatheringID");
-            $stmt2->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
-            $stmt2->execute();
+            $stmt2 = $this->db->prepare("UPDATE `gathering` SET currentParticipant = currentParticipant + 1 WHERE gatheringID = :gatheringID");
+            $stmt2->execute([':gatheringID' => $gatheringID]);
 
             // Commit the transaction if both queries were successful
             $this->db->commit();
@@ -214,13 +214,16 @@ class GatheringDAO
     {
         try {
             $sql = "
-                SELECT g.*, l.* 
-                FROM location l
-                JOIN gathering g ON g.locationID = l.locationID
-                LEFT JOIN profilegathering p ON g.gatheringID = p.gatheringID AND p.profileID = :pid
-                WHERE (g.hostProfileID != :pid)
-                AND (g.maxParticipant > g.currentParticipant)
-                AND g.status IN ('NEW', 'START')";
+             SELECT g.*, l.* 
+            FROM location l
+            JOIN gathering g ON g.locationID = l.locationID
+            LEFT JOIN profilegathering p 
+              ON g.gatheringID = p.gatheringID AND p.profileID = :pid
+            WHERE g.hostProfileID != :pid
+              AND p.profileID IS NULL
+              AND g.maxParticipant > g.currentParticipant
+              AND g.status IN ('NEW', 'START')
+              ";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

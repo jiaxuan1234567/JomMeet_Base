@@ -106,10 +106,10 @@ class GatheringModel
     // Add a user to a gathering (Join gathering)
     public function addUserToGathering(int $userID, int $gatheringID): bool
     {
-        if (!$this->verifyUserInGathering($userID, $gatheringID)) {
-            error_log("User $userID has already joined gathering $gatheringID.");
-            return false;
-        }
+        // if (!$this->verifyUserInGathering($userID, $gatheringID)) {
+        //     error_log("User $userID has already joined gathering $gatheringID.");
+        //     return false;
+        // }
 
         $result = $this->dao->addUserToGathering($userID, $gatheringID);
 
