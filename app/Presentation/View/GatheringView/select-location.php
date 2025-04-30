@@ -15,6 +15,13 @@ require_once __DIR__ . '/../HomeView/header.php';
     input[type="search"]::-webkit-search-results-decoration {
         display: none;
     }
+
+    #resultsList {
+        max-height: 92vh;
+        ;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
 </style>
 
 <script>
@@ -62,10 +69,9 @@ require_once __DIR__ . '/../HomeView/header.php';
         <div id="map" class="w-100 h-100"></div>
 
         <!-- move the detailPanel here -->
-        <div
-            id="detailPanel"
-            class="position-absolute ms-3 bg-white shadow rounded p-3 w-50"
-            style="display: none;"></div>
+        <div id="detailOverlay" class="position-absolute w-100 h-100 top-0 start-0" style="display: none; z-index: 10;">
+            <div id="detailPanel" class="position-absolute"></div>
+        </div>
     </div>
 </div>
 

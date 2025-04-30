@@ -3,6 +3,7 @@
 let map;
 let markers = [];
 let savedLocations = null;
+const markerMap = {};
 
 // 1) Dynamically load Maps + Places libraries
 async function loadLibraries() {
@@ -23,6 +24,13 @@ async function initMap() {
         mapTypeControl: false,
         fullscreenControl: false,
         streetViewControl: false,
+        clickableIcons: false,
+        styles: [
+            {
+                featureType: "poi",
+                stylers: [{ visibility: "off" }]
+            }
+        ]
     });
 
     // one InfoWindow for the whole page
@@ -30,6 +38,34 @@ async function initMap() {
 
     // then fetch and wire up your savedLocations…
     savedLocations = await $.getJSON('/api/savedLocations');
+
+    const bounds = new google.maps.LatLngBounds();
+
+    savedLocations.forEach(loc => {
+        const pos = {
+            lat: parseFloat(loc.latitude),
+            lng: parseFloat(loc.longitude)
+        };
+
+        const marker = new google.maps.Marker({
+            position: pos,
+            map,
+            icon: {
+                url: '/asset/geo-alt.svg',
+                scaledSize: new google.maps.Size(32, 32)
+            }
+        });
+
+        marker.placeData = loc;
+
+        marker.addListener('click', () => showDetailPanel(loc, pos, null));
+
+        markers.push(marker);
+        markerMap[loc.locationID] = marker; // map it
+        bounds.extend(pos);
+    });
+
+    map.fitBounds(bounds);
 
     // wire up your search UI
     $('#searchBtn').on('click', performSearch);
@@ -142,14 +178,12 @@ async function performSearch() {
 
     // 1) Always clear UI if the box is empty
     if (!query) {
-        clearMarkers();
         $('#resultsList').empty();
         $('#detailPanel').hide();
         return;
     }
 
     // 2) Otherwise, do your normal search/filtering…
-    clearMarkers();
     $('#resultsList').empty();
     $('#detailPanel').hide();
 
@@ -159,7 +193,21 @@ async function performSearch() {
         (loc.address && loc.address.toLowerCase().includes(query))
     );
 
+    if (results.length === 0) {
+        $('<li>')
+            .addClass('list-group-item text-start text-black fw-semibold border-0 bg-transparent')
+            .text('Location Not Available')
+            .appendTo('#resultsList');
+        return; // stop further processing
+    }
+
     results.forEach(loc => {
+        const marker = markerMap[loc.locationID];
+        if (marker) {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(() => marker.setAnimation(null), 700);
+        }
+
         // parseFloat ensures lat & lng are real numbers
         const pos = {
             lat: parseFloat(loc.latitude),
@@ -168,25 +216,18 @@ async function performSearch() {
 
         // list item
         $('<li>')
-            .addClass('list-group-item list-group-item-action')
+            .addClass('list-group-item list-group-item-action bg-transparent rounded-0')
+            .css({
+                'border-top': 'none',
+                'border-left': 'none',
+                'border-right': 'none',
+                'border-bottom': '1px solid #dee2e6' // Bootstrap’s default border color
+            })
             .html(`<strong>${loc.locationName}</strong><br>${loc.address || ''}`)
             .appendTo('#resultsList')
             .on('click', function () {
                 showDetailPanel(loc, pos, this);
             });
-
-        // marker on map
-        const marker = new google.maps.Marker({
-            position: pos,
-            map,
-            icon: {
-                url: '/asset/geo-alt.svg',
-                scaledSize: new google.maps.Size(32, 32)
-            }
-        });
-        marker.placeData = loc;
-        marker.addListener('click', () => showDetailPanel(loc, pos, null));
-        markers.push(marker);
     });
 
     if (results[0]) {
@@ -203,24 +244,32 @@ async function performSearch() {
 // location details
 function showDetailPanel(loc, pos, liElem) {
     const html = `
-      <div class="card border-0">
-        ${loc.image ? `<img src="${loc.image}" class="card-img-top">` : ''}
-        <div class="card-body p-3">
-          <h5 class="card-title mb-1">${loc.locationName}</h5>
-          <p class="mb-1">${loc.address || ''}</p>
-
-          ${loc.closeTime ? `<p class="mb-1"><small>Close: ${loc.closeTime}</small></p>` : ''}
-          ${typeof loc.commentCount !== 'undefined'
-            ? `<p class="mb-2"><small>Comment(${loc.commentCount})</small></p>`
-            : ''
-        }
-          <button id="selectBtn" class="btn btn-primary btn-sm">Select</button>
-        </div>
+    <div class="card shadow border-0 rounded-4" style="width: 260px;">
+      <img src="${loc.image || 'https://cdn-icons-png.flaticon.com/512/1161/1161388.png'}"
+           class="card-img-top rounded-top"
+           style="object-fit: cover; height: 120px;">
+  
+      <div class="card-body px-3 py-2">
+        <h6 class="fw-bold mb-1">${loc.locationName || 'Unnamed Location'}</h6>
+        <p class="mb-2 small text-muted">${loc.address || ''}</p>
+  
+        ${loc.closeTime ? `<p class="mb-2 small text-muted">Close: ${loc.closeTime}</p>` : ''}
+  
+        ${typeof loc.commentCount !== 'undefined' ? `
+          <p class="mb-1 small text-muted">Comment(${loc.commentCount})</p>
+        ` : ''}
+        <p class="mb-1 small text-muted">Comment (20)</p>
+        <a href="#" class="mb-1 small text-muted"><p>More Comments</p></a>
+        <button id="selectBtn"
+                class="btn btn-primary btn-sm w-100 rounded border-0 button-blue-color"
+                style="font-weight: 500;">
+          Select
+        </button>
       </div>
-    `;
-    const $panel = $('#detailPanel')
-        .html(html)
-        .show();
+    </div>
+  `;
+    const $overlay = $('#detailOverlay').show();
+    const $panel = $('#detailPanel').html(html).show();
 
     if (liElem) {
         // panel is absolutely positioned within its parent (.col-md-8.position-relative)
@@ -276,10 +325,15 @@ function showDetailPanel(loc, pos, liElem) {
             setTimeout(() => m.setAnimation(null), 700);
         }
     });
-    // const panelWidth = $('#detailPanel').outerWidth(true);
-    // map.panBy(-panelWidth / 2, 0);
-    // map.setZoom(17);
 }
+
+$(document).on('click', '#detailOverlay', function (e) {
+    // If the user clicks directly on the overlay (not the panel), hide everything
+    if (e.target.id === 'detailOverlay') {
+        $('#detailOverlay').hide();
+        $('#detailPanel').hide();
+    }
+});
 
 function selectSavedLocation(loc, pos) {
     map.panTo(pos);
@@ -335,7 +389,6 @@ $(document).ready(function () {
         $vertBar.addClass('d-none');
         $('#resultsList').empty();
         $('#detailPanel').hide();
-        clearMarkers();
         $searchBox.focus();
     });
 
