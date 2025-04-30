@@ -68,6 +68,9 @@ class ProfileDAO
         } catch (PDOException $e) {
             error_log("Error in getAllProfiles: " . $e->getMessage());
             return false;
+        }
+    }
+
     public function getProfileDetails($profileId)
     {
         try {
@@ -75,7 +78,7 @@ class ProfileDAO
             $stmt = $this->db->prepare(
                 "SELECT phone, nickname, mbti, aboutme, hobbies, preference FROM `profile` WHERE profileID = $profileId"
             );
-            
+
             $stmt->execute();
 
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
