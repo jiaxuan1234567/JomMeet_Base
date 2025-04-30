@@ -8,7 +8,7 @@ $asset = new FileHelper('asset');
 $controller = new GatheringController();
 
 //For testing purposes only
-$userid = 1;
+$userid = $_SESSION['profile']['profileID'];
 
 ?>
 

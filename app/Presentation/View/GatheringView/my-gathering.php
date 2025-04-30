@@ -1,106 +1,7 @@
 <?php
 $_title = 'My Gathering';
-//require_once __DIR__ . '/../../../FileHelper.php'; // adjust the path accordingly
+
 require_once __DIR__ . '/../HomeView/header.php';
-?>
-
-<?php
-// dummy data
-// $myGatherings = [
-//     [
-//         "cover" => "dinnerPic.png",
-//         "theme" => "Dinner",
-//         "date" => "17 June 2025",
-//         "startTime" => "6:00pm",
-//         "endTime" => "8:00pm",
-//         "pax" => 4,
-//         "venue" => "Anna Elizabeth Park",
-//         "status" => "hosted"
-//     ],
-//     [
-//         "cover" => "gameboy.png",
-//         "theme" => "Dinner",
-//         "date" => "29 June 2025",
-//         "startTime" => "6:00pm",
-//         "endTime" => "8:00pm",
-//         "pax" => 5,
-//         "venue" => "Anna Elizabeth Park",
-//         "status" => "hosted"
-//     ],
-//     [
-//         "cover" => "palm-tree.png",
-//         "theme" => "Dinner",
-//         "date" => "20 June 2025",
-//         "startTime" => "6:00pm",
-//         "endTime" => "8:00pm",
-//         "pax" => 5,
-//         "venue" => "Anna Elizabeth Park",
-//         "status" => "upcoming"
-//     ],
-
-//     [
-//         "cover" => "dinnerPic.png",
-//         "theme" => "Dinner",
-//         "date" => "20 June 2025",
-//         "startTime" => "6:00pm",
-//         "endTime" => "8:00pm",
-//         "pax" => 5,
-//         "venue" => "Anna Elizabeth Park",
-//         "status" => "ongoing"
-//     ],
-//     [
-//         "cover" => "dinnerPic.png",
-//         "theme" => "Dinner",
-//         "date" => "20 June 2025",
-//         "startTime" => "6:00pm",
-//         "endTime" => "8:00pm",
-//         "pax" => 5,
-//         "venue" => "Anna Elizabeth Park",
-//         "status" => "cancelled"
-//     ],
-//     [
-//         "cover" => "dinnerPic.png",
-//         "theme" => "Dinner",
-//         "date" => "20 June 2025",
-//         "startTime" => "6:00pm",
-//         "endTime" => "8:00pm",
-//         "pax" => 5,
-//         "venue" => "Anna Elizabeth Park",
-//         "status" => "completed"
-//     ],
-
-//     [
-//         "cover" => "dinnerPic.png",
-//         "theme" => "Dinner",
-//         "date" => "20 June 2025",
-//         "startTime" => "6:00pm",
-//         "endTime" => "8:00pm",
-//         "pax" => 5,
-//         "venue" => "Anna Elizabeth Park",
-//         "status" => "completed"
-//     ],
-//     [
-//         "cover" => "dinnerPic.png",
-//         "theme" => "Dinner",
-//         "date" => "20 June 2025",
-//         "startTime" => "6:00pm",
-//         "endTime" => "8:00pm",
-//         "pax" => 5,
-//         "venue" => "Anna Elizabeth Park",
-//         "status" => "upcoming"
-//     ],
-//     [
-//         "cover" => "dinnerPic.png",
-//         "theme" => "Dinner",
-//         "date" => "20 June 2025",
-//         "startTime" => "6:00pm",
-//         "endTime" => "8:00pm",
-//         "pax" => 5,
-//         "venue" => "Anna Elizabeth Park",
-//         "status" => "hosted"
-//     ],
-//     // More gatherings...
-// ];
 ?>
 
 <div class="container-fluid my-5 mb-5">
@@ -269,8 +170,17 @@ require_once __DIR__ . '/../HomeView/header.php';
         function setActiveTab(status) {
             $tabs.each(function() {
                 var $b = $(this);
-                $b.toggleClass('active', $b.data('status') === status)
-                    .toggleClass('bg-white text-black', $b.data('status') !== status);
+                if ($b.data('status') === status) {
+                    $b
+                        .removeClass('bg-white text-black')
+                        .addClass('text-white')
+                        .css('background-color', '#569FFF');
+                } else {
+                    $b
+                        .removeClass('text-white')
+                        .addClass('bg-white text-black')
+                        .css('background-color', '');
+                }
             });
         }
 
