@@ -10,7 +10,6 @@ class ProfileController
 {
     private $profileModel;
     private $fileHelper;
-    private $profileModel;
 
     public function __construct()
     {
@@ -78,5 +77,4 @@ class ProfileController
     {
         include $this->fileHelper->getFilePath('EditProfile');
     }
-
 }
