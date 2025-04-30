@@ -2,15 +2,13 @@
 $_title = 'Gathering Details';
 require_once __DIR__ . '/../HomeView/header.php';
 
-use Presentation\Controller\GatheringController\GatheringController;
-
-//For testing purposes only
-$userid = 1;
-$controller = new GatheringController();
-$gatheringid = $gathering['gatheringID'];
-error_log("Gathering ID: " . $gatheringid);
-// Call the method to check if the user has joined
-$notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
+//use Presentation\Controller\GatheringController\GatheringController;
+// //For testing purposes only
+// $userid = 1;
+// $controller = new GatheringController();
+// $gatheringid = $gathering['gatheringID'];
+// // Call the method to check if the user has joined
+// $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
 ?>
 <div class="container-sm mt-4">
     <div class="row">

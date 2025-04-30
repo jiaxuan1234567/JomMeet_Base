@@ -4,6 +4,24 @@ $_title = 'My Gathering';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
+<?php //if (!empty($_SESSION['flash_message'])): 
+$_SESSION['flash_message'] = 'Gathering has been created successfully!';
+$_SESSION['flash_type'] = 'error';
+?>
+<div id="flashMessage"
+    class="flash-message"
+    data-type="<?= $_SESSION['flash_type'] ?? 'info' ?>">
+    <?= $_SESSION['flash_message'] ?>
+</div>
+<?php
+unset($_SESSION['flash_message']);
+unset($_SESSION['flash_type']);
+?>
+<?php //endif; 
+?>
+
+
+
 <div class="container-fluid my-5 mb-5">
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">

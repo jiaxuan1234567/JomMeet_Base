@@ -2,6 +2,54 @@
 // General Functions
 // ============================================================================
 
+// flash Message
+$(function () {
+    const $msg = $('#flashMessage');
+    if (!$msg.length) return;
+
+    const type = $msg.data('type');
+    if (type !== 'sucess' && type !== 'error') return;
+
+    // Add Bootstrap Icon before the text
+    const icons = {
+        success: 'bi-check-circle',
+        error: 'bi-x-circle'
+    };
+
+    const iconClass = icons[type];
+    $msg.prepend(`<i class="bi ${iconClass} me-2" style="font-size: 35px;"></i>`);
+
+    // Base styles
+    $msg.css({
+        position: 'absolute',
+        top: '15px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        'align-items': 'center',
+        'justify-content': 'center',
+        padding: '0px 25px',
+        'border-radius': '10px',
+        'z-index': 9999,
+        'font-weight': 'bold',
+        'font-size': '15px',
+        'text-align': 'center',
+        'box-shadow': '0 4px 8px rgba(0,0,0,0.2)',
+        color: 'white',
+        'min-width': '300px'
+    });
+
+    // Type-specific styles
+    const styles = {
+        success: { backgroundColor: '#13E300' },
+        error: { backgroundColor: '#D94343' }
+    };
+
+    $msg.css(styles[type]);
+
+    // Auto-fade
+    setTimeout(() => $msg.fadeOut(500), 3000);
+});
 
 
 // ============================================================================

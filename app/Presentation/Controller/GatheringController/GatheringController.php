@@ -56,8 +56,10 @@ class GatheringController
 
         try {
             $newId = $this->gatheringModel->createGathering($data);
-            // 3) Redirect to a "view" page or index
-            header("Location: /my-gathering/view/{$newId}");
+            $_SESSION['flash_message'] = 'Gathering has been created successfully!';
+            $_SESSION['flash_type'] = 'success'; // can be: success, error, warning, info
+
+            header("Location: /my-gathering#hosted");
             exit;
         } catch (Exception $e) {
             // on error, you could re-render the form with $e->getMessage()
@@ -101,7 +103,11 @@ class GatheringController
     }
 
     // wait
-    public function viewMyGatheringDetail($id) {}
+    public function viewMyGatheringDetail($id)
+    {
+        $gathering = $this->gatheringModel->getGatheringById($id);
+        include $this->fileHelper->getFilePath('MyGatheringDetails');
+    }
 
     public function apiSavedLocations()
     {
