@@ -174,11 +174,14 @@ require_once __DIR__ . '/../HomeView/header.php';
     $(function() {
         const $date = $('#inputDate');
         const today = new Date().toISOString().split('T')[0];
-        $date.attr('min', today).val(today);
-        $date.val(today);
+        $date.attr('min', today);
+
+        if (!$date.val()) {
+            $date.val(today);
+        }
     });
-    $('.input-group-text').on('click', function() {
-        $('#inputDate')[0].showPicker?.(); // Best browser support (Chrome 93+)
+    $('.input-group-text').on('click', () => {
+        document.getElementById('inputDate').showPicker?.();
     });
 
     // time button
@@ -232,7 +235,6 @@ require_once __DIR__ . '/../HomeView/header.php';
 
         // Set default to today
         const today = new Date().toISOString().split('T')[0];
-        $date.val(today);
         updateStartTimeMin();
     });
 </script>

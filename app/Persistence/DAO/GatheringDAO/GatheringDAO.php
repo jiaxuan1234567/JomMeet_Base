@@ -285,16 +285,29 @@ class GatheringDAO
         return (int)$this->db->lastInsertId();
     }
 
-    public function updateStatus($gathiringID, $status)
+    public function cancelWithParticipant($gatheringID)
     {
         try {
-            $stmt = $this->db->prepare("UPDATE `gathering` SET status = :status WHERE gatheringID = :id");
-            return $stmt->execute([
-                ':status' => $status,
-                ':id' => $gathiringID
-            ]);
+            $this->db->beginTransaction();
+
+            // 1. Get participants BEFORE deleting
+            $selectStmt = $this->db->prepare("SELECT profileID FROM profilegathering WHERE gatheringID = :id");
+            $selectStmt->execute([':id' => $gatheringID]);
+            $participants = $selectStmt->fetchAll(PDO::FETCH_COLUMN);
+
+            // 2. Update status
+            $updateStmt = $this->db->prepare("UPDATE gathering SET status = 'CANCELLED' WHERE gatheringID = :id");
+            $updateStmt->execute([':id' => $gatheringID]);
+
+            // 3. Remove participants
+            $deleteStmt = $this->db->prepare("DELETE FROM profilegathering WHERE gatheringID = :id");
+            $deleteStmt->execute([':id' => $gatheringID]);
+
+            $this->db->commit();
+            return $participants;
         } catch (PDOException $e) {
-            error_log("[GatheringDAO] updateStatus error: " . $e->getMessage());
+            $this->db->rollBack();
+            error_log("[GatheringDAO] cancelWithParticipants failed: " . $e->getMessage());
             return false;
         }
     }

@@ -99,7 +99,8 @@ class GatheringController
     {
         $result = $this->gatheringModel->cancelGathering($id);
 
-        header("Location: " . ($result ? "/my-gathering#cancelled" : '/my-gathering'));
+        $returnLoc = is_array($result) ? "/my-gathering#cancelled" : "/my-gathering";
+        header("Location: " . $returnLoc);
         exit;
     }
 

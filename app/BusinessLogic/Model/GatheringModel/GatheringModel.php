@@ -236,16 +236,28 @@ class GatheringModel
         // validate time constraint
         $start = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
         $hoursDiff = ($start->getTimestamp() - (new DateTime())->getTimestamp()) / 3600;
+
+        error_log('diff: ' . $hoursDiff);
         if ($hoursDiff < 3) {
             $_SESSION['flash_message'] = "Gathering can only be cancelled at least 3 hours before it starts.";
             $_SESSION['flash_type'] = "error";
             return false;
         }
 
-        $result = $this->dao->updateStatus($id, 'CANCELLED');
+        $result = $this->dao->cancelWithParticipant($id);
 
-        $_SESSION['flash_message'] = $result ? "Gathering cancelled successfully." : "Something went wrong.";
-        $_SESSION['flash_type'] = $result ? "success" : "error";
+        if (is_array($result)) {
+            // notify participants (skeleton function)
+            foreach ($result as $p) {
+                error_log("Would notify profile ID $p about cancellation of gathering $id");
+            }
+
+            $_SESSION['flash_message'] = "Gathering has been cancelled successfully.";
+            $_SESSION['flash_type'] = "success";
+        } else {
+            $_SESSION['flash_message'] = "Something went wrong. Please try again.";
+            $_SESSION['flash_type'] = "error";
+        }
 
         return $result;
     }
