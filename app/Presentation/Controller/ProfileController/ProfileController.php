@@ -8,11 +8,13 @@ use Exception;
 
 class ProfileController
 {
+    private $profileModel;
     private $fileHelper;
     private $profileModel;
 
     public function __construct()
     {
+        $this->profileModel = new ProfileModel();
         $this->fileHelper = new FileHelper('profile');
         $this->profileModel = new ProfileModel();
     }
@@ -65,4 +67,16 @@ class ProfileController
             header("Location: /login");
         }
     }
+
+    // public function viewProfile($id)
+    // {
+    //     $profile = $this->profileModel->getProfileById($id);
+    //     include $this->fileHelper->getFilePath('ProfileDetail');
+    // }
+
+    public function editProfile()
+    {
+        include $this->fileHelper->getFilePath('EditProfile');
+    }
+
 }

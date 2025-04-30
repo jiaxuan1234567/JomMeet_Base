@@ -27,6 +27,7 @@ class HomeController
 
     public function profileHome()
     {
+        $profile = (new HomeModel())->getProfileDetails();
         include $this->fileHelper->getFilePath('Profile');
     }
 

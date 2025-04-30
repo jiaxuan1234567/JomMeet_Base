@@ -10,6 +10,12 @@ class HomeModel
 {
     public function __construct() {}
 
+    public function getProfileDetails()
+    {
+        $profileId = $_SESSION['profile_id'];
+        return (new ProfileModel())->getProfileDetails($profileId);
+    }
+
     public function getAllReflections()
     {
         $profileId = $_SESSION['profile_id'];

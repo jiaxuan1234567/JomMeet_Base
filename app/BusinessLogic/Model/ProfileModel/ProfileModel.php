@@ -78,4 +78,14 @@ class ProfileModel
 
         return true;
     }
+    public function getProfileDetails($profileId)
+    {
+        return $this->profileDAO->getProfileDetails($profileId);
+    }
+
+    // // Fetch a gathering by its ID
+    // public function getProfileById(int $id): array
+    // {
+    //     return $this->profileDAO->getProfileById($id);
+    // }
 }

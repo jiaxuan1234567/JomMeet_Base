@@ -16,7 +16,7 @@ Route::post('/login/process', [ProfileController::class, 'validateLogin']);
 Route::get('/logout', [HomeController::class, 'logoutHome']);
 
 // profile routes
-
+Route::get('/profile/edit', [ProfileController::class, 'editProfile']);
 
 // self-reflection routes
 Route::get('/reflection/create', [ReflectionController::class, 'createReflection']);
