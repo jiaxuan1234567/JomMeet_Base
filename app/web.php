@@ -13,6 +13,7 @@ Route::get('/gathering', [HomeController::class, 'gatheringHome']);
 Route::get('/my-gathering', [HomeController::class, 'myGatheringHome']);
 Route::get('/login', [HomeController::class, 'loginHome']);
 Route::post('/login/process', [ProfileController::class, 'validateLogin']);
+Route::get('/logout', [HomeController::class, 'logoutHome']);
 
 // profile routes
 

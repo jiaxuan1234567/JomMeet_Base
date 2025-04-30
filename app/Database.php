@@ -22,7 +22,6 @@ final class Database
                 self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
                 error_log($e->getMessage());
-                error_log($e->getMessage());
                 die("Database connection failed: " . $e->getMessage());
             }
         }

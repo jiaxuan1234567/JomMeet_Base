@@ -30,4 +30,9 @@ class HomeModel
     {
         return (new ProfileModel())->getAllProfiles();
     }
+
+    public function logout()
+    {
+        return (new ProfileModel())->logout();
+    }
 }

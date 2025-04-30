@@ -29,28 +29,53 @@ class ProfileModel
         }
     }
 
-    public function validateLogin()
+    public function validateLogin($phoneNumber, $password)
     {
-        $phoneNumber = $_POST['phoneNumber'];
-        $password = $_POST['password'];
+        // $phoneNumber = $_POST['phoneNumber'];
+        // $password = $_POST['password'];
 
-        $profiles = $this->getAllProfiles();
-        // Validate phone number and password
-        if (empty($phoneNumber) || empty($password)) {
-            return false; // or handle error
+        $profile = $this->profileDAO->getUserByPhoneNumber($phoneNumber);
+
+        //if (!$profile || !password_verify($password, $profile['password'])) {
+        if (!$profile || !($password == $profile['password'])) {
+            //$_SESSION['login_error'] = 'Invalid username or password.';
+            return false;
+        } else {
+            $_SESSION['profile'] = $profile;
+            $_SESSION['profile_id'] = $profile['profileID'];
+            return true;
         }
 
-        // Here you would typically check the credentials against a database
-        foreach ($profiles as $p) {
-            error_log("Checking profile: " . print_r($p, true));
-            if ($p['phone'] == $phoneNumber && $p['password'] == $password) {
-                $_SESSION['profile_id'] = $p['profileID'];
-            $_SESSION['name'] = $p['nickname'];
-                $_SESSION['phone'] = $p['phone'];
-                $_SESSION['password'] = $p['password'];
-                return true;
-            }
-        }
-        return false;
+        // $profiles = $this->getAllProfiles();
+        // // Validate phone number and password
+        // if (empty($phoneNumber) || empty($password)) {
+        //     return false; // or handle error
+        // }
+
+        // // Here you would typically check the credentials against a database
+        // foreach ($profiles as $p) {
+        //     error_log("Checking profile: " . print_r($p, true));
+        //     if ($p['phone'] == $phoneNumber && $p['password'] == $password) {
+        //         $_SESSION['profile_id'] = $p['profileID'];
+        //         $_SESSION['name'] = $p['nickname'];
+        //         $_SESSION['phone'] = $p['phone'];
+        //         $_SESSION['password'] = $p['password'];
+        //         return true;
+        //     }
+        // }
+        // return false;
+    }
+
+    public function logout()
+    {
+        session_start();
+        session_unset();
+        session_destroy();
+
+        // Optional: regenerate session ID for safety
+        session_start();
+        session_regenerate_id(true);
+
+        return true;
     }
 }

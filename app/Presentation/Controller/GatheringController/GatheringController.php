@@ -111,13 +111,14 @@ class GatheringController
         echo json_encode($svc->getAllLocations());
     }
 
-    // helper function to save location (need delete in future)
+    // helper function to save location (will delete in future)
     public function saveLocation()
     {
         // read JSON POST body
         $loc = json_decode(file_get_contents('php://input'), true);
 
         $db = Database::getConnection();
+
         try {
             try {
                 $placeId = $loc['place_id'];

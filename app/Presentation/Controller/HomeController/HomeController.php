@@ -53,4 +53,14 @@ class HomeController
     {
         include $this->fileHelper->getFilePath('Login');
     }
+
+    public function logoutHome()
+    {
+        $status = (new HomeModel())->logout();
+
+        if ($status) {
+            header('Location: /login');
+            exit;
+        }
+    }
 }
