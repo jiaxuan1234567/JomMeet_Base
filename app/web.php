@@ -20,7 +20,9 @@ Route::get('/logout', [HomeController::class, 'logoutHome']);
 
 // self-reflection routes
 Route::get('/reflection/create', [ReflectionController::class, 'createReflection']);
-Route::get('/reflection/edit', [ReflectionController::class, 'editReflection']);
+Route::post('/reflection/create', [ReflectionController::class, 'saveReflection']);
+Route::get('/reflection/edit/{id}', [ReflectionController::class, 'editReflection']);
+Route::post('/reflection/edit/{id}', [ReflectionController::class, 'editSaveReflection']);
 Route::get('/reflection/delete', [ReflectionController::class, 'deleteReflection']);
 Route::get('/reflection/view', [ReflectionController::class, 'viewReflection']);
 
