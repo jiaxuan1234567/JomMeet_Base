@@ -233,10 +233,23 @@ async function performSearch() {
 }
 
 // location details
-function showDetailPanel(loc, pos, liElem) {
+async function showDetailPanel(loc, pos, liElem) {
+    let imageUrl = "";
+    const place = new google.maps.places.Place({ id: loc.placeID });
+    await place.fetchFields({ fields: ['photos'] });
+
+    try {
+        const photo = place.photos?.[0];
+        if (photo && typeof photo.getURI === 'function') {
+            imageUrl = photo.getURI({ maxWidthPx: 400 });
+        }
+    } catch (err) {
+        console.warn('Google photo fetch failed:', err);
+    }
+
     const html = `
     <div class="card shadow border-0 rounded-4" style="width: 260px;">
-      <img src="${loc.image || 'https://cdn-icons-png.flaticon.com/512/1161/1161388.png'}"
+      <img src="${imageUrl || 'https://cdn-icons-png.flaticon.com/512/1161/1161388.png'}"
            class="card-img-top rounded-top"
            style="object-fit: cover; height: 120px;">
   
@@ -326,10 +339,15 @@ function showDetailPanel(loc, pos, liElem) {
             scaledSize: new google.maps.Size(48, 48) // enlarge it
         });
 
+        activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => activeMarker.setAnimation(null), 700);
+
         currentActiveMarker = activeMarker;
     }
-    activeMarker.setAnimation(google.maps.Animation.BOUNCE);
-    setTimeout(() => activeMarker.setAnimation(null), 700);
+
+    if (currentActiveMarker && currentActiveMarker !== activeMarker) {
+        resetActiveMarker();
+    }
 }
 
 $(document).on('click', '#detailOverlay', function (e) {
@@ -340,6 +358,20 @@ $(document).on('click', '#detailOverlay', function (e) {
         resetActiveMarker();
     }
 });
+
+// cover photo from google maps
+function fetchCoverPhoto(placeId, callback) {
+    const service = new google.maps.places.PlacesService(map);
+
+    service.getDetails({ placeId }, (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place.photos && place.photos.length > 0) {
+            const imageUrl = place.photos[0].getUrl({ maxWidth: 400 });
+            callback(imageUrl);
+        } else {
+            callback(null); // fallback to default
+        }
+    });
+}
 
 function resetActiveMarker() {
     if (currentActiveMarker) {
