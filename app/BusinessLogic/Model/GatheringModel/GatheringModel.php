@@ -4,6 +4,7 @@ namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
 use Persistence\DAO\GatheringDAO\LocationDAO;
+use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
 use Exception;
 use FileHelper;
 use DateTime;
@@ -13,12 +14,13 @@ class GatheringModel
 {
     private $gatheringDAO;
     private $locationDAO;
-    private $validator;
+    private $chkStatusService;
 
     public function __construct()
     {
         $this->gatheringDAO = new GatheringDAO();
         $this->locationDAO = new LocationDAO();
+        $this->chkStatusService = new CheckGatheringStatusService();
     }
 
     // Fetch all gatherings
@@ -328,6 +330,26 @@ class GatheringModel
             error_log("[GatheringModel] Error in matchGathering: " . $e->getMessage());
             return [];
         }
+    }
+
+    // Status Service
+    public function checkAndCloseGatherings()
+    {
+        // 1) fetch raw rows needing inspection
+        $toClose = $this->gatheringDAO->fetchGatheringsToClose();
+
+        // 2) ask the service which IDs truly need flipping
+        $ids = $this->chkStatusService->identifyToClose($toClose);
+
+        // 3) update each one via DAO
+        $updated = false;
+        foreach ($ids as $id) {
+            if ($this->gatheringDAO->updateGatheringStatus($id, 'END')) {
+                $updated = true;
+            }
+        }
+
+        return $updated;
     }
 
     // validate

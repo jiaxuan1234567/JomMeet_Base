@@ -15,11 +15,12 @@ class GatheringDAO
         $this->db = Database::getConnection();
     }
 
+    // Update a gathering’s status
     public function updateGatheringStatus($gatheringID, $status)
     {
         try {
             $stmt = $this->db->prepare("UPDATE gathering SET status = :status WHERE gatheringID = :id");
-            $stmt->execute([
+            return $stmt->execute([
                 ':status' => $status,
                 ':id' => $gatheringID
             ]);
@@ -303,6 +304,24 @@ class GatheringDAO
             $this->db->rollBack();
             error_log("[GatheringDAO] cancelWithParticipants failed: " . $e->getMessage());
             return false;
+        }
+    }
+
+    // Fetch gatherings whose end‐datetime has passed but status ≠ 'END'
+    public function fetchGatheringsToClose()
+    {
+        $sql = "
+          SELECT gatheringID, date, endTime 
+          FROM `gathering`
+          WHERE status != 'END'
+            AND CONCAT(date, ' ', endTime) <= NOW()
+        ";
+        try {
+            $stmt = $this->db->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] fetchGatheringsToClose: " . $e->getMessage());
+            return [];
         }
     }
 }

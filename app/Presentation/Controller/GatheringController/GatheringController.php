@@ -268,14 +268,14 @@ class GatheringController
         }
     }
 
-    public function checkGatheringStatus()
-    {
-        $checker = new CheckGatheringStatus();
-        $updated = $checker->run();
+    // public function checkGatheringStatus()
+    // {
+    //     $checker = new CheckGatheringStatus();
+    //     $updated = $checker->run();
 
-        header('Content-Type: application/json');
-        echo json_encode(['updated' => $updated]);
-    }
+    //     header('Content-Type: application/json');
+    //     echo json_encode(['updated' => $updated]);
+    // }
 
     public function matchGathering($userid)
     {
@@ -300,5 +300,12 @@ class GatheringController
             error_log("[GatheringController] Stack trace: " . $e->getTraceAsString());
             return include $this->fileHelper->getFilePath('GatheringList');
         }
+    }
+
+
+    // Background Job
+    public function runGatheringJob()
+    {
+        $this->gatheringModel->checkAndCloseGatherings();
     }
 }
