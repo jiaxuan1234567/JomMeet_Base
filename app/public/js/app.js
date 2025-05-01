@@ -33,6 +33,16 @@ $(() => {
         }
     });
 
+     //   message reflection
+     $('[data-confirm-deleteReflection]').on('click', function (e) {
+        const text = e.currentTarget.dataset.confirm || 'Confirm to delete your self-reflection record?';
+        if (!confirm(text)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    });
+    
+
 
     // Initiate GET request
     $('[data-get]').on('click', e => {
