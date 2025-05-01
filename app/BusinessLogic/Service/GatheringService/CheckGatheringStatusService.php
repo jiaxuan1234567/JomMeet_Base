@@ -26,19 +26,19 @@ class CheckGatheringStatusService
             if (strtoupper($g['status']) === 'NEW' && $startDT && $now >= $startDT && $now < $endDT) {
                 $transitions[$g['gatheringID']] = 'START';
 
-                error_log('[Gathering ID: ' . $g['gatheringID'] . '] => [NEW => START]');
+                echo ('[Gathering ID: ' . $g['gatheringID'] . '] => [NEW => START]');
 
                 // NEW → END (in case start and end both passed)
             } elseif (strtoupper($g['status']) === 'NEW' && $endDT && $now >= $endDT) {
                 $transitions[$g['gatheringID']] = 'END';
 
-                error_log('[Gathering ID: ' . $g['gatheringID'] . '] => [NEW => END]');
+                echo ('[Gathering ID: ' . $g['gatheringID'] . '] => [NEW => END]');
 
                 // START → END
             } elseif (strtoupper($g['status']) === 'START' && $endDT && $now >= $endDT) {
                 $transitions[$g['gatheringID']] = 'END';
 
-                error_log('[Gathering ID: ' . $g['gatheringID'] . '] => [START => END]');
+                echo ('[Gathering ID: ' . $g['gatheringID'] . '] => [START => END]');
             }
         }
 
