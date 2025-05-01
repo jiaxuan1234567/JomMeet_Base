@@ -33,8 +33,10 @@ $userid = $_SESSION['profile']['profileID'];
 
     <div class="container py-4">
         <?php if (empty($gatherings)): ?>
-            <div class="alert alert-info">
-                No gatherings available at the moment.
+            <div style="height: 575px;">
+                <div class="alert alert-info">
+                    No gatherings available at the moment.
+                </div>
             </div>
         <?php else: ?>
             <div class="row g-4">
