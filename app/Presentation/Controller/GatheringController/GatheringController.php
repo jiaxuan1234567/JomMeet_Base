@@ -4,9 +4,7 @@ namespace Presentation\Controller\GatheringController;
 
 use BusinessLogic\Service\GatheringService\CheckGatheringStatus;
 use BusinessLogic\Model\GatheringModel\GatheringModel;
-
-// need dlt
-use BusinessLogic\Service\GatheringService\LocationService;
+use BusinessLogic\Model\GatheringModel\LocationModel;
 
 use Database;
 use Exception;
@@ -108,8 +106,7 @@ class GatheringController
     public function ajaxValidateGathering()
     {
         header('Content-Type: application/json');
-        $model = new GatheringModel();
-        $errors = $model->validateGatheringFields($_POST);
+        $errors = $this->gatheringModel->validateGatheringFields($_POST);
 
         echo json_encode(['errors' => $errors]);
     }
@@ -135,8 +132,8 @@ class GatheringController
     public function apiSavedLocations()
     {
         header('Content-Type: application/json');
-        $svc = new LocationService();
-        echo json_encode($svc->getAllLocations());
+
+        echo json_encode((new LocationModel())->getAllLocations());
     }
 
     // helper function to save location (will delete in future)

@@ -11,32 +11,32 @@ use Error;
 
 class GatheringModel
 {
-    private $dao;
+    private $gatheringDAO;
     private $locationDAO;
     private $validator;
 
     public function __construct()
     {
-        $this->dao = new GatheringDAO();
+        $this->gatheringDAO = new GatheringDAO();
         $this->locationDAO = new LocationDAO();
     }
 
     // Fetch all gatherings
     public function getAllGatherings(): array
     {
-        return $this->dao->getAllGatherings();
+        return $this->gatheringDAO->getAllGatherings();
     }
 
     // get getAvailableGatherings
     public function getAvailableGatherings($profileId)
     {
-        return $this->dao->getAvailableGatherings($profileId);
+        return $this->gatheringDAO->getAvailableGatherings($profileId);
     }
 
     public function searchGatherings(string $searchTerm): array
     {
         try {
-            $results = $this->dao->searchGatherings($searchTerm);
+            $results = $this->gatheringDAO->searchGatherings($searchTerm);
             return $results ?: [];
         } catch (Exception $e) {
             error_log("[GatheringModel] Error in searchGatherings: " . $e->getMessage());
@@ -47,12 +47,12 @@ class GatheringModel
     // Fetch a gathering by its ID
     public function getGatheringById(int $id): array
     {
-        return $this->dao->getGatheringById($id);
+        return $this->gatheringDAO->getGatheringById($id);
     }
 
     public function verifyUserInGathering($userID, $gatheringID)
     {
-        return $this->dao->verifyUserInGathering($userID, $gatheringID);
+        return $this->gatheringDAO->verifyUserInGathering($userID, $gatheringID);
 
         // // Get the gatherings for the user
         // $gathering = $this->dao->getProfileGatheringByUserId($userID);
@@ -73,7 +73,7 @@ class GatheringModel
         try {
             error_log("[GatheringModel] Starting isBeforeStartTime check for gathering ID: " . $gatheringID);
             // Get the specific gathering by gatheringID
-            $gathering = $this->dao->getGatheringById($gatheringID);
+            $gathering = $this->gatheringDAO->getGatheringById($gatheringID);
             if (!$gathering) {
                 error_log("[GatheringModel] Gathering not found for ID: " . $gatheringID);
                 return false;
@@ -113,7 +113,7 @@ class GatheringModel
         //     return false;
         // }
 
-        $result = $this->dao->addUserToGathering($userID, $gatheringID);
+        $result = $this->gatheringDAO->addUserToGathering($userID, $gatheringID);
 
         if ($result) {
             error_log("User $userID successfully joined gathering $gatheringID.");
@@ -126,7 +126,7 @@ class GatheringModel
 
     public function getJoinedGatheringByUserId($userID)
     {
-        return $this->dao->getJoinedGatheringByUserId($userID);
+        return $this->gatheringDAO->getJoinedGatheringByUserId($userID);
     }
 
     public function isNewGatheringConflicting($userID, $gatheringID)
@@ -138,7 +138,7 @@ class GatheringModel
         $joinedGatherings = $this->getJoinedGatheringByUserId($userID);
         error_log("User $userID has joined " . count($joinedGatherings) . " gatherings.");
         // Fetch the new gathering details based on gatheringID
-        $newGathering = $this->dao->getGatheringById($gatheringID);
+        $newGathering = $this->gatheringDAO->getGatheringById($gatheringID);
 
         if (!$newGathering) {
             // Log if the new gathering doesn't exist
@@ -178,7 +178,7 @@ class GatheringModel
     public function getMyGatherings($profileId)
     {
         try {
-            $rows = $this->dao->getMyGatherings($profileId);
+            $rows = $this->gatheringDAO->getMyGatherings($profileId);
             return array_map(function (array $g) {
                 return [
                     'id'        => (int)$g['gatheringID'],
@@ -204,9 +204,9 @@ class GatheringModel
     public function createGathering($data)
     {
         try {
-            $newId = $this->dao->createGathering($data);
+            $newId = $this->gatheringDAO->createGathering($data);
             $profileId = $_SESSION['profile']['profileID'];
-            $this->dao->addUserToGathering($profileId, $newId);
+            $this->gatheringDAO->addUserToGathering($profileId, $newId);
             return $newId;
         } catch (Exception $e) {
             error_log("[GatheringModel] Error creating gathering: " . $e->getMessage());
@@ -218,7 +218,7 @@ class GatheringModel
     public function cancelGathering($id)
     {
         $profileID = $_SESSION['profile']['profileID'];
-        $gathering = $this->dao->getGatheringById($id);
+        $gathering = $this->gatheringDAO->getGatheringById($id);
 
         // validate user is host
         if ($profileID != $gathering['hostProfileID']) {
@@ -238,7 +238,7 @@ class GatheringModel
             return false;
         }
 
-        $result = $this->dao->cancelWithParticipant($id);
+        $result = $this->gatheringDAO->cancelWithParticipant($id);
 
         if (is_array($result)) {
             // notify participants (skeleton function)
@@ -260,7 +260,7 @@ class GatheringModel
     {
         try {
             // Get user's profile to access their preferences
-            $userProfile = $this->dao->getProfileByUserId($userID);
+            $userProfile = $this->gatheringDAO->getProfileByUserId($userID);
             if (!$userProfile) {
                 error_log("[GatheringModel] User profile not found for userID: $userID");
                 return [];
@@ -475,7 +475,7 @@ class GatheringModel
         }
 
 
-        $joined = $this->dao->getJoinedGatheringByUserId($profileID);
+        $joined = $this->gatheringDAO->getJoinedGatheringByUserId($profileID);
         foreach ($joined as $g) {
             if (in_array(strtoupper($g['status']), ['END', 'CANCELLED'], true)) {
                 continue;

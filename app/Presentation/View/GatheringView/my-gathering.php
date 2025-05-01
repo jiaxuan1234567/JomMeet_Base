@@ -135,6 +135,8 @@ $asset = new FileHelper('asset');
         ?>
     <?php endif; ?>
 </div>
+
+
 <script>
     $(function() {
         var allGatherings = <?= json_encode($myGatherings) ?>;
@@ -193,9 +195,6 @@ $asset = new FileHelper('asset');
             }
             var html = '';
             list.forEach(function(g) {
-
-
-
 
                 html += `
       <div class="col-6 mb-0 mt-4 pb-0">
