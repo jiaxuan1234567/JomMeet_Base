@@ -332,19 +332,19 @@ class GatheringModel
         }
     }
 
-    // Status Service
-    public function checkAndCloseGatherings()
+    // Status Service (run job)
+    public function checkAndTransitionGatherings()
     {
-        // 1) fetch raw rows needing inspection
-        $toClose = $this->gatheringDAO->fetchGatheringsToClose();
+        // 1) DAO gives only the candidates
+        $candidates = $this->gatheringDAO->fetchGatheringsToTransition();
 
-        // 2) ask the service which IDs truly need flipping
-        $ids = $this->chkStatusService->identifyToClose($toClose);
+        // 2) Service returns a map [id=>newStatus]
+        $toUpdate = $this->chkStatusService->identifyTransitions($candidates);
 
-        // 3) update each one via DAO
+        // 3) Persist each change
         $updated = false;
-        foreach ($ids as $id) {
-            if ($this->gatheringDAO->updateGatheringStatus($id, 'END')) {
+        foreach ($toUpdate as $id => $newStatus) {
+            if ($this->gatheringDAO->updateGatheringStatus($id, $newStatus)) {
                 $updated = true;
             }
         }

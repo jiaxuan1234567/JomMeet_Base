@@ -307,20 +307,30 @@ class GatheringDAO
         }
     }
 
-    // Fetch gatherings whose end‐datetime has passed but status ≠ 'END'
-    public function fetchGatheringsToClose()
+    // Fetch all gatherings whose status may need updating
+    public function fetchGatheringsToTransition()
     {
         $sql = "
-          SELECT gatheringID, date, endTime 
-          FROM `gathering`
-          WHERE status != 'END'
-            AND CONCAT(date, ' ', endTime) <= NOW()
+            SELECT
+                `gatheringID`,
+                `date`,
+                `startTime`,
+                `endTime`,
+                `status`
+            FROM `gathering`
+            WHERE
+            ( `status` = 'new'
+                AND CONCAT(`date`, ' ', `startTime`) <= NOW()
+            )
+        OR ( `status` = 'start'
+                AND CONCAT(`date`, ' ', `endTime`)   <= NOW()
+            )
         ";
         try {
             $stmt = $this->db->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
-            error_log("[GatheringDAO] fetchGatheringsToClose: " . $e->getMessage());
+            error_log("[GatheringDAO] fetchGatheringsToTransition: " . $e->getMessage());
             return [];
         }
     }

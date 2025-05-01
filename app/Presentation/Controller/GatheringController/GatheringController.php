@@ -306,6 +306,6 @@ class GatheringController
     // Background Job
     public function runGatheringJob()
     {
-        $this->gatheringModel->checkAndCloseGatherings();
+        $this->gatheringModel->checkAndTransitionGatherings();
     }
 }
