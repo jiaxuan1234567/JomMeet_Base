@@ -67,23 +67,27 @@ class GatheringDAO
             ];
 
             $stmt = $this->db->prepare("
-                SELECT * FROM gathering 
-                WHERE theme LIKE :searchTerm 
-                OR preference LIKE :searchTerm
-                OR DATE_FORMAT(date, '%Y-%m-%d') LIKE :searchTerm
-                OR DATE_FORMAT(date, '%d-%m-%Y') LIKE :searchTerm
-                OR DATE_FORMAT(date, '%m/%d/%Y') LIKE :searchTerm
-                OR DATE_FORMAT(date, '%d/%m/%Y') LIKE :searchTerm
-                OR DATE_FORMAT(date, '%Y/%m/%d') LIKE :searchTerm
-                OR TIME_FORMAT(startTime, '%H:%i:%s') LIKE :searchTerm
-                OR TIME_FORMAT(startTime, '%H:%i') LIKE :searchTerm
-                OR TIME_FORMAT(startTime, '%h:%i %p') LIKE :searchTerm
-                OR TIME_FORMAT(startTime, '%h %p') LIKE :searchTerm
-                OR TIME_FORMAT(endTime, '%H:%i:%s') LIKE :searchTerm
-                OR TIME_FORMAT(endTime, '%H:%i') LIKE :searchTerm
-                OR TIME_FORMAT(endTime, '%h:%i %p') LIKE :searchTerm
-                OR TIME_FORMAT(endTime, '%h %p') LIKE :searchTerm
-            ");
+    SELECT * FROM gathering 
+    WHERE (
+        theme LIKE :searchTerm 
+        OR preference LIKE :searchTerm
+        OR DATE_FORMAT(date, '%Y-%m-%d') LIKE :searchTerm
+        OR DATE_FORMAT(date, '%d-%m-%Y') LIKE :searchTerm
+        OR DATE_FORMAT(date, '%m/%d/%Y') LIKE :searchTerm
+        OR DATE_FORMAT(date, '%d/%m/%Y') LIKE :searchTerm
+        OR DATE_FORMAT(date, '%Y/%m/%d') LIKE :searchTerm
+        OR TIME_FORMAT(startTime, '%H:%i:%s') LIKE :searchTerm
+        OR TIME_FORMAT(startTime, '%H:%i') LIKE :searchTerm
+        OR TIME_FORMAT(startTime, '%h:%i %p') LIKE :searchTerm
+        OR TIME_FORMAT(startTime, '%h %p') LIKE :searchTerm
+        OR TIME_FORMAT(endTime, '%H:%i:%s') LIKE :searchTerm
+        OR TIME_FORMAT(endTime, '%H:%i') LIKE :searchTerm
+        OR TIME_FORMAT(endTime, '%h:%i %p') LIKE :searchTerm
+        OR TIME_FORMAT(endTime, '%h %p') LIKE :searchTerm
+    )
+    AND status = 'NEW'
+");
+
 
             $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
             $stmt->execute();

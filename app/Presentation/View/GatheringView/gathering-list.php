@@ -8,8 +8,6 @@ $userid = $_SESSION['profile']['profileID'];
 
 ?>
 
-<script src="/js/gatheringlist.js"></script>
-
 <body>
     <div class="container-sm mt-4">
         <div class="row">

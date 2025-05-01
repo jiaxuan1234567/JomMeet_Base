@@ -117,6 +117,7 @@ class GatheringController
         $userID = $_SESSION['profile']['profileID'] ?? null;
         $isJoined = $this->gatheringModel->verifyUserInGathering($userID, $id);
         $isHost = ($gathering['hostProfileID'] ?? null) == $userID;
+        $isBeforeStartTime = $this->isBeforeStartTime($id);
 
         include $this->fileHelper->getFilePath('GatheringDetail');
     }
