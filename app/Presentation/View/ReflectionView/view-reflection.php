@@ -3,7 +3,7 @@ $_title = 'Viewing Reflection';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
-<div class="main">
+<div class="main d-flex flex-column min-vh-100">
     <div class="container-fluid py-3">
         <h4>
             <a href="/reflection">

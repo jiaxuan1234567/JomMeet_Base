@@ -13,7 +13,7 @@ unset($_SESSION['old']);
 ?>
 
 
-<div class="main">
+<div class="main d-flex flex-column min-vh-100">
     <div class="container-fluid py-3">
         <h4>
             <a href="/reflection">
