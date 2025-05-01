@@ -46,7 +46,6 @@ Route::post('/my-gathering/create/location', [GatheringController::class, 'selec
 Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGathering']);
 
 //AJAX
-//Route::get('/api/check-gathering-status', [GatheringController::class, 'checkGatheringStatus']);
 Route::get('/api/savedLocations', [GatheringController::class, 'apiSavedLocations']);
 
 // AJAX Validation

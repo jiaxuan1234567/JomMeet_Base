@@ -268,15 +268,6 @@ class GatheringController
         }
     }
 
-    // public function checkGatheringStatus()
-    // {
-    //     $checker = new CheckGatheringStatus();
-    //     $updated = $checker->run();
-
-    //     header('Content-Type: application/json');
-    //     echo json_encode(['updated' => $updated]);
-    // }
-
     public function matchGathering($userid)
     {
         try {

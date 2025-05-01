@@ -5,6 +5,7 @@ namespace BusinessLogic\Model\GatheringModel;
 use Persistence\DAO\GatheringDAO\GatheringDAO;
 use Persistence\DAO\GatheringDAO\LocationDAO;
 use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
+use BusinessLogic\Service\GatheringService\GatheringValidationService;
 use Exception;
 use FileHelper;
 use DateTime;
@@ -15,16 +16,18 @@ class GatheringModel
     private $gatheringDAO;
     private $locationDAO;
     private $chkStatusService;
+    private $validatorService;
 
     public function __construct()
     {
         $this->gatheringDAO = new GatheringDAO();
         $this->locationDAO = new LocationDAO();
         $this->chkStatusService = new CheckGatheringStatusService();
+        $this->validatorService = new GatheringValidationService();
     }
 
     // Fetch all gatherings
-    public function getAllGatherings(): array
+    public function getAllGatherings()
     {
         return $this->gatheringDAO->getAllGatherings();
     }
@@ -35,7 +38,7 @@ class GatheringModel
         return $this->gatheringDAO->getAvailableGatherings($profileId);
     }
 
-    public function searchGatherings(string $searchTerm): array
+    public function searchGatherings($searchTerm)
     {
         try {
             $results = $this->gatheringDAO->searchGatherings($searchTerm);
@@ -47,7 +50,7 @@ class GatheringModel
     }
 
     // Fetch a gathering by its ID
-    public function getGatheringById(int $id): array
+    public function getGatheringById($id)
     {
         return $this->gatheringDAO->getGatheringById($id);
     }
@@ -108,13 +111,8 @@ class GatheringModel
     }
 
     // Add a user to a gathering (Join gathering)
-    public function addUserToGathering(int $userID, int $gatheringID): bool
+    public function addUserToGathering($userID, $gatheringID)
     {
-        // if (!$this->verifyUserInGathering($userID, $gatheringID)) {
-        //     error_log("User $userID has already joined gathering $gatheringID.");
-        //     return false;
-        // }
-
         $result = $this->gatheringDAO->addUserToGathering($userID, $gatheringID);
 
         if ($result) {
@@ -258,7 +256,7 @@ class GatheringModel
         return $result;
     }
 
-    public function matchGathering(int $userID): array
+    public function matchGathering($userID)
     {
         try {
             // Get user's profile to access their preferences
@@ -355,174 +353,185 @@ class GatheringModel
     // validate
     public function validateGatheringFields($post)
     {
-        $errors = [];
+        // 1) fetch persistence‐backed facts
+        $locRow = $this->locationDAO->getLocationById($post['locationId'] ?? '');
+        $joined = $this->gatheringDAO->getJoinedGatheringByUserId(
+            $_SESSION['profile']['profileID'] ?? 0
+        );
 
-        // 1. Theme: required, ≤100 chars, at least one letter
-        $theme = trim($post['inputTheme'] ?? '');
-        $errors = $this->validateTheme($theme, $errors);
-
-        // 3. Pax: integer between 3 and 8
-        $pax = (int)($post['inputPax'] ?? 0);
-        $errors = $this->validatePax($pax, $errors);
-
-        // 4. Location: ID + name must match DB
-        $locId   = $post['locationId']    ?? '';
-        $locName = trim($post['inputLocation'] ?? '');
-        $errors = $this->validateLocation($locId, $locName, $errors);
-
-        // 2. Date + Time: required, valid format, future, end>start, 3-hour buffer
-        $date  = $post['inputDate']  ?? '';
-        $start = $post['startTime']  ?? '';
-        $end   = $post['endTime']    ?? '';
-
-        // 2.1 Date presence & format
-        $errors = $this->validateDate($date, $errors);
-
-        // 2.2 Time presence
-        $errors = $this->validateTime($start, $end, $errors);
-
-        // only proceed if date, start & end are present and dateObj is valid
-        if (empty($errors['inputDate']) && empty($errors['startTime']) && empty($errors['endTime'])) {
-            $errors = $this->validateDateTime($date, $start, $end, $errors);
-        }
-
-        if (!empty($errors['startTime'])) {
-            unset($errors['startTime']);
-        }
-
-        // 5. Overlap: re‐run on *every* valid date+start parse (so stale errors get cleared)
-        $errors = $this->checkJoinedGathering($date, $start, $errors);
-
-        return $errors;
+        // 2) call pure helper
+        return $this->validatorService->validate($post, $locRow, $joined);
     }
+    // public function validateGatheringFields($post)
+    // {
+    //     $errors = [];
 
-    private function validateTheme($theme, $errors)
-    {
-        if ($theme === '') {
-            $errors['inputTheme'] = 'Theme is required.';
-        } elseif (strlen($theme) > 100) {
-            $errors['inputTheme'] = 'Theme cannot exceed 100 characters.';
-        } elseif (!preg_match('/[A-Za-z]/', $theme)) {
-            $errors['inputTheme'] = 'Theme must contain at least one letter.';
-        }
-        return $errors;
-    }
+    //     // 1. Theme: required, ≤100 chars, at least one letter
+    //     $theme = trim($post['inputTheme'] ?? '');
+    //     $errors = $this->validateTheme($theme, $errors);
 
-    private function validatePax($pax, $errors)
-    {
-        if ($pax < 3 || $pax > 8) {
-            $errors['inputPax'] = 'Pax must be between 3 and 8.';
-        }
-        return $errors;
-    }
+    //     // 3. Pax: integer between 3 and 8
+    //     $pax = (int)($post['inputPax'] ?? 0);
+    //     $errors = $this->validatePax($pax, $errors);
 
-    private function validateLocation($locId, $locName, $errors)
-    {
-        if ($locId === '' || $locName === '') {
-            $errors['inputLocation'] = 'Please select a valid location.';
-        } else {
-            $row = $this->locationDAO->getLocationById($locId);
-            if (!$row || strcasecmp($row['locationName'], $locName) !== 0) {
-                $errors['inputLocation'] = 'Selected location is invalid.';
-            }
-        }
-        return $errors;
-    }
+    //     // 4. Location: ID + name must match DB
+    //     $locId   = $post['locationId']    ?? '';
+    //     $locName = trim($post['inputLocation'] ?? '');
+    //     $errors = $this->validateLocation($locId, $locName, $errors);
 
-    private function validateDate($date, $errors)
-    {
-        if ($date === '') {
-            $errors['inputDate'] = 'Date is required.';
-        } else {
-            $dateObj = DateTime::createFromFormat('Y-m-d', $date);
-            if (!$dateObj) {
-                $errors['inputDate'] = 'Invalid date format.';
-            } elseif ($dateObj < new DateTime('today')) {
-                $errors['inputDate'] = 'Date cannot be in the past.';
-            }
-        }
-        return $errors;
-    }
+    //     // 2. Date + Time: required, valid format, future, end>start, 3-hour buffer
+    //     $date  = $post['inputDate']  ?? '';
+    //     $start = $post['startTime']  ?? '';
+    //     $end   = $post['endTime']    ?? '';
 
-    private function validateTime($start, $end, $errors)
-    {
-        if ($start === '') {
-            $errors['startTime'] = 'Start time is required.';
-        }
-        if ($end   === '') {
-            $errors['endTime']   = 'End time is required.';
-        }
-        return $errors;
-    }
+    //     // 2.1 Date presence & format
+    //     $errors = $this->validateDate($date, $errors);
 
-    private function validateDateTime($date, $start, $end, $errors)
-    {
-        $startDT = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
-        $endDT   = DateTime::createFromFormat('Y-m-d H:i', "$date $end");
+    //     // 2.2 Time presence
+    //     $errors = $this->validateTime($start, $end, $errors);
 
-        // 2.3 Valid time formats
-        if (!$startDT || !$endDT) {
-            $errors['startTime'] = 'Invalid time format.';
-        }
-        // 2.4 End must be after start
-        elseif ($startDT >= $endDT) {
-            $errors['endTime'] = 'End time must be after start time.';
-        }
-        // 2.5 3-hour buffer from “now”
-        else {
-            $minStart = (new DateTime())->modify('+3 hours');
-            if ($startDT < $minStart) {
-                $errors['startTime'] = 'Start time must be at least 3 hours from now.';
-            }
-        }
-        return $errors;
-    }
+    //     // only proceed if date, start & end are present and dateObj is valid
+    //     if (empty($errors['inputDate']) && empty($errors['startTime']) && empty($errors['endTime'])) {
+    //         $errors = $this->validateDateTime($date, $start, $end, $errors);
+    //     }
 
-    private function checkJoinedGathering($date, $start, $errors)
-    {
-        unset($errors['startTime']);
+    //     if (!empty($errors['startTime'])) {
+    //         unset($errors['startTime']);
+    //     }
 
-        if ($date === '' || $start === '') {
-            return $errors;
-        }
+    //     // 5. Overlap: re‐run on *every* valid date+start parse (so stale errors get cleared)
+    //     $errors = $this->checkJoinedGathering($date, $start, $errors);
 
-        $profileID = $_SESSION['profile']['profileID'] ?? null;
-        if (!$profileID) {
-            return $errors;
-        }
+    //     return $errors;
+    // }
 
-        $newStart = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
-        if (!$newStart) {
-            return $errors;
-        }
+    // private function validateTheme($theme, $errors)
+    // {
+    //     if ($theme === '') {
+    //         $errors['inputTheme'] = 'Theme is required.';
+    //     } elseif (strlen($theme) > 100) {
+    //         $errors['inputTheme'] = 'Theme cannot exceed 100 characters.';
+    //     } elseif (!preg_match('/[A-Za-z]/', $theme)) {
+    //         $errors['inputTheme'] = 'Theme must contain at least one letter.';
+    //     }
+    //     return $errors;
+    // }
+
+    // private function validatePax($pax, $errors)
+    // {
+    //     if ($pax < 3 || $pax > 8) {
+    //         $errors['inputPax'] = 'Pax must be between 3 and 8.';
+    //     }
+    //     return $errors;
+    // }
+
+    // private function validateLocation($locId, $locName, $errors)
+    // {
+    //     if ($locId === '' || $locName === '') {
+    //         $errors['inputLocation'] = 'Please select a valid location.';
+    //     } else {
+    //         $row = $this->locationDAO->getLocationById($locId);
+    //         if (!$row || strcasecmp($row['locationName'], $locName) !== 0) {
+    //             $errors['inputLocation'] = 'Selected location is invalid.';
+    //         }
+    //     }
+    //     return $errors;
+    // }
+
+    // private function validateDate($date, $errors)
+    // {
+    //     if ($date === '') {
+    //         $errors['inputDate'] = 'Date is required.';
+    //     } else {
+    //         $dateObj = DateTime::createFromFormat('Y-m-d', $date);
+    //         if (!$dateObj) {
+    //             $errors['inputDate'] = 'Invalid date format.';
+    //         } elseif ($dateObj < new DateTime('today')) {
+    //             $errors['inputDate'] = 'Date cannot be in the past.';
+    //         }
+    //     }
+    //     return $errors;
+    // }
+
+    // private function validateTime($start, $end, $errors)
+    // {
+    //     if ($start === '') {
+    //         $errors['startTime'] = 'Start time is required.';
+    //     }
+    //     if ($end   === '') {
+    //         $errors['endTime']   = 'End time is required.';
+    //     }
+    //     return $errors;
+    // }
+
+    // private function validateDateTime($date, $start, $end, $errors)
+    // {
+    //     $startDT = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
+    //     $endDT   = DateTime::createFromFormat('Y-m-d H:i', "$date $end");
+
+    //     // 2.3 Valid time formats
+    //     if (!$startDT || !$endDT) {
+    //         $errors['startTime'] = 'Invalid time format.';
+    //     }
+    //     // 2.4 End must be after start
+    //     elseif ($startDT >= $endDT) {
+    //         $errors['endTime'] = 'End time must be after start time.';
+    //     }
+    //     // 2.5 3-hour buffer from “now”
+    //     else {
+    //         $minStart = (new DateTime())->modify('+3 hours');
+    //         if ($startDT < $minStart) {
+    //             $errors['startTime'] = 'Start time must be at least 3 hours from now.';
+    //         }
+    //     }
+    //     return $errors;
+    // }
+
+    // private function checkJoinedGathering($date, $start, $errors)
+    // {
+    //     unset($errors['startTime']);
+
+    //     if ($date === '' || $start === '') {
+    //         return $errors;
+    //     }
+
+    //     $profileID = $_SESSION['profile']['profileID'] ?? null;
+    //     if (!$profileID) {
+    //         return $errors;
+    //     }
+
+    //     $newStart = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
+    //     if (!$newStart) {
+    //         return $errors;
+    //     }
 
 
-        $joined = $this->gatheringDAO->getJoinedGatheringByUserId($profileID);
-        foreach ($joined as $g) {
-            if (in_array(strtoupper($g['status']), ['END', 'CANCELLED'], true)) {
-                continue;
-            }
-            $jStart = DateTime::createFromFormat(
-                'Y-m-d H:i:s',
-                "{$g['date']} {$g['startTime']}"
-            );
-            $jEnd = DateTime::createFromFormat(
-                'Y-m-d H:i:s',
-                "{$g['date']} {$g['endTime']}"
-            );
+    //     $joined = $this->gatheringDAO->getJoinedGatheringByUserId($profileID);
+    //     foreach ($joined as $g) {
+    //         if (in_array(strtoupper($g['status']), ['END', 'CANCELLED'], true)) {
+    //             continue;
+    //         }
+    //         $jStart = DateTime::createFromFormat(
+    //             'Y-m-d H:i:s',
+    //             "{$g['date']} {$g['startTime']}"
+    //         );
+    //         $jEnd = DateTime::createFromFormat(
+    //             'Y-m-d H:i:s',
+    //             "{$g['date']} {$g['endTime']}"
+    //         );
 
-            if ($jStart && $jEnd && $newStart >= $jStart && $newStart < $jEnd) {
-                $errors['startTime'] = sprintf(
-                    "You have another gathering from %s to %s.",
-                    $jStart->format('d M Y g:i A'),
-                    $jEnd->format('d M Y g:i A')
-                );
-                // only log when we actually set an error
-                error_log($errors['startTime']);
-                break;
-            }
-        }
+    //         if ($jStart && $jEnd && $newStart >= $jStart && $newStart < $jEnd) {
+    //             $errors['startTime'] = sprintf(
+    //                 "You have another gathering from %s to %s.",
+    //                 $jStart->format('d M Y g:i A'),
+    //                 $jEnd->format('d M Y g:i A')
+    //             );
+    //             // only log when we actually set an error
+    //             error_log($errors['startTime']);
+    //             break;
+    //         }
+    //     }
 
-        return $errors;
-    }
+    //     return $errors;
+    // }
 }
