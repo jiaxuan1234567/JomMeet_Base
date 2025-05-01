@@ -3,7 +3,18 @@ $_title = 'My Gathering';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
+
+
 <div class="main d-flex flex-column min-vh-100">
+    <?php if (!empty($_SESSION['flash_message'])): ?>
+        <div class="position-fixed top-0 start-50 translate-middle-x mt-3 z-3" style="z-index: 1050;">
+            <div class="alert alert-success d-flex align-items-center shadow rounded-3 py-2 px-4" role="alert" style="min-width: 300px;">
+                <i class="bi bi-check-circle-fill me-2" style="font-size: 1.5rem;"></i>
+                <div><?= htmlspecialchars($_SESSION['flash_message']['text']) ?></div>
+            </div>
+        </div>
+        <?php unset($_SESSION['flash_message']); ?>
+    <?php endif; ?>
     <section class="page-header page-header-classic page-header-sm">
         <div class="container-fluid">
             <div class="row">
@@ -54,7 +65,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                                         </a>
                                     </div>
                                     <div class="col-md-1 w-50">
-                                        <a href="/reflection/delete/<?= $reflection['selfreflectID'] ?>" onclick="return confirm('Are you sure you want to delete this reflection?')">
+                                        <a href="/reflection/delete/<?= $reflection['selfreflectID'] ?>" data-confirm-deleteReflection>
                                             <i class="bi bi-trash" style="font-size: 3.0rem; color:red;"></i>
                                         </a>
                                     </div>
@@ -77,5 +88,13 @@ require_once __DIR__ . '/../HomeView/header.php';
         </div>
     </div>
 </div>
+
+<script>
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) alert.remove();
+    }, 3000);
+</script>
+
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

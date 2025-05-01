@@ -46,10 +46,18 @@ class ReflectionModel
         return $this->reflectionDAO->saveReflection($profileId, $reflectionDate, $reflectionTitle, $reflectionContent);
     }
 
-    public function getReflectionById($reflectionId) 
+    public function getReflectionById($reflectionId)
     {
-        return $this->reflectionDAO->getReflectionById($reflectionId);
+        $reflection = $this->reflectionDAO->getReflectionById($reflectionId);
+
+        // If the reflection does not exist, return null
+        if (!$reflection) {
+            return null; 
+        }
+        // Return the reflection if it exists
+        return $reflection;
     }
+
 
     public function editSaveReflection($reflectionId,$reflectionTitle,$reflectionContent)
     {

@@ -29,6 +29,10 @@ class ReflectionController
         $reflectionContent = $_POST['reflectionContent'];
 
         $this->reflectionModel->saveReflection($profileId,$reflectionDate,$reflectionTitle,$reflectionContent);
+        $_SESSION['flash_message'] = [
+            'type' => 'success',
+            'text' => 'Your self-reflection has been successfully created.'
+        ];
         header("Location: /reflection");
     }
 
@@ -49,9 +53,13 @@ class ReflectionController
 
     public function viewReflection($reflectionId)
     {
+        // Call the model to get the reflection by ID
         $reflectionViewed = $this->reflectionModel->getReflectionById($reflectionId);
+
+        // Pass the result (whether the reflection was found or not) to the view
         include $this->fileHelper->getFilePath('ViewReflection');
     }
+
 
     public function deleteReflection($reflectionId)
     {
