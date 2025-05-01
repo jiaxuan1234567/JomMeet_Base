@@ -10,8 +10,7 @@ set_time_limit(0);
 $gatheringController = new GatheringController();
 
 while (true) {
-    error_log('running...');
-    echo ('running...');
+    print("running...\n");
     $gatheringController->runGatheringJob();
 
     // run on every 30 seconds
