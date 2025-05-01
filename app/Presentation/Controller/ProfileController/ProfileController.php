@@ -78,11 +78,22 @@ class ProfileController
         include $this->fileHelper->getFilePath('CreateProfile');
     }
 
+    public function submitProfile()
+    {
+        $nickname   = trim($_POST['nickname']);
+        $aboutMe    = trim($_POST['about_me']);
+        $mbti       = $_POST['mbti'];
+        $hobbies    = $_POST['hobbies'] ?? [];
+        $preferences = $_POST['preferences'] ?? [];
+
+        $this->profileModel->submitProfile($nickname, $aboutMe, $mbti, $hobbies, $preferences);
+
+        header('Location: /profile');
+    }
+
 
     public function editProfile()
     {
         include $this->fileHelper->getFilePath('EditProfile');
     }
-
-
 }

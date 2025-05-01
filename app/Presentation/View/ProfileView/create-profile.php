@@ -56,7 +56,7 @@
                 <div class="col-md-9">
                     <label for="nickname" class="form-label fw-bold fs-5">Nickname</label>
 
-                    <input type="text" name="nickname" class="form-control w-75" placeholder="Nickname for your profile." required />
+                    <input type="text" name="nickname" class="form-control w-75" maxlength="30" placeholder="Nickname for your profile." required />
                     <div class="d-block text-end fs-6 w-75" style="color:#0C0C0D; opacity:40%;">0/20 characters</div>
                 </div>
                 <div class="col-md-1">
@@ -87,7 +87,7 @@
             <div class="row mb-4">
                 <div class="col-md-10 offset-md-1">
                     <label class="form-label fw-bold fs-5">About Me</label>
-                    <textarea name="about_me" class="form-control" rows="4" placeholder="Share a bit about yourself!" style="resize: none;" required></textarea>
+                    <textarea name="about_me" class="form-control" rows="4" maxlength="270" placeholder="Share a bit about yourself!" style="resize: none;" required></textarea>
                     <div class="d-block text-end fs-6" style="color:#0C0C0D; opacity:40%;">0/255 characters</div>
                 </div>
             </div>
@@ -200,52 +200,52 @@
             <div class="row mb-4">
                 <div class="col-md-10 offset-md-1" style="display: grid;">
                     <h6 class="fw-bold fs-5">Preference Gathering</h6>
-                    <div class="border rounded p-3 mb-4" id="hobbiesList" style="display: grid;grid-template-columns: repeat(8, 1fr); gap: 1.5rem; background-color: #ffffff;">
+                    <div class="border rounded p-3 mb-4" id="preferencesList" style="display: grid;grid-template-columns: repeat(8, 1fr); gap: 1.5rem; background-color: #ffffff;">
 
                         <button type="button"
-                            class="btn btn-outline-dark w-100 hobby-btn fw-bold"
+                            class="btn btn-outline-dark w-100 preference-btn fw-bold"
                             data-value="Entertainment">
                             Entertainment
                         </button>
 
                         <button type="button"
-                            class="btn btn-outline-dark w-100 hobby-btn fw-bold"
+                            class="btn btn-outline-dark w-100 preference-btn fw-bold"
                             data-value="Sports">
                             Sports
                         </button>
 
                         <button type="button"
-                            class="btn btn-outline-dark w-100 hobby-btn fw-bold"
+                            class="btn btn-outline-dark w-100 preference-btn fw-bold"
                             data-value="Dining">
                             Dining
                         </button>
 
                         <button type="button"
-                            class="btn btn-outline-dark w-100 hobby-btn fw-bold"
+                            class="btn btn-outline-dark w-100 preference-btn fw-bold"
                             data-value="Nature">
                             Nature
                         </button>
 
                         <button type="button"
-                            class="btn btn-outline-dark w-100 hobby-btn fw-bold"
+                            class="btn btn-outline-dark w-100 preference-btn fw-bold"
                             data-value="Hangout">
                             Hangout
                         </button>
 
                         <button type="button"
-                            class="btn btn-outline-dark w-100 hobby-btn fw-bold"
+                            class="btn btn-outline-dark w-100 preference-btn fw-bold"
                             data-value="Coffee">
                             Coffee
                         </button>
 
                         <button type="button"
-                            class="btn btn-outline-dark w-100 hobby-btn fw-bold"
+                            class="btn btn-outline-dark w-100 preference-btn fw-bold"
                             data-value="Picnic">
                             Picnic
                         </button>
 
                         <button type="button"
-                            class="btn btn-outline-dark w-100 hobby-btn fw-bold"
+                            class="btn btn-outline-dark w-100 preference-btn fw-bold"
                             data-value="Chill">
                             Chill
                         </button>
@@ -253,11 +253,10 @@
                 </div>
             </div>
 
-
             <!-- Form Buttons -->
             <div class="col-12 d-flex justify-content-center gap-3 mt-4">
-                    <button type="reset" class="btn btn-secondary py-2 px-4">Reset</button>
-                    <button type="submit" class="btn btn-primary py-2 px-4">Create</button>
+                <button type="reset" class="btn btn-secondary py-2 px-4">Reset</button>
+                <button type="submit" class="btn btn-primary py-2 px-4">Create</button>
             </div>
 
         </form>
@@ -265,33 +264,70 @@
     </main>
 
     <script>
-        function toggleSelection(button, inputName) {
-            const value = button.getAttribute('data-value');
-            const isActive = button.classList.contains('active');
+        $(document).ready(function() {
+            // Toggle selection for hobbies and preferences
+            function toggleSelection($btn, inputName) {
+                const value = $btn.data('value');
+                const isActive = $btn.hasClass('active');
 
-            if (!isActive) {
-                button.classList.add('active');
-                button.classList.replace('btn-outline-dark', 'btn-dark');
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = inputName + '[]';
-                input.value = value;
-                input.setAttribute('data-key', value);
-                document.getElementById('hiddenInputs').appendChild(input);
-            } else {
-                button.classList.remove('active');
-                button.classList.replace('btn-dark', 'btn-outline-dark');
-                document.querySelector(`input[data-key="${value}"]`)?.remove();
+                if (!isActive) {
+                    $btn.addClass('active').removeClass('btn-outline-dark')
+                    .css({
+                        'background-color': '#569FFF',
+                        'border-color': '#000000',
+                        'color': '#000000'
+                    });
+                    $('<input>')
+                        .attr({
+                            type: 'hidden',
+                            name: inputName + '[]',
+                            value: value,
+                            'data-key': value
+                        })
+                        .appendTo('#hiddenInputs');
+                } else {
+                    $btn.removeClass('active').addClass('btn-outline-dark')
+                    .css({
+                        'background-color': '',
+                        'border-color': '',
+                        'color': ''
+                    });
+                    $(`#hiddenInputs input[data-key="${value}"]`).remove();
+                }
             }
-        }
 
-        document.querySelectorAll('.hobby-btn').forEach(btn =>
-            btn.addEventListener('click', () => toggleSelection(btn, 'hobbies'))
-        );
-        document.querySelectorAll('.pref-btn').forEach(btn =>
-            btn.addEventListener('click', () => toggleSelection(btn, 'preferences'))
-        );
+            $('.hobby-btn').on('click', function() {
+                toggleSelection($(this), 'hobbies');
+            });
+
+            $('.pref-btn').on('click', function() {
+                toggleSelection($(this), 'preferences');
+            });
+
+            // Live character count for Nickname (max 20)
+            const $nickInput = $('input[name="nickname"]');
+            const $nickCounter = $nickInput.siblings('div').filter(function() {
+                return /\/20 characters/.test($(this).text());
+            });
+
+            $nickInput.on('input', function() {
+                const len = $(this).val().length;
+                $nickCounter.text(`${len}/20 characters`);
+            });
+
+            // Live character count for About Me (max 255)
+            const $aboutTextarea = $('textarea[name="about_me"]');
+            const $aboutCounter = $aboutTextarea.siblings('div').filter(function() {
+                return /\/255 characters/.test($(this).text());
+            });
+
+            $aboutTextarea.on('input', function() {
+                const len = $(this).val().length;
+                $aboutCounter.text(`${len}/255 characters`);
+            });
+        });
     </script>
+
 </body>
 
 </html>

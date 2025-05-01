@@ -90,4 +90,92 @@ class ProfileModel
     // {
     //     return $this->profileDAO->getProfileById($id);
     // }
+
+    public function submitProfile(
+        string $nickname,
+        string $aboutMe,
+        string $mbti,
+        array  $hobbies,
+        array  $preferences
+    ): int {
+        // 1) Business‐logic validation
+        $_err = [];
+
+        // Nickname: required, max 20 chars
+        if (trim($nickname) === '') {
+            $_err['nickname'] = 'Nickname is required';
+        } elseif (strlen($nickname) > 20) {
+            $_err['nickname'] = 'Maximum length is 20 characters';
+        }
+
+        // About Me: required, max 255 chars
+        if (trim($aboutMe) === '') {
+            $_err['about_me'] = 'About Me is required';
+        } elseif (strlen($aboutMe) > 255) {
+            $_err['about_me'] = 'Maximum length is 255 characters';
+        }
+
+        // MBTI: required, must be one of the defined types
+        $validMbti = [
+            'INTJ',
+            'INTP',
+            'ENTJ',
+            'ENTP',
+            'INFJ',
+            'INFP',
+            'ENFJ',
+            'ENFP',
+            'ISTJ',
+            'ISFJ',
+            'ESTJ',
+            'ESFJ',
+            'ISTP',
+            'ISFP',
+            'ESTP',
+            'ESFP'
+        ];
+        if (!in_array($mbti, $validMbti, true)) {
+            $_err['mbti'] = 'Please select a valid MBTI';
+        }
+
+        // Hobbies: optional—but if provided, each must be nonempty
+        foreach ($hobbies as $i => $h) {
+            if (trim($h) === '') {
+                $_err["hobbies[$i]"] = 'Invalid hobby selection';
+            }
+        }
+
+        // Preferences: optional—but if provided, each must be nonempty
+        foreach ($preferences as $i => $p) {
+            if (trim($p) === '') {
+                $_err["preferences[$i]"] = 'Invalid preference selection';
+            }
+        }
+
+        // 2) If any errors, store them and the old input, then redirect back
+        if (!empty($_err)) {
+            $_SESSION['profileErrors'] = $_err;
+            $_SESSION['old'] = [
+                'nickname'    => $nickname,
+                'about_me'    => $aboutMe,
+                'mbti'        => $mbti,
+                'hobbies'     => $hobbies,
+                'preferences' => $preferences,
+            ];
+            header('Location: /profile/create');
+            exit;
+        }
+
+        // 3) No errors → hand off to DAO to insert into the database
+        $data = [
+            'nickname'    => trim($nickname),
+            'about_me'    => trim($aboutMe),
+            'mbti'        => $mbti,
+            'hobbies'     => $hobbies,
+            'preferences' => $preferences,
+            'phone'       => $_SESSION['profile']['phone']    ?? null,
+            'password'    => $_SESSION['profile']['password'] ?? null,
+        ];
+        return $this->profileDAO->submitProfile($data);
+    }
 }

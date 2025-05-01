@@ -7,7 +7,7 @@ use Presentation\Controller\ProfileController\ProfileController;
 
 // home routes
 Route::get('/', [HomeController::class, 'home']);
-Route::get('/profile/create', [HomeController::class, 'profileHome']);
+Route::get('/profile', [HomeController::class, 'profileHome']);
 Route::get('/reflection', [HomeController::class, 'reflectionHome']);
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);
 Route::get('/my-gathering', [HomeController::class, 'myGatheringHome']);
@@ -17,6 +17,7 @@ Route::get('/logout', [HomeController::class, 'logoutHome']);
 
 // profile routes
 Route::get('/profile/edit', [ProfileController::class, 'editProfile']);
+Route::post('/profile/edit', [ProfileController::class, 'saveProfile']);
 Route::get('/profile/create', [ProfileController::class, 'createProfile']);
 Route::post('/profile/create', [ProfileController::class, 'submitProfile']);
 
