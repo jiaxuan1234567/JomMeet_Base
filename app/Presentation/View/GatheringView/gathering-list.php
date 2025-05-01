@@ -10,7 +10,23 @@ $userid = $_SESSION['profile']['profileID'];
 
 <script src="/js/gatheringlist.js"></script>
 
-<body>
+<div class="container-fluid my-5 mb-5">
+    <!-- Flash Message -->
+    <?php
+    if (!empty($_SESSION['flash_message'])):
+    ?>
+        <div id="flashMessage"
+            class="flash-message"
+            data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
+            data-msg="<?= $_SESSION['flash_message'] ?>">
+        </div>
+        <?php
+        unset($_SESSION['flash_message']);
+        unset($_SESSION['flash_type']);
+        ?>
+    <?php endif; ?>
+
+    <!-- Content -->
     <div class="container-sm mt-4">
         <div class="row">
             <div class="col">
@@ -64,8 +80,6 @@ $userid = $_SESSION['profile']['profileID'];
             </div>
         <?php endif; ?>
     </div>
+</div>
 
-    <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
-</body>
-
-</html>
+<?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

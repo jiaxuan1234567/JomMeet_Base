@@ -13,6 +13,19 @@ $asset = new FileHelper('asset');
 </style>
 
 <div class="container-fluid my-5 mb-5">
+    <?php
+    if (!empty($_SESSION['flash_message'])):
+    ?>
+        <div id="flashMessage"
+            class="flash-message"
+            data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
+            data-msg="<?= $_SESSION['flash_message'] ?>">
+        </div>
+        <?php
+        unset($_SESSION['flash_message']);
+        unset($_SESSION['flash_type']);
+        ?>
+    <?php endif; ?>
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
         <h2 class="fw-bold">My Gathering</h2>
@@ -120,20 +133,6 @@ $asset = new FileHelper('asset');
 
     </div>
     <div style="height: 300px;"></div>
-
-    <?php
-    if (!empty($_SESSION['flash_message'])):
-    ?>
-        <div id="flashMessage"
-            class="flash-message"
-            data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
-            data-msg="<?= $_SESSION['flash_message'] ?>">
-        </div>
-        <?php
-        unset($_SESSION['flash_message']);
-        unset($_SESSION['flash_type']);
-        ?>
-    <?php endif; ?>
 </div>
 
 

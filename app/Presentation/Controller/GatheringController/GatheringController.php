@@ -120,13 +120,33 @@ class GatheringController
         echo json_encode(['errors' => $errors]);
     }
 
-    public function viewDetail($id)
+    // GET: gathering-detail
+    public function viewDetail($gatheringId)
     {
-        $gathering = $this->gatheringModel->getGatheringById($id);
+        // $gathering = $this->gatheringModel->getGatheringById($gatheringId);
 
-        $userID = $_SESSION['profile']['profileID'] ?? null;
-        $isJoined = $this->gatheringModel->verifyUserInGathering($userID, $id);
-        $isHost = ($gathering['hostProfileID'] ?? null) == $userID;
+        // $userID = $_SESSION['profile']['profileID'] ?? null;
+        // $isJoined = $this->gatheringModel->verifyUserInGathering($userID, $gatheringId);
+        // $isHost = ($gathering['hostProfileID'] ?? null) == $userID;
+
+        // include $this->fileHelper->getFilePath('GatheringDetail');
+        $profileId = $_SESSION['profile']['profileID'];
+        $gathering = $this->gatheringModel->getPublicGatheringById($profileId, $gatheringId);
+
+        // Not public gathering
+        if (!$gathering) {
+            // Check if is user gathering
+            $gathering = $this->gatheringModel->getUserGatheringById($profileId, $gatheringId);
+            if ($gathering) {
+                header('Location: /my-gathering/view/' . $gathering['gatheringID']);
+                exit;
+            } else {
+                $_SESSION['flash_message'] = "You are not authorized to view this gathering.";
+                $_SESSION['flash_type'] = "error";
+                header('Location: /gathering');
+                exit;
+            }
+        }
 
         include $this->fileHelper->getFilePath('GatheringDetail');
     }
@@ -137,7 +157,9 @@ class GatheringController
         $profileId = $_SESSION['profile']['profileID'];
         $gathering = $this->gatheringModel->getUserGatheringById($profileId, $gatheringId);
 
+        // Not user gathering
         if (!$gathering) {
+            // Check if is public gathering
             $gathering = $this->gatheringModel->getPublicGatheringById($profileId, $gatheringId);
             if ($gathering) {
                 header('Location: /gathering/view/' . $gathering['gatheringID']);
@@ -207,12 +229,11 @@ class GatheringController
     }
 
     // -- Join Gathering --
-
     public function joinGathering()
     {
         try {
             $gatheringid = $_POST['gatheringid'] ?? null;
-            $userid = $_POST['userid'] ?? null;
+            $userid = $_SESSION['profile']['profileID'] ?? null;
 
             if ($gatheringid != null && $userid != null) {
                 $result = $this->gatheringModel->addUserToGathering($userid, $gatheringid);

@@ -50,15 +50,18 @@ class GatheringModel
         // 2. Not hosted by user
         if ($gathering['hostProfileID'] == $profileId) return false;
 
-        // 3. Not joined already
+        // 3. No.Pax not full
+        if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) return false;
+
+        // 4. Not joined already
         if ($this->gatheringDAO->isUserJoined($gatheringId, $profileId)) return false;
 
-        // 4. Not started
+        // 5. Not started
         $now = new DateTime();
-        $startTime = new \DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+        $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
         if ($startTime <= $now) return false;
 
-        // 5. Not clashing with user’s active joined gatherings
+        // 6. Not clashing with user’s active joined gatherings
         if ($this->gatheringDAO->hasTimeConflict($profileId, $startTime)) return false;
 
         return $gathering;

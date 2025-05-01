@@ -1,17 +1,8 @@
 <?php
 $_title = 'Gathering Details';
 require_once __DIR__ . '/../HomeView/header.php';
-
-//use Presentation\Controller\GatheringController\GatheringController;
-// //For testing purposes only
-// $userid = 1;
-// $controller = new GatheringController();
-// $gatheringid = $gathering['gatheringID'];
-// // Call the method to check if the user has joined
-// $notJoined = $controller->verifyUserInGathering($userid, $gatheringid);
-
-$userid = $_SESSION['profile']['profileID'];
 ?>
+
 <div class="container-sm mt-4">
     <div class="row">
         <div class="col">
@@ -21,6 +12,7 @@ $userid = $_SESSION['profile']['profileID'];
 </div>
 
 <div class="container py-3" style="height:630px;">
+    <!-- Content -->
     <div class="container justify-content-between p-3 mt-7 border rounded bg-blue-color border-light-blue">
         <div class="row">
             <div class="col align-self-start">
@@ -56,14 +48,10 @@ $userid = $_SESSION['profile']['profileID'];
                 </div>
                 <div class="row justify-content-center">
                     <a href="/gathering" class="btn btn-light mx-1" style="height: 35px; width: 200px;">Back</a>
-
-                    <?php if (!$isHost && !$isJoined && ($gathering['currentParticipant'] < $gathering['maxParticipant'])): ?>
-                        <form method="POST" action="/gathering/join" style="width:200px;">
-                            <input type="hidden" name="userid" value="<?php echo htmlspecialchars($userid); ?>">
-                            <input type="hidden" name="gatheringid" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
-                            <button data-confirm type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">Join Gathering</button>
-                        </form>
-                    <?php endif; ?>
+                    <form method="POST" action="/gathering/join" style="width:200px;">
+                        <input type="hidden" name="gatheringid" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
+                        <button data-confirm type="submit" class="btn btn-primary button-blue-color border-0 mx-1" style="height: 35px; width: 200px;">Join Gathering</button>
+                    </form>
                 </div>
             </div>
         </div>
