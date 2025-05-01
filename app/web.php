@@ -24,7 +24,6 @@ Route::post('/profile/create', [ProfileController::class, 'submitProfile']);
 // self-reflection routes
 Route::get('/reflection/create', [ReflectionController::class, 'createReflection']);
 Route::post('/reflection/create', [ReflectionController::class, 'saveReflection']);
-Route::post('/reflection/validate', [ReflectionController::class, 'validateReflection']);
 Route::get('/reflection/edit/{id}', [ReflectionController::class, 'editReflection']);
 Route::post('/reflection/edit/{id}', [ReflectionController::class, 'editSaveReflection']);
 Route::get('/reflection/delete/{id}', [ReflectionController::class, 'deleteReflection']);
@@ -52,6 +51,7 @@ Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGat
 Route::get('/api/savedLocations', [GatheringController::class, 'apiSavedLocations']);
 
 // AJAX Validation
+Route::post('/api/validate-reflection', [ReflectionController::class, 'validateReflection']);
 Route::post('/api/validate-gathering', [GatheringController::class, 'ajaxValidateGathering']);
 
 // helper route to save location (need delete in future)

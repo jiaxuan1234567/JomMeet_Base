@@ -33,13 +33,13 @@ unset($_SESSION['old']);
                     <div class="my-3">
                         <h4 style="font-size: 30px;"><label for="title"><b>Title</b></label></h4>
                         <input type="text" class="ps-2 border border-black border-2 rounded-3" id="reflectionTitle" name="reflectionTitle" placeholder="Write Your Self-Reflection Title Here!" value="<?= htmlspecialchars($old['reflectionTitle'] ?? '') ?>" style="width:500px;">
-                        <div class="invalid-reflection" id="errorReflection"></div>
+                        <div class="invalid-reflection" id="errorReflectionTitle"></div>
                     </div>
 
                     <div class="my-3">
                         <h4 style="font-size: 30px;"><label for="content"><b>Content</b></label></h4>
                         <textarea class="ps-2 border border-black border-2 rounded-3" id="reflectionContent" name="reflectionContent" placeholder="Share how was your day!" style="width:500px;height:200px;"><?= htmlspecialchars($old['reflectionContent'] ?? '') ?></textarea>
-                        <div class="invalid-reflection" id="errorReflection"></div>
+                        <div class="invalid-reflection" id="errorReflectionContent"></div>
                     </div>
 
                     <section class="d-flex justify-content-center my-3">

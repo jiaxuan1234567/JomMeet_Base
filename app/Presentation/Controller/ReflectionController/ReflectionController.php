@@ -28,7 +28,7 @@ class ReflectionController
         $reflectionTitle = $_POST['reflectionTitle'];
         $reflectionContent = $_POST['reflectionContent'];
 
-        $this->reflectionModel->saveReflection($profileId,$reflectionDate,$reflectionTitle,$reflectionContent);
+        $this->reflectionModel->saveReflection($profileId, $reflectionDate, $reflectionTitle, $reflectionContent);
         $_SESSION['flash_message'] = [
             'type' => 'success',
             'text' => 'Your self-reflection has been successfully created.'
@@ -47,7 +47,7 @@ class ReflectionController
         $reflectionTitle = $_POST['reflectionTitle'];
         $reflectionContent = $_POST['reflectionContent'];
 
-        $this->reflectionModel->editSaveReflection($reflectionId,$reflectionTitle,$reflectionContent);
+        $this->reflectionModel->editSaveReflection($reflectionId, $reflectionTitle, $reflectionContent);
         header("Location: /reflection");
     }
 
@@ -66,5 +66,17 @@ class ReflectionController
         $this->reflectionModel->deleteReflectionById($reflectionId);
         header("Location: /reflection");
     }
-    
+
+    // new added
+    public function validateReflection()
+    {
+        header('Content-Type: application/json');
+
+        $title = $_POST['reflectionTitle'] ?? null;
+        $content = $_POST['reflectionContent'] ?? null;
+
+        $result = $this->reflectionModel->validateReflection($title, $content);
+
+        echo json_encode($result);
+    }
 }
