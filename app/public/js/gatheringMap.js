@@ -1,3 +1,5 @@
+// gatheringMap.js (Switched to classic google.maps.Marker)
+
 let map;
 let markers = [];
 let savedLocations = null;
@@ -6,36 +8,32 @@ const markerMap = {};
 
 // Load required libraries
 async function loadLibraries() {
-    const [mapsLib, placesLib, markerLib] = await Promise.all([
+    const [mapsLib, placesLib] = await Promise.all([
         google.maps.importLibrary("maps"),
-        google.maps.importLibrary("places"),
-        google.maps.importLibrary("marker"),
+        google.maps.importLibrary("places")
     ]);
-    return { ...mapsLib, ...placesLib, ...markerLib };
+    return { ...mapsLib, ...placesLib };
 }
 
-// Create marker icon element
-function createCustomMarkerIcon(url, size = 32) {
-    const img = document.createElement('img');
-    img.src = url;
-    img.style.width = `${size}px`;
-    img.style.height = `${size}px`;
-    img.style.objectFit = 'contain';
-    return img;
-}
-
-// Highlight marker (scale up)
+// Highlight marker (scale up + bounce)
 function highlightMarker(marker) {
-    marker.content = createCustomMarkerIcon('/asset/geo-alt.svg', 48);
+    marker.setIcon({
+        url: '/asset/geo-alt.svg',
+        scaledSize: new google.maps.Size(48, 48)
+    });
+    marker.setAnimation(google.maps.Animation.BOUNCE);
     currentActiveMarker = marker;
 }
 
-// Reset marker to default size
+// Reset marker to default
 function resetMarker(marker) {
-    marker.content = createCustomMarkerIcon('/asset/geo-alt.svg', 32);
+    marker.setIcon({
+        url: '/asset/geo-alt.svg',
+        scaledSize: new google.maps.Size(32, 32)
+    });
+    marker.setAnimation(null);
 }
 
-// Reset the currently active marker
 function resetActiveMarker() {
     if (currentActiveMarker) {
         resetMarker(currentActiveMarker);
@@ -43,30 +41,28 @@ function resetActiveMarker() {
     }
 }
 
-// Update hidden input fields for lat/lng
 function updateCoordinates({ lat, lng }) {
     $('#latitude').val(lat);
     $('#longitude').val(lng);
 }
 
-// Handle marker selection
 function onMarkerSelect(marker) {
-    showDetailPanel(marker.placeData, marker.position);
+    showDetailPanel(marker.placeData, marker.getPosition());
     if (currentActiveMarker && currentActiveMarker !== marker) {
         resetMarker(currentActiveMarker);
     }
     highlightMarker(marker);
 }
 
-// Display detail panel for selected location
 async function showDetailPanel(loc, pos, liElem) {
-    let imageUrl = '';
+    let imageUrl = '/asset/image-comingsoon.jpg';
+
     try {
         const place = new google.maps.places.Place({ id: loc.placeID });
         await place.fetchFields({ fields: ['photos'] });
         const photo = place.photos?.[0];
         if (photo?.name) {
-            const apiKey = 'AIzaSyCIm3LWq0gbsblgi0kmbEscuFq9zUoERD4'; // Replace this
+            const apiKey = 'AIzaSyCIm3LWq0gbsblgi0kmbEscuFq9zUoERD4';
             imageUrl = `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxWidthPx=400`;
         }
     } catch (err) {
@@ -96,7 +92,6 @@ async function showDetailPanel(loc, pos, liElem) {
     map.setZoom(17);
 }
 
-// Create and submit location form
 function submitLocationForm(loc) {
     const form = document.createElement('form');
     form.method = 'POST';
@@ -120,7 +115,6 @@ function submitLocationForm(loc) {
     form.submit();
 }
 
-// Perform search and populate list
 async function performSearch() {
     const query = $('#searchBox').val().trim().toLowerCase();
     $('#resultsList').empty();
@@ -141,10 +135,13 @@ async function performSearch() {
     }
 
     results.forEach(loc => {
-        const pos = { lat: parseFloat(loc.latitude), lng: parseFloat(loc.longitude) };
+        const pos = { lat: +loc.latitude, lng: +loc.longitude };
         const marker = markerMap[loc.locationID];
         if (marker) {
-            marker.content = createCustomMarkerIcon('/asset/geo-alt.svg', 36);
+            marker.setIcon({
+                url: '/asset/geo-alt.svg',
+                scaledSize: new google.maps.Size(36, 36)
+            });
         }
 
         $('<li>')
@@ -158,11 +155,9 @@ async function performSearch() {
     });
 }
 
-// Initialize the map
 window.initMap = async function () {
     const { Map } = await loadLibraries();
     map = new Map(document.getElementById("map"), {
-        mapId: "4a86f89e0d763174",
         center: { lat: 3.1390, lng: 101.6869 },
         zoom: 13,
         mapTypeControl: false,
@@ -178,13 +173,17 @@ window.initMap = async function () {
 
         savedLocations.forEach(loc => {
             const pos = { lat: +loc.latitude, lng: +loc.longitude };
-            const marker = new google.maps.marker.AdvancedMarkerElement({
+            const marker = new google.maps.Marker({
                 map,
                 position: pos,
-                content: createCustomMarkerIcon('/asset/geo-alt.svg', 32)
+                icon: {
+                    url: '/asset/geo-alt.svg',
+                    scaledSize: new google.maps.Size(32, 32)
+                },
+                animation: google.maps.Animation.DROP
             });
             marker.placeData = loc;
-            marker.addListener('gmp-click', () => onMarkerSelect(marker));
+            marker.addListener('click', () => onMarkerSelect(marker));
             markers.push(marker);
             markerMap[loc.locationID] = marker;
             bounds.extend(pos);
@@ -202,7 +201,6 @@ window.initMap = async function () {
     $('#searchBtn').on('click', performSearch);
 };
 
-// Overlay click to close
 $(document).on('click', '#detailOverlay', function (e) {
     if (e.target.id === 'detailOverlay') {
         $('#detailOverlay').hide();
@@ -211,7 +209,6 @@ $(document).on('click', '#detailOverlay', function (e) {
     }
 });
 
-// Debounce search input
 $(document).ready(function () {
     const debounce = (fn, delay) => {
         let t;
@@ -223,8 +220,7 @@ $(document).ready(function () {
 
     const liveSearch = debounce(performSearch, 150);
 
-    $('#searchBox')
-        .on('input', liveSearch);
+    $('#searchBox').on('input', liveSearch);
 
     $('#clearText').on('click', function () {
         $('#searchBox').val('').trigger('input');
@@ -242,6 +238,7 @@ $(document).ready(function () {
         $('#vertBar').toggleClass('d-none', !hasText);
     });
 });
+
 
 
 /* ------------------------ use to add location ---------------------------------------- */
