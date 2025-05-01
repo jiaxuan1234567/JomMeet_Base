@@ -28,8 +28,9 @@ class HomeModel
         return (new GatheringModel())->getAvailableGatherings($profileId);
     }
 
-    public function getMyGatherings($hostProfileId)
+    public function getMyGatherings()
     {
+        $hostProfileId = $_SESSION['profile']['profileID'];
         return (new GatheringModel())->getMyGatherings($hostProfileId);
     }
 

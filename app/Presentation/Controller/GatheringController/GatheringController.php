@@ -22,17 +22,9 @@ class GatheringController
         $this->gatheringModel = new GatheringModel();
     }
 
-    // -- My Gathering --
-
     // GET: create-gathering
     public function viewCreate()
     {
-        // $sel = $_SESSION['selected_location'] ?? ['locationID' => '', 'locationName' => ''];
-        // $locationId  = $sel['locationID'];
-        // $locationName   = $sel['locationName'];
-
-        // unset($_SESSION['selected_location']);
-
         include $this->fileHelper->getFilePath('CreateGathering');
     }
 
@@ -123,13 +115,6 @@ class GatheringController
     // GET: gathering-detail
     public function viewDetail($gatheringId)
     {
-        // $gathering = $this->gatheringModel->getGatheringById($gatheringId);
-
-        // $userID = $_SESSION['profile']['profileID'] ?? null;
-        // $isJoined = $this->gatheringModel->verifyUserInGathering($userID, $gatheringId);
-        // $isHost = ($gathering['hostProfileID'] ?? null) == $userID;
-
-        // include $this->fileHelper->getFilePath('GatheringDetail');
         $profileId = $_SESSION['profile']['profileID'];
         $gathering = $this->gatheringModel->getPublicGatheringById($profileId, $gatheringId);
 
@@ -147,7 +132,6 @@ class GatheringController
                 exit;
             }
         }
-
         include $this->fileHelper->getFilePath('GatheringDetail');
     }
 
@@ -171,61 +155,15 @@ class GatheringController
                 exit;
             }
         }
-
         include $this->fileHelper->getFilePath('MyGatheringDetails');
     }
 
+    // AJAX GET: Get All Locations
     public function apiSavedLocations()
     {
         header('Content-Type: application/json');
 
         echo json_encode((new LocationModel())->getAllLocations());
-    }
-
-    // helper function to save location (will delete in future)
-    public function saveLocation()
-    {
-        // read JSON POST body
-        $loc = json_decode(file_get_contents('php://input'), true);
-
-        $db = Database::getConnection();
-
-        try {
-            try {
-                $placeId = $loc['place_id'];
-                $name = $loc['name'];
-                $address = $loc['address'];
-                $latitude = $loc['latitude'];
-                $longtitude = $loc['longitude'];
-
-                $sql = "
-                      INSERT INTO `location` (placeID, locationName, address,  longitude, latitude)
-                      VALUES (:pid, :name, :addr, :lng, :lat)
-                      ON DUPLICATE KEY UPDATE
-                        locationName = VALUES(locationName),
-                        `address`    = VALUES(`address`),
-                        latitude     = VALUES(latitude),
-                        longitude    = VALUES(longitude)
-        
-                    ";
-                $stmt = $db->prepare($sql);
-                return $stmt->execute([
-                    ':pid'  => $placeId,
-                    ':name' => $name,
-                    ':addr' => $address,
-                    ':lng'  => $longtitude,
-                    ':lat'  => $latitude,
-                ]);
-            } catch (PDOException $e) {
-                error_log("Error in saveLocation: " . $e->getMessage());
-                return false;
-            }
-            http_response_code(200);
-            echo $status;
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo $e->getMessage();
-        }
     }
 
     // -- Join Gathering --
@@ -333,5 +271,53 @@ class GatheringController
     public function runGatheringJob()
     {
         $this->gatheringModel->checkAndTransitionGatherings();
+    }
+
+    //
+    // HELPER FUNCTION to save location (will DELETE in future)
+    //
+    public function saveLocation()
+    {
+        // read JSON POST body
+        $loc = json_decode(file_get_contents('php://input'), true);
+
+        $db = Database::getConnection();
+
+        try {
+            try {
+                $placeId = $loc['place_id'];
+                $name = $loc['name'];
+                $address = $loc['address'];
+                $latitude = $loc['latitude'];
+                $longtitude = $loc['longitude'];
+
+                $sql = "
+                          INSERT INTO `location` (placeID, locationName, address,  longitude, latitude)
+                          VALUES (:pid, :name, :addr, :lng, :lat)
+                          ON DUPLICATE KEY UPDATE
+                            locationName = VALUES(locationName),
+                            `address`    = VALUES(`address`),
+                            latitude     = VALUES(latitude),
+                            longitude    = VALUES(longitude)
+            
+                        ";
+                $stmt = $db->prepare($sql);
+                return $stmt->execute([
+                    ':pid'  => $placeId,
+                    ':name' => $name,
+                    ':addr' => $address,
+                    ':lng'  => $longtitude,
+                    ':lat'  => $latitude,
+                ]);
+            } catch (PDOException $e) {
+                error_log("Error in saveLocation: " . $e->getMessage());
+                return false;
+            }
+            http_response_code(200);
+            echo $status;
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo $e->getMessage();
+        }
     }
 }

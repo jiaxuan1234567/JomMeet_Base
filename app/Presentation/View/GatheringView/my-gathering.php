@@ -4,13 +4,6 @@ $_title = 'My Gathering';
 require_once __DIR__ . '/../HomeView/header.php';
 $asset = new FileHelper('asset');
 ?>
-<style>
-    .action-dropdown a:hover,
-    .action-dropdown button:hover {
-        background-color: #569FFF;
-        color: #F5F5F7;
-    }
-</style>
 
 <div class="container-fluid my-5 mb-5">
     <?php
@@ -26,6 +19,7 @@ $asset = new FileHelper('asset');
         unset($_SESSION['flash_type']);
         ?>
     <?php endif; ?>
+
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
         <h2 class="fw-bold">My Gathering</h2>

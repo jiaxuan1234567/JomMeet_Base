@@ -217,7 +217,7 @@ class GatheringModel
     public function getMyGatherings($profileId)
     {
         try {
-            $rows = $this->gatheringDAO->getMyGatherings($profileId);
+            $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
             return array_map(function (array $g) {
                 return [
                     'id'        => (int)$g['gatheringID'],
@@ -229,7 +229,7 @@ class GatheringModel
                     'pax'       => (int)$g['currentParticipant'],
                     'maxPax'       => (int)$g['maxParticipant'],
                     'venue'     => $g['venue'],
-                    'status'    => strtolower($g['status']),    // 'new','start','end','cancelled'
+                    'status'    => strtolower($g['status']),
                     'isHost'    => (bool)$g['isHost'],
                     'isJoined'  => (bool)$g['isJoined'],
                 ];
@@ -240,6 +240,8 @@ class GatheringModel
         }
     }
 
+
+    // Create Gathering
     public function createGathering($data)
     {
         try {

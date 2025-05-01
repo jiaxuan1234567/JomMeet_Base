@@ -3,100 +3,6 @@ $_title = 'Create Gathering';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
-<style>
-    input[type="date"]::-webkit-inner-spin-button,
-    input[type="date"]::-webkit-calendar-picker-indicator,
-    input[type="time"]::-webkit-inner-spin-button,
-    input[type="time"]::-webkit-calendar-picker-indicator {
-        opacity: 0;
-        cursor: pointer;
-        position: absolute;
-        right: 0;
-        z-index: 1;
-        width: 100%;
-        -webkit-appearance: none;
-    }
-
-    button[type="reset"]:hover {
-        background-color: #f8f9fa;
-        /* Bootstrap light */
-    }
-
-    button#createBtn[disabled] {
-        background-color: #e0dcdc !important;
-        color: #b1a9a9 !important;
-        cursor: not-allowed !important;
-        border: none !important;
-        opacity: 1 !important;
-    }
-
-    .pax-wrapper {
-        background-color: #fff;
-    }
-
-    #inputPax {
-        width: 60px;
-        font-size: 1.2rem;
-        background-color: #fff;
-    }
-
-    #decreasePax:disabled {
-        background-color: #e0dcdc;
-        color: #888;
-    }
-
-    #increasePax:disabled {
-        background-color: #e0dcdc;
-        color: #888;
-    }
-
-    .btn:disabled {
-        opacity: 1;
-    }
-
-    .gathering-input-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 0.375rem;
-        /* same as rounded */
-        padding: 0.5rem 1rem;
-        box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
-        /* shadow-sm */
-        height: 48px;
-        /* fixed height for all */
-    }
-
-    .gathering-input {
-        background-color: transparent;
-        border: none;
-        box-shadow: none;
-        font-weight: 600;
-        padding: 0;
-        text-align: center;
-        height: 100%;
-    }
-
-    button.gathering-button {
-        padding: 0.375rem 1rem;
-        font-weight: 500;
-        border: none;
-        border-radius: 0.375rem;
-    }
-
-    .time-blue {
-        background-color: #569FFF;
-        color: #fff;
-    }
-
-    .time-blue::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-        cursor: pointer;
-    }
-</style>
-
 <div class="container-fluid" id="mainContent">
     <div id="createGatheringForm">
         <div class="d-flex mb-4 align-items-center border-bottom border-2 px-2 py-3">
@@ -186,9 +92,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                             <button class="btn btn-primary button-blue-color text-white gathering-button"
                                 id="increasePax" type="button">+</button>
                         </div>
-
                     </div>
-
 
                     <div class="col-1 text-end">
                         <label for="startTime" class="col-form-label fw-semibold">Time</label>
@@ -201,7 +105,6 @@ require_once __DIR__ . '/../HomeView/header.php';
                                     name="startTime"
                                     class="form-control gathering-input text-center time-blue btn btn-primary"
                                     value="<?= htmlspecialchars($_GET['startTime'] ?? '') ?>">
-
                             </div>
 
                             <span class="fw-bold d-flex align-items-center">to</span>

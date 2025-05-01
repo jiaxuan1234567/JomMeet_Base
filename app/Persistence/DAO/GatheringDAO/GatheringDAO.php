@@ -246,7 +246,7 @@ class GatheringDAO
 
 
     // my-gathering
-    public function getMyGatherings($profileId)
+    public function getUserAllGatherings($profileId)
     {
         try {
             $sql = "SELECT 
