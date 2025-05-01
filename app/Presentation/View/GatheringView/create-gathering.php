@@ -359,6 +359,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                 $inputLocation.val().trim() !== '';
         }
 
+        const touched = new Set();
         const fields = ['inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
 
         function toggleSubmitButton() {
@@ -392,19 +393,33 @@ require_once __DIR__ . '/../HomeView/header.php';
                 locationId: $('input[name="locationId"]').val()
             };
 
+            console.log(data);
+
             $.post('/api/validate-gathering', data, function(response) {
-                const error = response.errors?.[fieldId];
-                if (error) {
-                    showValidationError(fieldId, error);
-                } else {
-                    clearValidationError(fieldId);
-                }
+                const errors = response.errors || {};
+
+                // only update the fields the user has touched
+                touched.forEach(fieldId => {
+                    if (errors[fieldId]) {
+                        showValidationError(fieldId, errors[fieldId]);
+                    } else {
+                        clearValidationError(fieldId);
+                    }
+                });
+
                 toggleSubmitButton();
             }, 'json');
         }
 
         fields.forEach(fieldId => {
             $(`#${fieldId}`).on('input change', function() {
+                touched.add(fieldId);
+
+                // when date changes, also force re-validate times
+                if (fieldId === 'inputDate') {
+                    touched.add('startTime');
+                }
+
                 validateField(fieldId);
             });
         });
