@@ -158,19 +158,30 @@ $asset = new FileHelper('asset');
 
             let items = [];
 
-            if (g.isHost) {
-                // Host-specific actions
-                items.push('<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>');
-                items.push('<li><a class="dropdown-item fw-bold" href="#">Edit Gathering</a></li>');
-                items.push(renderPostList(`my-gathering/cancel/${g.id}`, 'Cancel Gathering', 'Confirm to cancel the gathering?'));
-            } else if (g.status === 'new') {
-                items.push('<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>');
-                items.push(renderPostList(`gathering/leave/${g.id}`, 'Leave Gathering', 'Confirm to leave the gathering?'));
-            } else if (g.status === 'start') {
-                items.push('<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>');
-            } else if (g.status === 'end') {
-                items.push('<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>');
-                items.push('<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>');
+            switch (g.status) {
+                case 'new':
+                    if (g.isHost) {
+                        items.push(actionLink('Send Reminder'));
+                        items.push(actionLink('Edit Gathering'));
+                        items.push(renderPostList(`my-gathering/cancel/${g.id}`, 'Cancel Gathering', 'Confirm to cancel the gathering?'));
+                    } else {
+                        items.push(actionLink('Reply Reminder'));
+                        items.push(renderPostList(`gathering/leave/${g.id}`, 'Leave Gathering', 'Confirm to leave the gathering?'));
+                    }
+                    break;
+
+                case 'start':
+                    if (g.isHost) {
+                        items.push(actionLink('Send Reminder'));
+                    } else {
+                        items.push(actionLink('Reply Reminder'));
+                    }
+                    break;
+
+                case 'end':
+                    items.push(actionLink('Gathering Feedback'));
+                    items.push(actionLink('Location Feedback'));
+                    break;
             }
 
             if (!items.length) return '';
@@ -184,6 +195,11 @@ $asset = new FileHelper('asset');
                         ${items.join('')}
                     </ul>
                 </div>`;
+        }
+
+        // Helper to build a <li><a></a></li>
+        function actionLink(label) {
+            return `<li><a class="dropdown-item fw-bold" href="#">${label}</a></li>`;
         }
 
         function renderGatherings(list) {
@@ -240,8 +256,6 @@ $asset = new FileHelper('asset');
                         .addClass('bg-white text-black border border-black')
                         .css('background-color', '');
                 }
-                // $b.toggleClass('active', $b.data('status') === status)
-                //     .toggleClass('bg-white text-black', $b.data('status') !== status);
             });
         }
 

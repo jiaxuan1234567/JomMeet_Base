@@ -30,7 +30,7 @@ class HomeController
         // $profile = (new HomeModel())->getProfileDetails();
         $profile = $_SESSION['profile'];
         // include $this->fileHelper->getFilePath('Profile');
-        include $this->fileHelper->getFilePath('CreateProfile');
+        include $this->fileHelper->getFilePath('Profile');
     }
 
     public function reflectionHome()

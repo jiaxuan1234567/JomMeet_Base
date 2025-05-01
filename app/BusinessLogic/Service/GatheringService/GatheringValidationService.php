@@ -33,6 +33,11 @@ class GatheringValidationService
         $end   = $form['endTime']   ?? '';
         $errors = $this->validateTime($start, $end, $errors);
 
+        // NEW: Enforce start buffer as soon as we have a valid date and startTime
+        if (empty($errors['inputDate']) && empty($errors['startTime']) && $start !== '') {
+            $errors = $this->validateStartTimeBuffer($date, $start, $errors);
+        }
+
         // 6. Date+Time logic, only if date & time fields passed
         if (empty($errors['inputDate']) && empty($errors['startTime']) && empty($errors['endTime'])) {
             $errors = $this->validateDateTime($date, $start, $end, $errors);
@@ -118,10 +123,22 @@ class GatheringValidationService
         return $e;
     }
 
+    private function validateStartTimeBuffer(string $date, string $start, array $e): array
+    {
+        $startDT = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
+        if (!$startDT) return $e;
+
+        $minStart = (new DateTime())->modify('+3 hours');
+        if ($startDT < $minStart) {
+            $e['startTime'] = 'Start time must be at least 3 hours from now.';
+        }
+        return $e;
+    }
+
     private function validateOverlap(string $date, string $start, array $joined, array $e): array
     {
         // clear any old overlap error
-        unset($e['startTime']);
+        //unset($e['startTime']);
 
         if ($date === '' || $start === '' || !$joined) {
             return $e;

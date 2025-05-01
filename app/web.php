@@ -7,7 +7,8 @@ use Presentation\Controller\ProfileController\ProfileController;
 
 // home routes
 Route::get('/', [HomeController::class, 'home']);
-Route::get('/profile/create', [HomeController::class, 'profileHome']);
+Route::get('/profile', [HomeController::class, 'profileHome']);
+//Route::get('/profile/create', [HomeController::class, 'profileHome']);
 Route::get('/reflection', [HomeController::class, 'reflectionHome']);
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);
 Route::get('/my-gathering', [HomeController::class, 'myGatheringHome']);

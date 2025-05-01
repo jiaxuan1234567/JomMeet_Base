@@ -2,7 +2,6 @@
 
 namespace Presentation\Controller\GatheringController;
 
-use BusinessLogic\Service\GatheringService\CheckGatheringStatus;
 use BusinessLogic\Model\GatheringModel\GatheringModel;
 use BusinessLogic\Model\GatheringModel\LocationModel;
 
