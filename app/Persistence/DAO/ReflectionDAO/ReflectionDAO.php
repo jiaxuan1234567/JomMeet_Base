@@ -65,4 +65,17 @@ class ReflectionDAO
             return false;
         }
     }
+
+    public function deleteReflectionById($reflectionId) 
+    {
+        try {
+            $stmt = $this->db->prepare("DELETE FROM self_reflect WHERE selfreflectID = :id");
+            $stmt->bindParam(':id', $reflectionId, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error in deleteReflectionById: " . $e->getMessage());
+            return false;
+        }
+    }
+
 }
