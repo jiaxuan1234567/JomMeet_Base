@@ -33,24 +33,24 @@
 <body>
     <!-- Header -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light px-3 bg-blue-color">
+        <nav class="navbar navbar-expand-lg navbar-light px-4 bg-blue-color">
             <a class="navbar-brand" href="#">
                 <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" alt="Logo" width="40" height="40" />
             </a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li id="homeNav" class="nav-item"><a class="nav-link fw-bold" href="/">Home</a></li>
-                    <li id="reflectionNav" class="nav-item"><a class="nav-link fw-bold" href="/reflection">Reflection</a></li>
-                    <li id="GatheringNav" class="nav-item"><a class="nav-link fw-bold" href="/gathering">Gathering</a></li>
-                    <li id="MyGatheringNav" class="nav-item"><a class="nav-link fw-bold" href="/my-gathering">My Gathering</a></li>
+                    <li id="homeNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/">Home</a></li>
+                    <li id="reflectionNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/reflection">Reflection</a></li>
+                    <li id="GatheringNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/gathering">Gathering</a></li>
+                    <li id="MyGatheringNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/my-gathering">My Gathering</a></li>
                 </ul>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 align-items-center">
                     <?php if ($_SESSION['profile_id']): ?>
-                        <a href="/profile" class="btn btn-outline-secondary rounded-pill"><?= $_SESSION['profile']['nickname'] ?? '' ?></a>
+                        <a href="/profile" class="nav-link fw-bold me-3"><?= $_SESSION['profile']['nickname'] ?? '' ?></a>
                     <?php else: ?>
-                        <a href="/login" class="btn btn-outline-secondary rounded-pill">Profile</a>
+                        <a href="/login" class="nav-link fw-bold me-3">Login</a>
                     <?php endif; ?>
-                    <a href="/logout" class="btn btn-light rounded-pill">Log out</a>
+                    <a href="/logout" class="btn btn-light rounded fw-bold">Log out</a>
                 </div>
             </div>
         </nav>

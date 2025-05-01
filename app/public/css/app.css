@@ -64,5 +64,5 @@ body {
 }
 
 .navbar .nav-link.active {
-    color: #569FFF;
+    color: #569FFF !important;
 }
