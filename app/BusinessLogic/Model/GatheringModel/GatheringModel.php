@@ -338,8 +338,8 @@ class GatheringModel
         $theme = trim($data['inputTheme'] ?? '');
         if ($theme === '') {
             $errors['inputTheme'] = 'Theme is required.';
-        } elseif (strlen($theme) > 255) {
-            $errors['inputTheme'] = 'Theme cannot exceed 255 characters.';
+        } elseif (strlen($theme) > 100) {
+            $errors['inputTheme'] = 'Theme cannot exceed 100 characters.';
         }
 
         // Date and Time
@@ -374,6 +374,8 @@ class GatheringModel
             if ($startDateTime < $minStart) {
                 $errors['startTime'] = 'Start time must be at least 3 hours from now.';
             }
+        } else if (($date > $today) && !empty($start) && !empty($errors['startTime'])) {
+            $errors['startTime'] = '';
         }
 
         if (!empty($start) && !empty($end)) {
@@ -415,6 +417,31 @@ class GatheringModel
 
             if (!$location || strtolower($location['locationName']) !== strtolower($locationName)) {
                 $errors['inputLocation'] = 'Selected location is invalid.';
+            }
+        }
+
+        // Check User Current Gathering
+        $profileID = $_SESSION['profile']['profileID'];
+        if (empty($errors['date']) && empty($errors['startTime']) && !empty($profileID)) {
+            $newStart = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
+            $joined = $this->dao->getJoinedGatheringByUserId($profileID);
+
+            foreach ($joined as $g) {
+                if (!in_array(strtoupper($g['status']), ['END', 'CANCELLED'])) {
+                    $joinedDate = $g['date'];
+                    $joinedStart = DateTime::createFromFormat('Y-m-d H:i:s', "$joinedDate {$g['startTime']}");
+                    $joinedEnd = DateTime::createFromFormat('Y-m-d H:i:s', "$joinedDate {$g['endTime']}");
+
+                    // Check if new start falls within an existing gathering time range
+                    if ($joinedStart && $joinedEnd && ($newStart >= $joinedStart && $newStart < $joinedEnd)) {
+                        $str = 'You have another gathering from ' .
+                            $joinedStart->format('d M Y g:i A') . ' to ' .
+                            $joinedEnd->format('d M Y g:i A');
+                        $errors['startTime'] = $str;
+                        error_log($str);
+                        break;
+                    }
+                }
             }
         }
 

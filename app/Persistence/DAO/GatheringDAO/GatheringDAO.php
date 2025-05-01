@@ -166,11 +166,10 @@ class GatheringDAO
             $stmt = $this->db->prepare("
             SELECT g.*
             FROM gathering g
-            JOIN profileGathering pg ON g.gatheringID = pg.gatheringID
+            JOIN profilegathering pg ON g.gatheringID = pg.gatheringID
             WHERE pg.profileID = :profileID        
         ");
-            $stmt->bindParam(':profileID', $userID, PDO::PARAM_INT);
-            $stmt->execute();
+            $stmt->execute([':profileID' => $userID]);
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {

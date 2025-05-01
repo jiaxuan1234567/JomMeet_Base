@@ -1,0 +1,84 @@
+<?php
+use DateTime;
+
+/**
+ * Business-logic helper that validates the Create-Gathering input.
+ * It does NOT touch the database – every lookup must be supplied
+ * by the caller (normally the GatheringModel).
+ */
+class GatheringValidationService
+{
+    public function validate(
+        array $form,                  // raw POST
+        ?array $locationRow,          // row fetched by model, or null
+        array $currentGatherings      // rows fetched by model
+    ): array
+    {
+        $errors = [];
+
+        $this->theme($form, $errors);
+        $this->dateTime($form, $errors);
+        $this->pax($form, $errors);
+        $this->location($form, $locationRow, $errors);
+
+        if ($this->canCheckOverlap($errors)) {
+            $this->overlap($form, $currentGatherings, $errors);
+        }
+        return $errors;
+    }
+
+    /* ---- atomic helpers (unchanged except for DAO removal) ---- */
+
+    private function theme(array $d, array &$e): void { /* …same as before… */ }
+    private function dateTime(array $d, array &$e): void { /* …same as before… */ }
+    private function pax(array $d, array &$e): void { /* …same as before… */ }
+
+    private function location(array $d, ?array $loc, array &$e): void
+    {
+        $id   = $d['locationId'] ?? '';
+        $name = trim($d['inputLocation'] ?? '');
+
+        if ($id === '' || $name === '') {
+            $e['inputLocation'] = 'Please select a valid location.';
+            return;
+        }
+        if (!$loc || strcasecmp($loc['locationName'], $name) !== 0) {
+            $e['inputLocation'] = 'Selected location is invalid.';
+        }
+    }
+
+    private function canCheckOverlap(array $e): bool
+    {
+        return empty($e['inputDate']) && empty($e['startTime']);
+    }
+
+    private function overlap(array $d, array $rows, array &$e): void
+    {
+        $startDT = DateTime::createFromFormat(
+            'Y-m-d H:i',
+            "{$d['inputDate']} {$d['startTime']}"
+        );
+        if (!$startDT) { return; }
+
+        foreach ($rows as $g) {
+            if (in_array(strtoupper($g['status']), ['END', 'CANCELLED'], true)) {
+                continue;
+            }
+            $jStart = DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                "{$g['date']} {$g['startTime']}"
+            );
+            $jEnd = DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                "{$g['date']} {$g['endTime']}"
+            );
+            if ($jStart && $jEnd && $startDT >= $jStart && $startDT < $jEnd) {
+                $e['startTime'] =
+                    "You have another gathering from ".
+                    $jStart->format('d M Y g:i A')
+                    ." to ".$jEnd->format('d M Y g:i A').".";
+                break;
+            }
+        }
+    }
+}

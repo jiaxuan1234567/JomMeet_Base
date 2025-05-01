@@ -134,15 +134,13 @@ require_once __DIR__ . '/../HomeView/header.php';
                 </div>
 
                 <!-- Theme and Date -->
-                <div class="col-12 row align-items-center mb-3">
+                <div class="col-12 row align-items-center mb-4">
                     <div class="col-1 text-end">
                         <label for="inputTheme" class="col-form-label fw-semibold">Theme</label>
                     </div>
                     <div class="col-5">
-                        <div class="gathering-input-wrapper">
-                            <input type="text"
-                                id="inputTheme"
-                                name="inputTheme"
+                        <div class="gathering-input-wrapper position-relative">
+                            <input type="text" id="inputTheme" name="inputTheme"
                                 class="form-control gathering-input w-100 text-start"
                                 placeholder="Enter Gathering Theme"
                                 value="<?= htmlspecialchars($_GET['inputTheme'] ?? '') ?>">
@@ -153,7 +151,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                         <label for="inputDate" class="col-form-label fw-semibold">Date</label>
                     </div>
                     <div class="col-5">
-                        <div class="gathering-input-wrapper">
+                        <div class="gathering-input-wrapper position-relative">
                             <input type="date"
                                 id="inputDate"
                                 name="inputDate"
@@ -168,12 +166,12 @@ require_once __DIR__ . '/../HomeView/header.php';
                 </div>
 
                 <!-- Pax and Time -->
-                <div class="col-12 row align-items-center mb-3">
+                <div class="col-12 row align-items-center mb-4">
                     <div class="col-1 text-end">
                         <label for="inputPax" class="col-form-label fw-semibold">No. Pax</label>
                     </div>
                     <div class="col-5">
-                        <div class="gathering-input-wrapper">
+                        <div class="gathering-input-wrapper position-relative">
                             <button class="btn btn-primary button-blue-color text-white gathering-button"
                                 id="decreasePax" type="button">−</button>
 
@@ -188,6 +186,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                             <button class="btn btn-primary button-blue-color text-white gathering-button"
                                 id="increasePax" type="button">+</button>
                         </div>
+
                     </div>
 
 
@@ -195,33 +194,37 @@ require_once __DIR__ . '/../HomeView/header.php';
                         <label for="startTime" class="col-form-label fw-semibold">Time</label>
                     </div>
                     <div class="col-5">
-                        <div class="gathering-input-wrapper gap-2">
-                            <input type="time"
-                                id="startTime"
-                                name="startTime"
-                                class="form-control gathering-input text-center time-blue btn btn-primary"
-                                value="<?= htmlspecialchars($_GET['startTime'] ?? '') ?>">
+                        <div class="d-flex gathering-input-wrapper gap-2 ">
+                            <div class="flex-grow-1 position-relative">
+                                <input type="time"
+                                    id="startTime"
+                                    name="startTime"
+                                    class="form-control gathering-input text-center time-blue btn btn-primary"
+                                    value="<?= htmlspecialchars($_GET['startTime'] ?? '') ?>">
 
-                            <span class="fw-bold">to</span>
+                            </div>
 
-                            <input type="time"
-                                id="endTime"
-                                name="endTime"
-                                class="form-control gathering-input text-center time-blue btn btn-primary"
-                                value="<?= htmlspecialchars($_GET['endTime'] ?? '') ?>"
-                                <?= isset($_GET['endTime']) ? 'data-persisted="true"' : '' ?>>
+                            <span class="fw-bold d-flex align-items-center">to</span>
+
+                            <div class="flex-grow-1 position-relative">
+                                <input type="time"
+                                    id="endTime"
+                                    name="endTime"
+                                    class="form-control gathering-input text-center time-blue btn btn-primary"
+                                    value="<?= htmlspecialchars($_GET['endTime'] ?? '') ?>"
+                                    <?= isset($_GET['endTime']) ? 'data-persisted="true"' : '' ?>>
+                            </div>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- Location -->
-                <div class="col-12 row align-items-center mb-3">
+                <div class="col-12 row align-items-center mb-4">
                     <div class="col-1 text-end">
                         <label for="inputLocation" class="col-form-label fw-semibold">Location</label>
                     </div>
                     <div class="col-11">
-                        <div class="gathering-input-wrapper">
+                        <div class="gathering-input-wrapper position-relative">
                             <input type="text"
                                 id="inputLocation"
                                 name="inputLocation"
@@ -240,7 +243,15 @@ require_once __DIR__ . '/../HomeView/header.php';
                             </button>
                         </div>
                     </div>
+                </div>
 
+                <div class="col-12 text-start">
+                    <div class="text-danger small error-message" id="error-inputTheme"></div>
+                    <div class="text-danger small error-message" id="error-inputDate"></div>
+                    <div class="text-danger small error-message" id="error-inputPax"></div>
+                    <div class="text-danger small error-message" id="error-startTime"></div>
+                    <div class="text-danger small error-message" id="error-endTime"></div>
+                    <div class="text-danger small error-message" id="error-inputLocation"></div>
                 </div>
 
                 <!-- Action Buttons -->
@@ -338,41 +349,6 @@ require_once __DIR__ . '/../HomeView/header.php';
             return dateStr === today;
         }
 
-        // function updateStartTimeMin() {
-        //     const selectedDate = $inputDate.val();
-        //     if (isToday(selectedDate)) {
-        //         const minTime = getCurrentTimePlus();
-        //         $startTime.attr('min', minTime);
-
-        //         const val = $startTime.val();
-        //         $startTime.val('');
-        //         setTimeout(() => {
-        //             $startTime.val(val);
-        //             toggleSubmitButton();
-        //         }, 10);
-        //     } else {
-        //         $startTime.removeAttr('min');
-        //     }
-        // }
-
-        // function updateEndTimeMin() {
-        //     const startVal = $startTime.val();
-        //     if (startVal) {
-        //         $endTime.attr('min', startVal);
-        //         if ($endTime.val() && $endTime.val() < startVal && !$endTime.data('persisted')) {
-        //             $endTime.val('');
-        //         }
-        //     } else {
-        //         $endTime.removeAttr('min');
-        //     }
-        //     toggleSubmitButton();
-        // }
-
-        // $inputDate.on('change', updateStartTimeMin);
-        // $startTime.on('change', updateEndTimeMin);
-        // updateStartTimeMin();
-        // setTimeout(updateEndTimeMin, 50);
-
         // ====== Create Button Enable/Disable Logic ======
         function isFormValid() {
             return $inputTheme.val().trim() !== '' &&
@@ -405,10 +381,6 @@ require_once __DIR__ . '/../HomeView/header.php';
 
         // ====== AJAX Field Validation with Native Popup ======
         function validateField(fieldId) {
-            // const $input = $(`#${fieldId}`);
-            // const data = {};
-            // data[fieldId] = $input.val();
-
             const $input = $(`#${fieldId}`);
             const data = {
                 inputTheme: $inputTheme.val(),
@@ -440,14 +412,13 @@ require_once __DIR__ . '/../HomeView/header.php';
         function showValidationError(fieldId, message) {
             const $input = $(`#${fieldId}`);
             $input.addClass('is-invalid');
-            $input.setCustomValidity(message);
-            $input.reportValidity();
+            $(`#error-${fieldId}`).text(message + '*').show();
         }
 
         function clearValidationError(fieldId) {
             const $input = $(`#${fieldId}`);
             $input.removeClass('is-invalid');
-            $input.setCustomValidity('');
+            $(`#error-${fieldId}`).text('').hide();
         }
     })();
 </script>
