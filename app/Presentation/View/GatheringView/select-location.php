@@ -66,6 +66,14 @@ require_once __DIR__ . '/../HomeView/header.php';
         </ul>
     </div>
     <div class="col-md-8 p-0 position-relative">
+        <!-- Loading UI -->
+        <div id="mapLoadingOverlay" class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center bg-white">
+            <div class="spinner-border text-blue-color" role="status">
+                <span class="visually-hidden">Loading map...</span>
+            </div>
+        </div>
+
+        <!-- Maps Content -->
         <div id="map" class="w-100 h-100"></div>
 
         <!-- move the detailPanel here -->

@@ -55,6 +55,10 @@ body {
     background-color: #DEECFF;
 }
 
+.text-blue-color {
+    color: #569FFF;
+}
+
 .border-light-blue {
     border-color: #0077CC !important;
 }

@@ -1,76 +1,248 @@
-// gatheringMap.new.js
-
 let map;
 let markers = [];
 let savedLocations = null;
-const markerMap = {};
 let currentActiveMarker = null;
+const markerMap = {};
 
-// 1) Dynamically load Maps + Places libraries
+// Load required libraries
 async function loadLibraries() {
-    const [mapsLib, placesLib] = await Promise.all([
+    const [mapsLib, placesLib, markerLib] = await Promise.all([
         google.maps.importLibrary("maps"),
         google.maps.importLibrary("places"),
+        google.maps.importLibrary("marker"),
     ]);
-    return { ...mapsLib, ...placesLib };
+    return { ...mapsLib, ...placesLib, ...markerLib };
 }
 
-// 2) Initialize map & session token
-async function initMap() {
-    const { Map } = await loadLibraries();
+// Create marker icon element
+function createCustomMarkerIcon(url, size = 32) {
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.width = `${size}px`;
+    img.style.height = `${size}px`;
+    img.style.objectFit = 'contain';
+    return img;
+}
 
+// Highlight marker (scale up)
+function highlightMarker(marker) {
+    marker.content = createCustomMarkerIcon('/asset/geo-alt.svg', 48);
+    currentActiveMarker = marker;
+}
+
+// Reset marker to default size
+function resetMarker(marker) {
+    marker.content = createCustomMarkerIcon('/asset/geo-alt.svg', 32);
+}
+
+// Reset the currently active marker
+function resetActiveMarker() {
+    if (currentActiveMarker) {
+        resetMarker(currentActiveMarker);
+        currentActiveMarker = null;
+    }
+}
+
+// Update hidden input fields for lat/lng
+function updateCoordinates({ lat, lng }) {
+    $('#latitude').val(lat);
+    $('#longitude').val(lng);
+}
+
+// Handle marker selection
+function onMarkerSelect(marker) {
+    showDetailPanel(marker.placeData, marker.position);
+    if (currentActiveMarker && currentActiveMarker !== marker) {
+        resetMarker(currentActiveMarker);
+    }
+    highlightMarker(marker);
+}
+
+// Display detail panel for selected location
+async function showDetailPanel(loc, pos, liElem) {
+    let imageUrl = '';
+    try {
+        const place = new google.maps.places.Place({ id: loc.placeID });
+        await place.fetchFields({ fields: ['photos'] });
+        const photo = place.photos?.[0];
+        if (photo?.name) {
+            const apiKey = 'AIzaSyCIm3LWq0gbsblgi0kmbEscuFq9zUoERD4'; // Replace this
+            imageUrl = `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxWidthPx=400`;
+        }
+    } catch (err) {
+        console.warn('Google photo fetch failed:', err);
+    }
+
+    const html = `
+    <div class="card shadow border-0 rounded-4" style="width: 260px;">
+      <img src="${imageUrl || 'https://cdn-icons-png.flaticon.com/512/1161/1161388.png'}"
+           class="card-img-top rounded-top" style="object-fit: cover; height: 120px;">
+      <div class="card-body px-3 py-2">
+        <h6 class="fw-bold mb-1">${loc.locationName || 'Unnamed Location'}</h6>
+        <p class="mb-2 small text-muted">${loc.address || ''}</p>
+        ${loc.closeTime ? `<p class="mb-2 small text-muted">Close: ${loc.closeTime}</p>` : ''}
+        ${typeof loc.commentCount !== 'undefined' ? `<p class="mb-1 small text-muted">Comment(${loc.commentCount})</p>` : ''}
+        <button id="selectBtn" class="btn btn-primary btn-sm w-100 rounded border-0 button-blue-color" style="font-weight: 500;">Select</button>
+      </div>
+    </div>`;
+
+    $('#detailOverlay').show();
+    $('#detailPanel').html(html).show().css('top', liElem
+        ? `${$(liElem).offset().top - $('#detailPanel').parent().offset().top}px`
+        : '10px');
+
+    $('#selectBtn').on('click', () => submitLocationForm(loc));
+    map.panTo(pos);
+    map.setZoom(17);
+}
+
+// Create and submit location form
+function submitLocationForm(loc) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/my-gathering/create/location';
+
+    const fields = {
+        locationID: loc.locationID,
+        locationName: loc.locationName,
+        ...Object.fromEntries(new URLSearchParams(window.location.search).entries())
+    };
+
+    for (const [key, val] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = val;
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Perform search and populate list
+async function performSearch() {
+    const query = $('#searchBox').val().trim().toLowerCase();
+    $('#resultsList').empty();
+    $('#detailPanel').hide();
+
+    if (!query) return;
+
+    const results = savedLocations.filter(loc =>
+        loc.locationName.toLowerCase().includes(query) ||
+        (loc.address && loc.address.toLowerCase().includes(query))
+    );
+
+    if (results.length === 0) {
+        $('<li>').addClass('list-group-item text-start text-black fw-semibold border-0 bg-transparent')
+            .text('Location Not Available')
+            .appendTo('#resultsList');
+        return;
+    }
+
+    results.forEach(loc => {
+        const pos = { lat: parseFloat(loc.latitude), lng: parseFloat(loc.longitude) };
+        const marker = markerMap[loc.locationID];
+        if (marker) {
+            marker.content = createCustomMarkerIcon('/asset/geo-alt.svg', 36);
+        }
+
+        $('<li>')
+            .addClass('list-group-item list-group-item-action bg-transparent rounded-0')
+            .css({ borderBottom: '1px solid #dee2e6' })
+            .html(`<strong>${loc.locationName}</strong><br>${loc.address || ''}`)
+            .appendTo('#resultsList')
+            .on('click', function () {
+                onMarkerSelect(marker);
+            });
+    });
+}
+
+// Initialize the map
+window.initMap = async function () {
+    const { Map } = await loadLibraries();
     map = new Map(document.getElementById("map"), {
+        mapId: "4a86f89e0d763174",
         center: { lat: 3.1390, lng: 101.6869 },
         zoom: 13,
         mapTypeControl: false,
         fullscreenControl: false,
         streetViewControl: false,
         clickableIcons: false,
-        styles: [
-            {
-                featureType: "poi",
-                stylers: [{ visibility: "off" }]
-            }
-        ]
+        styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }]
     });
 
-    // then fetch and wire up your savedLocations…
-    savedLocations = await $.getJSON('/api/savedLocations');
+    try {
+        savedLocations = await $.getJSON('/api/savedLocations');
+        const bounds = new google.maps.LatLngBounds();
 
-    const bounds = new google.maps.LatLngBounds();
-
-    savedLocations.forEach(loc => {
-        const pos = {
-            lat: parseFloat(loc.latitude),
-            lng: parseFloat(loc.longitude)
-        };
-
-        const marker = new google.maps.Marker({
-            position: pos,
-            map,
-            icon: {
-                url: '/asset/geo-alt.svg',
-                scaledSize: new google.maps.Size(32, 32)
-            }
+        savedLocations.forEach(loc => {
+            const pos = { lat: +loc.latitude, lng: +loc.longitude };
+            const marker = new google.maps.marker.AdvancedMarkerElement({
+                map,
+                position: pos,
+                content: createCustomMarkerIcon('/asset/geo-alt.svg', 32)
+            });
+            marker.placeData = loc;
+            marker.addListener('gmp-click', () => onMarkerSelect(marker));
+            markers.push(marker);
+            markerMap[loc.locationID] = marker;
+            bounds.extend(pos);
         });
 
-        marker.placeData = loc;
+        map.fitBounds(bounds);
+        updateCoordinates(map.getCenter().toJSON());
+    } catch (err) {
+        console.error("Failed to load saved locations:", err);
+        $('#mapLoadingOverlay').html('<span class="text-danger fw-bold">Failed to load map data.</span>');
+        return;
+    }
 
-        marker.addListener('click', () => showDetailPanel(loc, pos, null));
+    $('#mapLoadingOverlay').fadeOut();
+    $('#searchBtn').on('click', performSearch);
+};
 
-        markers.push(marker);
-        markerMap[loc.locationID] = marker; // map it
-        bounds.extend(pos);
+// Overlay click to close
+$(document).on('click', '#detailOverlay', function (e) {
+    if (e.target.id === 'detailOverlay') {
+        $('#detailOverlay').hide();
+        $('#detailPanel').hide();
+        resetActiveMarker();
+    }
+});
+
+// Debounce search input
+$(document).ready(function () {
+    const debounce = (fn, delay) => {
+        let t;
+        return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn(...args), delay);
+        };
+    };
+
+    const liveSearch = debounce(performSearch, 150);
+
+    $('#searchBox')
+        .on('input', liveSearch);
+
+    $('#clearText').on('click', function () {
+        $('#searchBox').val('').trigger('input');
+        $('#clearText').addClass('d-none');
+        $('#vertBar').addClass('d-none');
+        $('#resultsList').empty();
+        $('#detailPanel').hide();
+        resetActiveMarker();
+        $('#searchBox').focus();
     });
 
-    map.fitBounds(bounds);
+    $('#searchBox').on('input', function () {
+        const hasText = $.trim($(this).val()) !== '';
+        $('#clearText').toggleClass('d-none', !hasText);
+        $('#vertBar').toggleClass('d-none', !hasText);
+    });
+});
 
-    // wire up your search UI
-    $('#searchBtn').on('click', performSearch);
-
-    // seed hidden lat/lng inputs
-    updateCoordinates(map.getCenter().toJSON());
-}
 
 /* ------------------------ use to add location ---------------------------------------- */
 // async function performSearch() {
@@ -160,286 +332,3 @@ async function initMap() {
 //         error: e => console.error('Save failed', e)
 //     });
 // }
-
-
-/* ------------------------ performSearch start ---------------------------------------- */
-
-async function performSearch() {
-    const query = $('#searchBox').val().trim().toLowerCase();
-
-    // 1) Always clear UI if the box is empty
-    if (!query) {
-        $('#resultsList').empty();
-        $('#detailPanel').hide();
-        return;
-    }
-
-    // 2) Otherwise, do your normal search/filtering…
-    $('#resultsList').empty();
-    $('#detailPanel').hide();
-
-    // search location logic
-    const results = savedLocations.filter(loc =>
-        loc.locationName.toLowerCase().includes(query) ||
-        (loc.address && loc.address.toLowerCase().includes(query))
-    );
-
-    if (results.length === 0) {
-        $('<li>')
-            .addClass('list-group-item text-start text-black fw-semibold border-0 bg-transparent')
-            .text('Location Not Available')
-            .appendTo('#resultsList');
-        return; // stop further processing
-    }
-
-    results.forEach(loc => {
-        const marker = markerMap[loc.locationID];
-        if (marker) {
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(() => marker.setAnimation(null), 700);
-        }
-
-        // parseFloat ensures lat & lng are real numbers
-        const pos = {
-            lat: parseFloat(loc.latitude),
-            lng: parseFloat(loc.longitude)
-        };
-
-        // list item
-        $('<li>')
-            .addClass('list-group-item list-group-item-action bg-transparent rounded-0')
-            .css({
-                'border-top': 'none',
-                'border-left': 'none',
-                'border-right': 'none',
-                'border-bottom': '1px solid #dee2e6' // Bootstrap’s default border color
-            })
-            .html(`<strong>${loc.locationName}</strong><br>${loc.address || ''}`)
-            .appendTo('#resultsList')
-            .on('click', function () {
-                showDetailPanel(loc, pos, this);
-            });
-    });
-
-    if (results[0]) {
-        // convert to numbers here too
-        const firstPos = {
-            lat: parseFloat(results[0].latitude),
-            lng: parseFloat(results[0].longitude)
-        };
-        map.panTo(firstPos);
-        map.setZoom(15);
-    }
-}
-
-// location details
-async function showDetailPanel(loc, pos, liElem) {
-    let imageUrl = "";
-    const place = new google.maps.places.Place({ id: loc.placeID });
-    await place.fetchFields({ fields: ['photos'] });
-
-    try {
-        const photo = place.photos?.[0];
-        if (photo && typeof photo.getURI === 'function') {
-            imageUrl = photo.getURI({ maxWidthPx: 400 });
-        }
-    } catch (err) {
-        console.warn('Google photo fetch failed:', err);
-    }
-
-    const html = `
-    <div class="card shadow border-0 rounded-4" style="width: 260px;">
-      <img src="${imageUrl || 'https://cdn-icons-png.flaticon.com/512/1161/1161388.png'}"
-           class="card-img-top rounded-top"
-           style="object-fit: cover; height: 120px;">
-  
-      <div class="card-body px-3 py-2">
-        <h6 class="fw-bold mb-1">${loc.locationName || 'Unnamed Location'}</h6>
-        <p class="mb-2 small text-muted">${loc.address || ''}</p>
-  
-        ${loc.closeTime ? `<p class="mb-2 small text-muted">Close: ${loc.closeTime}</p>` : ''}
-  
-        ${typeof loc.commentCount !== 'undefined' ? `
-          <p class="mb-1 small text-muted">Comment(${loc.commentCount})</p>
-        ` : ''}
-        <p class="mb-1 small text-muted">Comment (20)</p>
-        <a href="#" class="mb-1 small text-muted"><p>More Comments</p></a>
-        <button id="selectBtn"
-                class="btn btn-primary btn-sm w-100 rounded border-0 button-blue-color"
-                style="font-weight: 500;">
-          Select
-        </button>
-      </div>
-    </div>
-  `;
-    const $overlay = $('#detailOverlay').show();
-    const $panel = $('#detailPanel').html(html).show();
-
-    if (liElem) {
-        // panel is absolutely positioned within its parent (.col-md-8.position-relative)
-        const parentTop = $panel.parent().offset().top;
-        const liTop = $(liElem).offset().top;
-        $panel.css('top', (liTop - parentTop) + 'px');
-    } else {
-        // fallback if marker clicked
-        $panel.css('top', '10px');
-    }
-
-    // hook up Select
-    $panel.find('#selectBtn').on('click', () => {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/my-gathering/create/location';
-
-        // Location values
-        const locationFields = {
-            locationID: loc.locationID,
-            locationName: loc.locationName
-        };
-
-        // Previous form values from query string
-        const urlParams = new URLSearchParams(window.location.search);
-        const keysToKeep = ['inputTheme', 'inputPax', 'inputDate', 'startTime', 'endTime'];
-
-        keysToKeep.forEach(key => {
-            if (urlParams.has(key)) {
-                locationFields[key] = urlParams.get(key);
-            }
-        });
-
-        // Append all as hidden fields
-        for (const key in locationFields) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = locationFields[key];
-            form.appendChild(input);
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-    });
-
-    // center and bounce
-    map.panTo(pos);
-    map.setZoom(17);
-
-    if (currentActiveMarker) {
-        currentActiveMarker.setIcon({
-            url: '/asset/geo-alt.svg',
-            scaledSize: new google.maps.Size(32, 32)
-        });
-    }
-
-    // Highlight new marker
-    const activeMarker = markers.find(m => m.placeData.locationID === loc.locationID);
-    if (activeMarker) {
-        activeMarker.setIcon({
-            url: '/asset/geo-alt.svg',
-            scaledSize: new google.maps.Size(48, 48) // enlarge it
-        });
-
-        activeMarker.setAnimation(google.maps.Animation.BOUNCE);
-        setTimeout(() => activeMarker.setAnimation(null), 700);
-
-        currentActiveMarker = activeMarker;
-    }
-
-    if (currentActiveMarker && currentActiveMarker !== activeMarker) {
-        resetActiveMarker();
-    }
-}
-
-$(document).on('click', '#detailOverlay', function (e) {
-    // If the user clicks directly on the overlay (not the panel), hide everything
-    if (e.target.id === 'detailOverlay') {
-        $('#detailOverlay').hide();
-        $('#detailPanel').hide();
-        resetActiveMarker();
-    }
-});
-
-// cover photo from google maps
-function fetchCoverPhoto(placeId, callback) {
-    const service = new google.maps.places.PlacesService(map);
-
-    service.getDetails({ placeId }, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place.photos && place.photos.length > 0) {
-            const imageUrl = place.photos[0].getUrl({ maxWidth: 400 });
-            callback(imageUrl);
-        } else {
-            callback(null); // fallback to default
-        }
-    });
-}
-
-function resetActiveMarker() {
-    if (currentActiveMarker) {
-        currentActiveMarker.setIcon({
-            url: '/asset/geo-alt.svg',
-            scaledSize: new google.maps.Size(32, 32)
-        });
-        currentActiveMarker = null;
-    }
-}
-
-function selectSavedLocation(loc, pos) {
-    map.panTo(pos);
-    map.setZoom(17);
-    $('#latitude').val(pos.lat);
-    $('#longitude').val(pos.lng);
-    // if you want to re-save, you already have it in DB—no need to POST again
-}
-
-// update your hidden <input>s with the given coords
-function updateCoordinates({ lat, lng }) {
-    $('#latitude').val(lat);
-    $('#longitude').val(lng);
-}
-
-// 1) A small debounce helper:
-function debounce(fn, wait) {
-    let t;
-    return (...args) => {
-        clearTimeout(t);
-        t = setTimeout(() => fn(...args), wait);
-    };
-}
-
-// 2) Replace your keydown handler with an input handler:
-$(document).ready(function () {
-    const $searchBox = $('#searchBox');
-    const $clearText = $('#clearText');
-    const $vertBar = $('#vertBar');
-
-    // show/hide the clear button as before
-    $searchBox.on('input', function () {
-        if ($.trim($(this).val()) !== '') {
-            $clearText.removeClass('d-none');
-            $vertBar.removeClass('d-none');
-        } else {
-            $clearText.addClass('d-none');
-            $vertBar.addClass('d-none');
-        }
-    });
-
-    // clear behavior as before
-    $clearText.on('click', function () {
-        $searchBox.val('');
-        $clearText.addClass('d-none');
-        $vertBar.addClass('d-none');
-        $('#resultsList').empty();
-        $('#detailPanel').hide();
-        resetActiveMarker();
-        $searchBox.focus();
-    });
-
-    // 3) Debounced live search on each input
-    const liveSearch = debounce(performSearch, 150);
-    $('#searchBox')
-        .off('keydown')
-        .on('input', liveSearch);
-});
-
-// expose initMap for the API loader callback
-window.initMap = initMap;
