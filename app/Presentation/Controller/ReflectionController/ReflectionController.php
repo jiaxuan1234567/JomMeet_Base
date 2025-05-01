@@ -23,7 +23,7 @@ class ReflectionController
 
     public function saveReflection()
     {
-        $profileId = $_SESSION['profile_id'];
+        $profileId = $_SESSION['profile']['profileID'];
         $reflectionDate = $_POST['reflectionDate'];
         $reflectionTitle = $_POST['reflectionTitle'];
         $reflectionContent = $_POST['reflectionContent'];

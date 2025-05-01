@@ -76,9 +76,8 @@ require_once __DIR__ . '/../HomeView/header.php';
 
                 <?php else: ?>
                     <section class="text-center my-5">
-                        <!-- Spline 3D Object -->
-                        <spline-viewer url="https://prod.spline.design/VDuiMvkxF4DPHkAv/scene.splinecode" class="spline-model"></spline-viewer>
-                        <div>
+                        <img src="/asset/bubble.png">
+                        <div class="mt-5">
                             <h4 class="fw-bold">No self-reflection record</h4>
                             <h4 class="fw-bold">Please create a self-reflection.</h4>
                         </div>
