@@ -103,4 +103,62 @@ class ProfileDAO
     //         return [];
     //     }
     // }
+
+    public function submitProfile(array $data)
+    {
+        try {
+            // 1) insert into profile table
+            $stmt = $this->db->prepare(
+                'INSERT INTO profile
+                   (nickname, aboutme, mbti, profileStatus, phone, `password`)
+                 VALUES
+                   (?, ?, ?, ?, ?, ?)'
+            );
+            // you can adjust profileStatus, phone, password as needed:
+            $status   = 'active';
+            $phone    = $data['phone']    ?? null;
+            $password = $data['password'] ?? null;
+
+            $stmt->execute([
+                $data['nickname'],
+                $data['about_me'],
+                $data['mbti'],
+                $status,
+                $phone,
+                $password
+            ]);
+
+            // 2) get the new profileID
+            $profileId = (int)$this->db->lastInsertId();
+
+            // 3) insert into profile_hobby
+            if (!empty($data['hobbies'])) {
+                $hobbyStmt = $this->db->prepare(
+                    'INSERT INTO profile_hobby (hobby, profileID)
+                     VALUES (?, ?)'
+                );
+                foreach ($data['hobbies'] as $hobby) {
+                    $hobbyStmt->execute([$hobby, $profileId]);
+                }
+            }
+
+            // 4) insert into profile_preference
+            if (!empty($data['preferences'])) {
+                $prefStmt = $this->db->prepare(
+                    'INSERT INTO profile_preference (preference, profileID)
+                     VALUES (?, ?)'
+                );
+                foreach ($data['preferences'] as $pref) {
+                    $prefStmt->execute([$pref, $profileId]);
+                }
+            }
+
+            return $profileId;
+
+        } catch (PDOException $e) {
+            error_log("Error in insertProfile: " . $e->getMessage());
+            return false;
+        }
+    }
+
 }
