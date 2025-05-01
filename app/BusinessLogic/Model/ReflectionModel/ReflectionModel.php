@@ -48,6 +48,8 @@ class ReflectionModel
         return $this->reflectionDAO->saveReflection($profileId, $reflectionDate, $reflectionTitle, $reflectionContent);
     }
 
+
+
     public function getReflectionById($reflectionId)
     {
         $reflection = $this->reflectionDAO->getReflectionById($reflectionId);
@@ -90,6 +92,19 @@ class ReflectionModel
     public function deleteReflectionById($reflectionId) 
     {
         return $this->reflectionDAO->deleteReflectionById($reflectionId);
+    }
+
+    public function validateReflection($content) {
+        if(empty(trim($content))) {
+            return ['success' => false, 'message' => 'The input firld cannot be empty.'];
+        }
+
+        if(mb_strlen($content) > 5000) {
+            return ['success' => false, 'message' => 'Your message is too long. Please limit it to 5000 characters.'];
+        }
+
+        return ['success' => true];
+
     }
 
 }
