@@ -47,8 +47,9 @@ class ReflectionController
         header("Location: /reflection");
     }
 
-    public function viewReflection()
+    public function viewReflection($reflectionId)
     {
+        $reflectionViewed = $this->reflectionModel->getReflectionById($reflectionId);
         include $this->fileHelper->getFilePath('ViewReflection');
     }
 }
