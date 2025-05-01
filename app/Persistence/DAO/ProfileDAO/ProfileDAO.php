@@ -16,17 +16,17 @@ class ProfileDAO
         $this->db = Database::getConnection();
     }
 
-    public function getAllProfiles()
-    {
-        try {
-            $stmt = $this->db->prepare("SELECT * FROM `profile`");
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log("Error in getAllProfiles: " . $e->getMessage());
-            return false;
-        }
-    }
+    // public function getAllProfiles()
+    // {
+    //     try {
+    //         $stmt = $this->db->prepare("SELECT * FROM `profile`");
+    //         $stmt->execute();
+    //         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //     } catch (PDOException $e) {
+    //         error_log("Error in getAllProfiles: " . $e->getMessage());
+    //         return false;
+    //     }
+    // }
 
     public function getUserByPhoneNumber($phone)
     {
@@ -71,36 +71,36 @@ class ProfileDAO
         }
     }
 
-    public function getProfileDetails($profileId)
-    {
-        try {
-            // Basic profile fields
-            $stmt = $this->db->prepare(
-                "SELECT phone, nickname, mbti, aboutme, hobbies, preference FROM `profile` WHERE profileID = $profileId"
-            );
+    // public function getProfileDetails($profileId)
+    // {
+    //     try {
+    //         // Basic profile fields
+    //         $stmt = $this->db->prepare(
+    //             "SELECT phone, nickname, mbti, aboutme, hobbies, preference FROM `profile` WHERE profileID = $profileId"
+    //         );
 
-            $stmt->execute();
+    //         $stmt->execute();
 
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            if (!$row) {
-                return [];
-            }
+    //         $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    //         if (!$row) {
+    //             return [];
+    //         }
 
-            // Split comma-lists into arrays
-            $hobbies     = array_filter(array_map('trim', explode(',', $row['hobbies'] ?? '')));
-            $preferences = array_filter(array_map('trim', explode(',', $row['preference'] ?? '')));
+    //         // Split comma-lists into arrays
+    //         $hobbies     = array_filter(array_map('trim', explode(',', $row['hobbies'] ?? '')));
+    //         $preferences = array_filter(array_map('trim', explode(',', $row['preference'] ?? '')));
 
-            return [
-                'phone'         => $row['phone'],
-                'nickname'      => $row['nickname'],
-                'mbti'          => $row['mbti'],
-                'aboutme'       => $row['aboutme'],
-                'hobbies'       => $hobbies,
-                'preferences'   => $preferences,
-            ];
-        } catch (PDOException $e) {
-            error_log("Error in getProfileID: " . $e->getMessage());
-            return [];
-        }
-    }
+    //         return [
+    //             'phone'         => $row['phone'],
+    //             'nickname'      => $row['nickname'],
+    //             'mbti'          => $row['mbti'],
+    //             'aboutme'       => $row['aboutme'],
+    //             'hobbies'       => $hobbies,
+    //             'preferences'   => $preferences,
+    //         ];
+    //     } catch (PDOException $e) {
+    //         error_log("Error in getProfileID: " . $e->getMessage());
+    //         return [];
+    //     }
+    // }
 }

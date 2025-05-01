@@ -15,7 +15,7 @@ class ProfileController
     {
         $this->profileModel = new ProfileModel();
         $this->fileHelper = new FileHelper('profile');
-        $this->profileModel = new ProfileModel();
+        // $this->profileModel = new ProfileModel();
     }
 
     public function validateLogin()
@@ -73,8 +73,16 @@ class ProfileController
     //     include $this->fileHelper->getFilePath('ProfileDetail');
     // }
 
+    public function createProfile()
+    {
+        include $this->fileHelper->getFilePath('CreateProfile');
+    }
+
+
     public function editProfile()
     {
         include $this->fileHelper->getFilePath('EditProfile');
     }
+
+
 }

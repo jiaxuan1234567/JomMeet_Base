@@ -10,11 +10,11 @@ class HomeModel
 {
     public function __construct() {}
 
-    public function getProfileDetails()
-    {
-        $profileId = $_SESSION['profile_id'];
-        return (new ProfileModel())->getProfileDetails($profileId);
-    }
+    // public function getProfileDetails()
+    // {
+    //     $profileId = $_SESSION['profile_id'];
+    //     return (new ProfileModel())->getProfileDetails($profileId);
+    // }
 
     public function getAllReflections()
     {
@@ -33,10 +33,10 @@ class HomeModel
         return (new GatheringModel())->getMyGatherings($hostProfileId);
     }
 
-    public function getAllProfiles()
-    {
-        return (new ProfileModel())->getAllProfiles();
-    }
+    // public function getAllProfiles()
+    // {
+    //     return (new ProfileModel())->getAllProfiles();
+    // }
 
     public function logout()
     {

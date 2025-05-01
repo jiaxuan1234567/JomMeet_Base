@@ -56,7 +56,7 @@ $asset = new FileHelper('asset');
                     </form>
 
                     <div class="text-center mt-3">
-                        Don't have an account? <a href="/forgot-password" class="text-decoration-none">Sign up</a>
+                        Don't have an account? <a href="">Sign up</a>
                     </div>
                 </div>
             </div>
