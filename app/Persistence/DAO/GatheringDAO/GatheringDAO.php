@@ -179,36 +179,6 @@ class GatheringDAO
         }
     }
 
-    public function addUserToGathering($userID, $gatheringID)
-    {
-        try {
-            // Begin a transaction to ensure both queries are executed together
-            $this->db->beginTransaction();
-
-            // First query: Add user to the profileGathering table
-            $stmt1 = $this->db->prepare("INSERT INTO `profilegathering` (profileID, gatheringID) VALUES (:profileID, :gatheringID)");
-            $stmt1->execute([
-                ':profileID' => $userID,
-                ':gatheringID' =>  $gatheringID
-            ]);
-
-            // Second query: Increment the currentParticipant in the gathering table
-            $stmt2 = $this->db->prepare("UPDATE `gathering` SET currentParticipant = currentParticipant + 1 WHERE gatheringID = :gatheringID");
-            $stmt2->execute([':gatheringID' => $gatheringID]);
-
-            // Commit the transaction if both queries were successful
-            $this->db->commit();
-
-            return true;
-        } catch (PDOException $e) {
-            // Rollback the transaction in case of any error
-            $this->db->rollBack();
-
-            error_log("Error in addUserToGathering: " . $e->getMessage());
-            return false;
-        }
-    }
-
     // vs ----
     public function getAvailableGatherings($profileId)
     {
@@ -263,7 +233,7 @@ class GatheringDAO
         }
     }
 
-    public function createGathering(array $d)
+    public function createGathering($d)
     {
         $sql = "INSERT INTO `gathering` (locationID, theme, maxParticipant, minParticipant, currentParticipant, date, startTime, endTime, status, preference, hostProfileID) 
         VALUES (:locationID, :theme, :max, :min, :current, :date, :start, :end, :status, :preference, :hostProfileID)";
@@ -283,6 +253,31 @@ class GatheringDAO
         ]);
 
         return (int)$this->db->lastInsertId();
+    }
+
+    public function addUserToGathering($userID, $gatheringID)
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // First query: Add user to the profileGathering table
+            $stmt1 = $this->db->prepare("INSERT INTO `profilegathering` (profileID, gatheringID) VALUES (:profileID, :gatheringID)");
+            $stmt1->execute([
+                ':profileID' => $userID,
+                ':gatheringID' =>  $gatheringID
+            ]);
+
+            // Second query: Increment the currentParticipant in the gathering table
+            $stmt2 = $this->db->prepare("UPDATE `gathering` SET currentParticipant = currentParticipant + 1 WHERE gatheringID = :gatheringID");
+            $stmt2->execute([':gatheringID' => $gatheringID]);
+
+            $this->db->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->db->rollBack();
+            error_log("Error in addUserToGathering: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function cancelWithParticipant($gatheringID)

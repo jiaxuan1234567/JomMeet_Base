@@ -3,6 +3,7 @@
 namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
+use Persistence\DAO\GatheringDAO\LocationDAO;
 use Exception;
 use FileHelper;
 use DateTime;
@@ -201,17 +202,9 @@ class GatheringModel
 
     public function createGathering($data)
     {
-        // --- 1) basic validation ---
-        // if (empty($data['locationId']) || empty($data['theme'])) {
-        //     throw new Exception("Missing required fields");
-        // }
-        error_log(print_r($data));
-        // you can add more validation here (e.g. date format, time logic, etc.)
-
-        // --- 2) call the DAO to insert & get new PK ---
         try {
             $newId = $this->dao->createGathering($data);
-            $profileId = $_SESSION['profile_id'];
+            $profileId = $_SESSION['profile']['profile_id'];
             $this->dao->addUserToGathering($profileId, $newId);
             return $newId;
         } catch (Exception $e) {
@@ -334,5 +327,97 @@ class GatheringModel
             error_log("[GatheringModel] Error in matchGathering: " . $e->getMessage());
             return [];
         }
+    }
+
+    // validate
+    public function validateGatheringFields($data)
+    {
+        $errors = [];
+
+        // Theme: required
+        $theme = trim($data['inputTheme'] ?? '');
+        if ($theme === '') {
+            $errors['inputTheme'] = 'Theme is required.';
+        } elseif (strlen($theme) > 255) {
+            $errors['inputTheme'] = 'Theme cannot exceed 255 characters.';
+        }
+
+        // Date and Time
+        $date = $data['inputDate'] ?? '';
+        $start = $data['startTime'] ?? '';
+        $end = $data['endTime'] ?? '';
+
+        $today = date('Y-m-d');
+
+        if (empty($date)) {
+            $errors['inputDate'] = 'Date is required.';
+        } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            $errors['inputDate'] = 'Invalid date format.';
+        } elseif ($date < $today) {
+            $errors['inputDate'] = 'Date cannot be in the past.';
+        }
+
+        // Time logic (only validate if values are present)
+        if (empty($start)) {
+            $errors['startTime'] = 'Start time is required.';
+        }
+
+        if (empty($end)) {
+            $errors['endTime'] = 'End time is required.';
+        }
+
+        if (($date === $today) && !empty($start)) {
+            $startDateTime = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
+            $now = new DateTime();
+            $minStart = (clone $now)->modify('+3 hours');
+
+            if ($startDateTime < $minStart) {
+                $errors['startTime'] = 'Start time must be at least 3 hours from now.';
+            }
+        }
+
+        if (!empty($start) && !empty($end)) {
+            // Convert to DateTime for comparison
+            $startDateTime = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
+            $endDateTime = DateTime::createFromFormat('Y-m-d H:i', "$date $end");
+
+            if (!$startDateTime || !$endDateTime) {
+                $errors['startTime'] = 'Invalid time format.';
+            } elseif ($startDateTime >= $endDateTime) {
+                $errors['endTime'] = 'End time must be after start time.';
+            }
+
+            // If date is today, validate start time >= now + 3 hours
+            if ($date === $today) {
+                $now = new DateTime();
+                $minStart = (clone $now)->modify('+3 hours');
+
+                if ($startDateTime < $minStart) {
+                    $errors['startTime'] = 'Start time must be at least 3 hours from now.';
+                }
+            }
+        }
+
+        // Pax: must be integer between 3–8
+        $pax = (int)($data['inputPax'] ?? 0);
+        if ($pax < 3 || $pax > 8) {
+            $errors['inputPax'] = 'Pax must be between 3 and 8.';
+        }
+
+        // Location: required
+        $locationId = $data['locationId'] ?? '';
+        $locationName = $data['inputLocation'] ?? '';
+        if (empty($locationId) || empty(trim($locationName))) {
+            $errors['inputLocation'] = 'Please select a valid location.';
+        } else {
+            $locationDao = new LocationDAO();
+            $location = $locationDao->getLocationById($locationId);
+
+            if (!$location || strtolower($location['locationName']) !== strtolower($locationName)) {
+                $errors['inputLocation'] = 'Selected location is invalid.';
+            }
+        }
+
+        return $errors;
     }
 }

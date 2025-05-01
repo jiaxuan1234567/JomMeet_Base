@@ -47,7 +47,7 @@ class GatheringController
             'theme'             => trim($_POST['inputTheme'] ?? ''),
             'maxParticipant'    => (int)($_POST['inputPax'] ?? 0),
             'minParticipant'    => (int)($_POST['minParticipant'] ?? 3),
-            'currentParticipant' => 1,
+            'currentParticipant' => 0,
             'date'              => $_POST['inputDate'] ?? '',
             'startTime'         => $_POST['startTime'] ?? '',
             'endTime'           => $_POST['endTime'] ?? '',
@@ -102,6 +102,16 @@ class GatheringController
         $returnLoc = is_array($result) ? "/my-gathering#cancelled" : "/my-gathering";
         header("Location: " . $returnLoc);
         exit;
+    }
+
+    // AJAX Validation: Gathering Fields
+    public function ajaxValidateGathering()
+    {
+        header('Content-Type: application/json');
+        $model = new GatheringModel();
+        $errors = $model->validateGatheringFields($_POST);
+
+        echo json_encode(['errors' => $errors]);
     }
 
     public function viewDetail($id)

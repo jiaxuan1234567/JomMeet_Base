@@ -110,7 +110,7 @@ require_once __DIR__ . '/../HomeView/header.php';
         </div>
 
         <div class="container">
-            <form class="row my-4" action="/my-gathering/create" method="post">
+            <form class="row my-4" id="createGatheringFormEl" action="/my-gathering/create" method="post">
 
                 <!-- Image + Gathering Tag -->
                 <div class="col-12 text-center mb-4">
@@ -261,163 +261,195 @@ require_once __DIR__ . '/../HomeView/header.php';
 <script src="/js/gatheringMap.js"></script>
 
 <script>
-    // ====== Choose Location Button ======
-    $('#chooseLocationBtn').on('click', function() {
-        const query = new URLSearchParams({
-            inputTheme: $('#inputTheme').val(),
-            inputPax: $('#inputPax').val(),
-            inputDate: $('#inputDate').val(),
-            startTime: $('#startTime').val(),
-            endTime: $('#endTime').val()
-        }).toString();
-
-        window.location.href = `/my-gathering/create/location?${query}`;
-    });
-
-    // ====== Pax Button Adjustment ======
-    $(function() {
-        const $input = $('#inputPax');
+    (function() {
+        const $inputTheme = $('#inputTheme');
+        const $inputDate = $('#inputDate');
+        const $inputPax = $('#inputPax');
+        const $startTime = $('#startTime');
+        const $endTime = $('#endTime');
+        const $inputLocation = $('#inputLocation');
+        const $createBtn = $('#createBtn');
         const $increase = $('#increasePax');
         const $decrease = $('#decreasePax');
 
-        function updateButtons() {
-            const val = parseInt($input.val());
-            $decrease.prop('disabled', val <= parseInt($input.attr('min')));
-            $increase.prop('disabled', val >= parseInt($input.attr('max')));
+        // ====== Choose Location Button ======
+        $('#chooseLocationBtn').on('click', function() {
+            const query = new URLSearchParams({
+                inputTheme: $inputTheme.val(),
+                inputPax: $inputPax.val(),
+                inputDate: $inputDate.val(),
+                startTime: $startTime.val(),
+                endTime: $endTime.val()
+            }).toString();
 
+            window.location.href = `/my-gathering/create/location?${query}`;
+        });
+
+        // ====== Pax Button Adjustment ======
+        function updateButtons() {
+            const val = parseInt($inputPax.val());
+            const min = parseInt($inputPax.attr('min'));
+            const max = parseInt($inputPax.attr('max'));
             $decrease.prop('disabled', val <= min);
             $increase.prop('disabled', val >= max);
         }
 
         $increase.on('click', function() {
-            let current = parseInt($input.val());
-            const max = parseInt($input.attr('max'));
+            let current = parseInt($inputPax.val());
+            const max = parseInt($inputPax.attr('max'));
             if (current < max) {
-                $input.val(current + 1);
+                $inputPax.val(current + 1);
                 updateButtons();
                 toggleSubmitButton();
             }
         });
 
         $decrease.on('click', function() {
-            let current = parseInt($input.val());
-            const min = parseInt($input.attr('min'));
+            let current = parseInt($inputPax.val());
+            const min = parseInt($inputPax.attr('min'));
             if (current > min) {
-                $input.val(current - 1);
+                $inputPax.val(current - 1);
                 updateButtons();
                 toggleSubmitButton();
             }
         });
 
         updateButtons();
-    });
 
-    // ====== Date Setup ======
-    $(function() {
-        const $date = $('#inputDate');
+        // ====== Date Setup ======
         const today = new Date().toISOString().split('T')[0];
-        $date.attr('min', today);
+        $inputDate.attr('min', today);
+        if (!$inputDate.val()) $inputDate.val(today);
+        $inputDate.trigger('change');
 
-        if (!$date.val()) {
-            $date.val(today);
-        }
-        $date.trigger('change');
-    });
+        // ====== Open Date Picker on Icon Click ======
+        $('#triggerDatePicker').on('click', function() {
+            $inputDate[0].showPicker?.();
+        });
 
-    // ====== Open Date Picker on Icon Click ======
-    $('#triggerDatePicker').on('click', function() {
-        document.getElementById('inputDate').showPicker?.();
-    });
-
-    // ====== Time Picker Logic ======
-    $(function() {
-        const $date = $('#inputDate');
-        const $startTime = $('#startTime');
-        const $endTime = $('#endTime');
-
+        // ====== Time Picker Logic ======
         function getCurrentTimePlus(minutes = 1) {
             const now = new Date();
             now.setMinutes(now.getMinutes() + minutes);
-            return now.toTimeString().slice(0, 5); // "HH:MM"
+            return now.toTimeString().slice(0, 5);
         }
 
         function isToday(dateStr) {
-            const today = new Date().toISOString().split('T')[0];
             return dateStr === today;
         }
 
-        function updateStartTimeMin() {
-            const selectedDate = $date.val();
-            if (isToday(selectedDate)) {
-                const minTime = getCurrentTimePlus();
-                $startTime.attr('min', minTime);
+        // function updateStartTimeMin() {
+        //     const selectedDate = $inputDate.val();
+        //     if (isToday(selectedDate)) {
+        //         const minTime = getCurrentTimePlus();
+        //         $startTime.attr('min', minTime);
 
-                const val = $startTime.val();
-                $startTime.val('');
-                setTimeout(() => {
-                    $startTime.val(val);
-                    toggleSubmitButton();
-                }, 10);
-            } else {
-                $startTime.removeAttr('min');
-            }
+        //         const val = $startTime.val();
+        //         $startTime.val('');
+        //         setTimeout(() => {
+        //             $startTime.val(val);
+        //             toggleSubmitButton();
+        //         }, 10);
+        //     } else {
+        //         $startTime.removeAttr('min');
+        //     }
+        // }
+
+        // function updateEndTimeMin() {
+        //     const startVal = $startTime.val();
+        //     if (startVal) {
+        //         $endTime.attr('min', startVal);
+        //         if ($endTime.val() && $endTime.val() < startVal && !$endTime.data('persisted')) {
+        //             $endTime.val('');
+        //         }
+        //     } else {
+        //         $endTime.removeAttr('min');
+        //     }
+        //     toggleSubmitButton();
+        // }
+
+        // $inputDate.on('change', updateStartTimeMin);
+        // $startTime.on('change', updateEndTimeMin);
+        // updateStartTimeMin();
+        // setTimeout(updateEndTimeMin, 50);
+
+        // ====== Create Button Enable/Disable Logic ======
+        function isFormValid() {
+            return $inputTheme.val().trim() !== '' &&
+                $inputDate.val().trim() !== '' &&
+                $inputPax.val().trim() !== '' &&
+                $startTime.val().trim() !== '' &&
+                $endTime.val().trim() !== '' &&
+                $inputLocation.val().trim() !== '';
         }
 
-        function updateEndTimeMin() {
-            const startVal = $startTime.val();
-            if (startVal) {
-                $endTime.attr('min', startVal);
-                if ($endTime.val() && $startTime.val() && $endTime.val() < startVal && !$endTime.data('persisted')) {
-                    $endTime.val('');
-                }
-            } else {
-                $endTime.removeAttr('min');
-            }
-            toggleSubmitButton();
+        const fields = ['inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
+
+        function toggleSubmitButton() {
+            const hasError = fields.some(id => $(`#${id}`).hasClass('is-invalid'));
+            $createBtn.prop('disabled', hasError || !isFormValid());
         }
 
-        $date.on('change', updateStartTimeMin);
-        //$date.on('change', updateEndTimeMin);
-        $startTime.on('change', updateEndTimeMin);
-
-        updateStartTimeMin();
-        setTimeout(updateEndTimeMin, 50);
-        //updateEndTimeMin();
-    });
-
-    // ====== Create Button Enable/Disable Logic ======
-    function isFormValid() {
-        return $('#inputTheme').val().trim() !== '' &&
-            $('#inputDate').val().trim() !== '' &&
-            $('#inputPax').val().trim() !== '' &&
-            $('#startTime').val().trim() !== '' &&
-            $('#endTime').val().trim() !== '' &&
-            $('#inputLocation').val().trim() !== '';
-    }
-
-    function toggleSubmitButton() {
-        $('button#createBtn[type="submit"]').prop('disabled', !isFormValid());
-    }
-
-    $(function() {
         $('#inputTheme, #inputDate, #inputPax, #startTime, #endTime, #inputLocation').on('input change', toggleSubmitButton);
-
-        toggleSubmitButton();
-    });
-
-    // ====== Reset Button ======
-    $('#createResetBtn').on('click', function() {
-        // Clear all values manually
-        $('#inputTheme, #inputDate, #startTime, #endTime, #inputLocation, input[name="locationId"]').val('');
-        $('#inputPax').val(3);
-
-        // Disable create button
         toggleSubmitButton();
 
-        // Remove query string from URL
-        const cleanUrl = window.location.origin + window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-    });
+        // ====== Reset Button ======
+        $('#createResetBtn').on('click', function() {
+            $('#inputTheme, #inputDate, #startTime, #endTime, #inputLocation, input[name="locationId"]').val('');
+            $inputPax.val(3);
+            updateButtons();
+            toggleSubmitButton();
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+        });
+
+        // ====== AJAX Field Validation with Native Popup ======
+        function validateField(fieldId) {
+            // const $input = $(`#${fieldId}`);
+            // const data = {};
+            // data[fieldId] = $input.val();
+
+            const $input = $(`#${fieldId}`);
+            const data = {
+                inputTheme: $inputTheme.val(),
+                inputDate: $inputDate.val(),
+                inputPax: $inputPax.val(),
+                startTime: $startTime.val(),
+                endTime: $endTime.val(),
+                inputLocation: $inputLocation.val(),
+                locationId: $('input[name="locationId"]').val()
+            };
+
+            $.post('/api/validate-gathering', data, function(response) {
+                const error = response.errors?.[fieldId];
+                if (error) {
+                    showValidationError(fieldId, error);
+                } else {
+                    clearValidationError(fieldId);
+                }
+                toggleSubmitButton();
+            }, 'json');
+        }
+
+        fields.forEach(fieldId => {
+            $(`#${fieldId}`).on('input change', function() {
+                validateField(fieldId);
+            });
+        });
+
+        function showValidationError(fieldId, message) {
+            const $input = $(`#${fieldId}`);
+            $input.addClass('is-invalid');
+            $input.setCustomValidity(message);
+            $input.reportValidity();
+        }
+
+        function clearValidationError(fieldId) {
+            const $input = $(`#${fieldId}`);
+            $input.removeClass('is-invalid');
+            $input.setCustomValidity('');
+        }
+    })();
 </script>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
