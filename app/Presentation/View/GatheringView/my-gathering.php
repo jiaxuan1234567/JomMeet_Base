@@ -166,7 +166,7 @@ $asset = new FileHelper('asset');
                         items.push(renderPostList(`my-gathering/cancel/${g.id}`, 'Cancel Gathering', 'Confirm to cancel the gathering?'));
                     } else {
                         items.push(actionLink('Reply Reminder'));
-                        items.push(renderPostList(`gathering/leave/${g.id}`, 'Leave Gathering', 'Confirm to leave the gathering?'));
+                        items.push(renderPostList(`my-gathering/leave/${g.id}`, 'Leave Gathering', 'Confirm to leave the gathering?'));
                     }
                     break;
 

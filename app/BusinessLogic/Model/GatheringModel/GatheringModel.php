@@ -38,6 +38,32 @@ class GatheringModel
         return $this->gatheringDAO->getAvailableGatherings($profileId);
     }
 
+    // replace getAvailableGatherings
+    public function getPublicGatheringById($profileId, $gatheringId)
+    {
+        $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
+        if (!$gathering) return false;
+
+        // 1. Must be ACTIVE
+        if ($gathering['status'] !== 'NEW') return false;
+
+        // 2. Not hosted by user
+        if ($gathering['hostProfileID'] == $profileId) return false;
+
+        // 3. Not joined already
+        if ($this->gatheringDAO->isUserJoined($gatheringId, $profileId)) return false;
+
+        // 4. Not started
+        $now = new DateTime();
+        $startTime = new \DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+        if ($startTime <= $now) return false;
+
+        // 5. Not clashing with user’s active joined gatherings
+        if ($this->gatheringDAO->hasTimeConflict($profileId, $startTime)) return false;
+
+        return $gathering;
+    }
+
     public function searchGatherings($searchTerm)
     {
         try {
@@ -53,6 +79,16 @@ class GatheringModel
     public function getGatheringById($id)
     {
         return $this->gatheringDAO->getGatheringById($id);
+    }
+
+    // Fetch user only gathering by gathering ID
+    public function getUserGatheringById($profileId, $gatheringId)
+    {
+        $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
+        if (!$gathering || !$this->gatheringDAO->isProfileInvolved($gatheringId, $profileId)) {
+            return false;
+        }
+        return $gathering;
     }
 
     public function verifyUserInGathering($userID, $gatheringID)
@@ -254,6 +290,41 @@ class GatheringModel
         }
 
         return $result;
+    }
+
+    // Participant Leave Gathering
+    public function leaveGathering($profileId, $gatheringId)
+    {
+        try {
+            // Validate Gathering is Valid
+            $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
+            if (!$gathering) {
+                return false;
+            }
+
+            // Is Host?
+            if ($gathering['hostProfileID'] == $profileId) {
+                // Host cannot leave
+                return false;
+            }
+
+            // Leave
+            $result = $this->gatheringDAO->leaveGathering($profileId, $gatheringId);
+
+
+            if ($result) {
+                $_SESSION['flash_type'] = 'success';
+                $_SESSION['flash_message'] = 'You have successfully left the gathering.';
+            } else {
+                $_SESSION['flash_type'] = 'error';
+                $_SESSION['flash_message'] = 'Something went wrong.';
+            }
+            return $result;
+        } catch (Exception $e) {
+            $this->gatheringDAO->rollback(); // in case of uncaught error
+            error_log("[GatheringModel] Error in leaveGathering: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function matchGathering($userID)

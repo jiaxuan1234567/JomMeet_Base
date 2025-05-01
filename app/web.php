@@ -43,6 +43,7 @@ Route::post('/my-gathering/create', [GatheringController::class, 'createGatherin
 Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSelectLocation']);
 // before you dispatch
 Route::post('/my-gathering/create/location', [GatheringController::class, 'selectLocationSubmit']);
+Route::post('/my-gathering/leave/{gatheringId}', [GatheringController::class, 'leaveGathering']);
 Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGathering']);
 
 //AJAX

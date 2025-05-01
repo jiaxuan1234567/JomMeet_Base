@@ -15,6 +15,21 @@ class GatheringDAO
         $this->db = Database::getConnection();
     }
 
+    public function beginTransaction()
+    {
+        $this->db->beginTransaction();
+    }
+
+    public function commit()
+    {
+        $this->db->commit();
+    }
+
+    public function rollback()
+    {
+        $this->db->rollback();
+    }
+
     // Update a gathering’s status
     public function updateGatheringStatus($gatheringID, $status)
     {
@@ -203,11 +218,37 @@ class GatheringDAO
         }
     }
 
+    public function isUserJoined($gatheringId, $profileId)
+    {
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) FROM profilegathering 
+            WHERE gatheringID = :gid AND profileID = :pid
+        ");
+        $stmt->execute([':gid' => $gatheringId, ':pid' => $profileId]);
+        return $stmt->fetchColumn() > 0;
+    }
+
+    public function hasTimeConflict($profileId, $startTime)
+    {
+        $stmt = $this->db->prepare("
+            SELECT g.* FROM gathering g
+            JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
+            WHERE pg.profileID = :pid
+            AND g.status = 'ACTIVE'
+            AND CONCAT(g.date, ' ', g.startTime) = :start
+        ");
+        $stmt->execute([
+            ':pid' => $profileId,
+            ':start' => $startTime->format('Y-m-d H:i:s')
+        ]);
+        return $stmt->rowCount() > 0;
+    }
+
+
     // my-gathering
     public function getMyGatherings($profileId)
     {
         try {
-            //$sql = "SELECT * FROM gathering WHERE hostProfileID = :pid";
             $sql = "SELECT 
                 g.gatheringID, 
                 g.theme, 
@@ -231,6 +272,14 @@ class GatheringDAO
             error_log("[GatheringDAO] getUserGatherings: " . $e->getMessage());
             return [];
         }
+    }
+
+    // Get User-related gathering only
+    public function isProfileInvolved($gatheringId, $profileId)
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM profilegathering WHERE gatheringID = :gid AND profileID = :pid");
+        $stmt->execute([':gid' => $gatheringId, ':pid' => $profileId]);
+        return $stmt->fetchColumn() > 0;
     }
 
     public function createGathering($d)
@@ -303,6 +352,31 @@ class GatheringDAO
         } catch (PDOException $e) {
             $this->db->rollBack();
             error_log("[GatheringDAO] cancelWithParticipants failed: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function leaveGathering($profileId, $gatheringId)
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Remove user
+            $deleteStmt = $this->db->prepare("DELETE FROM profilegathering WHERE profileID = :pid AND gatheringID = :gid");
+            $deleteStmt->execute([
+                ':pid' => $profileId,
+                ':gid' => $gatheringId
+            ]);
+
+            // 2. Decrease participant count
+            $updateStmt = $this->db->prepare("UPDATE gathering SET currentParticipant = currentParticipant - 1 WHERE gatheringID = :gid");
+            $updateStmt->execute([':gid' => $gatheringId]);
+
+            $this->db->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->db->rollBack();
+            error_log("[GatheringDAO] participantLeaveGathering failed: " . $e->getMessage());
             return false;
         }
     }

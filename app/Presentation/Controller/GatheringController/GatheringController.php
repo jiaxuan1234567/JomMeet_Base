@@ -101,6 +101,16 @@ class GatheringController
         exit;
     }
 
+    // POST: leave-gathering
+    public function leaveGathering($gatheringId)
+    {
+        $profileId = $_SESSION['profile']['profileID'];
+        $result = $this->gatheringModel->leaveGathering($profileId, $gatheringId);
+
+        header('Location: /my-gathering');
+        exit;
+    }
+
     // AJAX Validation: Gathering Fields
     public function ajaxValidateGathering()
     {
@@ -121,10 +131,25 @@ class GatheringController
         include $this->fileHelper->getFilePath('GatheringDetail');
     }
 
-    // wait
-    public function viewMyGatheringDetail($id)
+    // GET: my-gathering-detail
+    public function viewMyGatheringDetail($gatheringId)
     {
-        $gathering = $this->gatheringModel->getGatheringById($id);
+        $profileId = $_SESSION['profile']['profileID'];
+        $gathering = $this->gatheringModel->getUserGatheringById($profileId, $gatheringId);
+
+        if (!$gathering) {
+            $gathering = $this->gatheringModel->getPublicGatheringById($profileId, $gatheringId);
+            if ($gathering) {
+                header('Location: /gathering/view/' . $gathering['gatheringID']);
+                exit;
+            } else {
+                $_SESSION['flash_message'] = "You are not authorized to view this gathering.";
+                $_SESSION['flash_type'] = "error";
+                header('Location: /my-gathering');
+                exit;
+            }
+        }
+
         include $this->fileHelper->getFilePath('MyGatheringDetails');
     }
 
