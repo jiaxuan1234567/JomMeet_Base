@@ -196,7 +196,7 @@ class GatheringDAO
             WHERE g.hostProfileID != :pid
               AND p.profileID IS NULL
               AND g.maxParticipant > g.currentParticipant
-              AND g.status IN ('NEW', 'START')
+              AND g.status IN ('NEW')
               ";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);
