@@ -52,4 +52,11 @@ class ReflectionController
         $reflectionViewed = $this->reflectionModel->getReflectionById($reflectionId);
         include $this->fileHelper->getFilePath('ViewReflection');
     }
+
+    public function deleteReflection($reflectionId)
+    {
+        $this->reflectionModel->deleteReflectionById($reflectionId);
+        header("Location: /reflection");
+    }
+    
 }

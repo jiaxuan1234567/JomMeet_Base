@@ -77,4 +77,9 @@ class ReflectionModel
         return $this->reflectionDAO->editSaveReflection($reflectionId,$reflectionTitle, $reflectionContent);
     }
 
+    public function deleteReflectionById($reflectionId) 
+    {
+        return $this->reflectionDAO->deleteReflectionById($reflectionId);
+    }
+
 }

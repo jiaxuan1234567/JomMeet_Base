@@ -11,7 +11,7 @@ unset($_SESSION['reflectionErrors']);
 unset($_SESSION['old']); //user no need to redo
 ?>
 
-<div class="main">
+<div class="main d-flex flex-column min-vh-100">
     <div class="container-fluid py-3">
         <h4>
             <a href="/reflection">
