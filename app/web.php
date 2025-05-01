@@ -20,6 +20,7 @@ Route::get('/my-gathering', [HomeController::class, 'myGatheringHome']);
 // self-reflection routes
 Route::get('/reflection/create', [ReflectionController::class, 'createReflection']);
 Route::post('/reflection/create', [ReflectionController::class, 'saveReflection']);
+Route::post('/reflection/validate', [ReflectionController::class, 'validateReflection']);
 Route::get('/reflection/edit/{id}', [ReflectionController::class, 'editReflection']);
 Route::post('/reflection/edit/{id}', [ReflectionController::class, 'editSaveReflection']);
 Route::get('/reflection/delete/{id}', [ReflectionController::class, 'deleteReflection']);

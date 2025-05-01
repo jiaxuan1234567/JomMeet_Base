@@ -23,7 +23,7 @@ unset($_SESSION['old']);
     <div class="container mb-5">
         <div class="container border border-2 rounded-3 m-2 align-content-center" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
             <div class="container d-flex align-item-center justify-content-center">
-                <form method="post" action="/reflection/create" class="form">
+                <form method="post" action="/reflection/create" class="form" id="selfReflectionForm">
                     <h1></h1>
                     <div class="my-3">
                         <h4 style="font-size: 30px;"><label for="date"><b>Date</b></label></h4>
@@ -33,17 +33,13 @@ unset($_SESSION['old']);
                     <div class="my-3">
                         <h4 style="font-size: 30px;"><label for="title"><b>Title</b></label></h4>
                         <input type="text" class="ps-2 border border-black border-2 rounded-3" id="reflectionTitle" name="reflectionTitle" placeholder="Write Your Self-Reflection Title Here!" value="<?= htmlspecialchars($old['reflectionTitle'] ?? '') ?>" style="width:500px;">
-                        <?php if (!empty($errors['reflectionTitle'])): ?>
-                            <div class="text-danger"><?= $errors['reflectionTitle'] ?></div>
-                        <?php endif; ?>
+                        <div class="invalid-reflection" id="errorReflection"></div>
                     </div>
 
                     <div class="my-3">
                         <h4 style="font-size: 30px;"><label for="content"><b>Content</b></label></h4>
                         <textarea class="ps-2 border border-black border-2 rounded-3" id="reflectionContent" name="reflectionContent" placeholder="Share how was your day!" style="width:500px;height:200px;"><?= htmlspecialchars($old['reflectionContent'] ?? '') ?></textarea>
-                        <?php if (!empty($errors['reflectionContent'])): ?>
-                            <div class="text-danger"><?= $errors['reflectionContent'] ?></div>
-                        <?php endif; ?>
+                        <div class="invalid-reflection" id="errorReflection"></div>
                     </div>
 
                     <section class="d-flex justify-content-center my-3">
@@ -55,4 +51,5 @@ unset($_SESSION['old']);
     </div>
 </div>
 
+<script src="/js/selfReflection.js"></script>
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
