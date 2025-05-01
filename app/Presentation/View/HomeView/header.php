@@ -46,7 +46,7 @@
                 </ul>
                 <div class="d-flex gap-2">
                     <?php if ($_SESSION['profile_id']): ?>
-                        <a href="/profile" class="btn btn-outline-secondary rounded-pill"><?= $_SESSION['profile']['nickname'] ?? '' ?></a>
+                        <a href="/profile/create" class="btn btn-outline-secondary rounded-pill"><?= $_SESSION['profile']['nickname'] ?? '' ?></a>
                     <?php else: ?>
                         <a href="/login" class="btn btn-outline-secondary rounded-pill">Profile</a>
                     <?php endif; ?>

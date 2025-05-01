@@ -15,19 +15,19 @@ class ProfileModel
         $this->profileDAO = new ProfileDAO();
     }
 
-    public function getAllProfiles()
-    {
-        try {
-            $profiles = $this->profileDAO->getAllProfiles();
-            if ($profiles === false) {
-                throw new Exception("Failed to fetch profiles");
-            }
-            return $profiles;
-        } catch (Exception $e) {
-            error_log("Error in getAllProfiles: " . $e->getMessage());
-            return [];
-        }
-    }
+    // public function getAllProfiles()
+    // {
+    //     try {
+    //         $profiles = $this->profileDAO->getAllProfiles();
+    //         if ($profiles === false) {
+    //             throw new Exception("Failed to fetch profiles");
+    //         }
+    //         return $profiles;
+    //     } catch (Exception $e) {
+    //         error_log("Error in getAllProfiles: " . $e->getMessage());
+    //         return [];
+    //     }
+    // }
 
     public function validateLogin($phoneNumber, $password)
     {
@@ -78,10 +78,12 @@ class ProfileModel
 
         return true;
     }
-    public function getProfileDetails($profileId)
-    {
-        return $this->profileDAO->getProfileDetails($profileId);
-    }
+
+
+    // public function getProfileDetails($profileId)
+    // {
+    //     return $this->profileDAO->getProfileDetails($profileId);
+    // }
 
     // // Fetch a gathering by its ID
     // public function getProfileById(int $id): array
