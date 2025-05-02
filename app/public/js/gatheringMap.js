@@ -93,26 +93,9 @@ async function showDetailPanel(loc, pos, liElem) {
 }
 
 function submitLocationForm(loc) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/my-gathering/create/location';
-
-    const fields = {
-        locationID: loc.locationID,
-        locationName: loc.locationName,
-        ...Object.fromEntries(new URLSearchParams(window.location.search).entries())
-    };
-
-    for (const [key, val] of Object.entries(fields)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = val;
-        form.appendChild(input);
-    }
-
-    document.body.appendChild(form);
-    form.submit();
+    sessionStorage.setItem('locationId', loc.locationID);
+    sessionStorage.setItem('inputLocation', loc.locationName);
+    window.location.href = '/my-gathering/create';
 }
 
 async function performSearch() {
@@ -238,7 +221,6 @@ $(document).ready(function () {
         $('#vertBar').toggleClass('d-none', !hasText);
     });
 });
-
 
 
 /* ------------------------ use to add location ---------------------------------------- */

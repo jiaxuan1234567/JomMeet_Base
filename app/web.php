@@ -16,6 +16,7 @@ Route::post('/login/process', [ProfileController::class, 'validateLogin']);
 Route::get('/logout', [HomeController::class, 'logoutHome']);
 
 // profile routes
+Route::get('/profile', [ProfileController::class, 'validateLogin']);
 Route::get('/profile/edit', [ProfileController::class, 'editProfile']);
 Route::post('/profile/edit', [ProfileController::class, 'saveProfile']);
 Route::get('/profile/create', [ProfileController::class, 'createProfile']);
@@ -42,8 +43,6 @@ Route::get('/my-gathering/view/{id}', [GatheringController::class, 'viewMyGather
 Route::get('/my-gathering/create', [GatheringController::class, 'viewCreate']);
 Route::post('/my-gathering/create', [GatheringController::class, 'createGathering']);
 Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSelectLocation']);
-// before you dispatch
-Route::post('/my-gathering/create/location', [GatheringController::class, 'selectLocationSubmit']);
 Route::post('/my-gathering/leave/{gatheringId}', [GatheringController::class, 'leaveGathering']);
 Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGathering']);
 

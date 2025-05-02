@@ -8,7 +8,6 @@ use BusinessLogic\Model\GatheringModel\LocationModel;
 use Database;
 use Exception;
 use FileHelper;
-
 use PDOException;
 
 class GatheringController
@@ -25,6 +24,9 @@ class GatheringController
     // GET: create-gathering
     public function viewCreate()
     {
+        $preferenceTags = $this->gatheringModel->getPreferenceTags();
+        $paxLimit = $this->gatheringModel->getPaxLimit();
+        $allowedDate = $this->gatheringModel->getCreateAllowedDate();
         include $this->fileHelper->getFilePath('CreateGathering');
     }
 
@@ -41,7 +43,7 @@ class GatheringController
             'startTime'         => $_POST['startTime'] ?? '',
             'endTime'           => $_POST['endTime'] ?? '',
             'status'            => 'NEW',
-            'preference'        => $_POST['preference'] ?? 'ENTERTAINMENT',
+            'preference'        => $_POST['gatheringTag'] ?? '',
             'hostProfileID' => $_SESSION['profile']['profileID']
         ];
 
@@ -64,23 +66,6 @@ class GatheringController
     {
         $redirectUrl = $_GET['redirect'] ?? '/my-gathering/create';
         require_once $this->fileHelper->getFilePath('SelectLocation');
-    }
-
-    // POST: select-location
-    public function selectLocationSubmit()
-    {
-        $query = http_build_query([
-            'locationID' => $_POST['locationID'],
-            'locationName' => $_POST['locationName'],
-            'inputTheme' => $_POST['inputTheme'] ?? '',
-            'inputPax' => $_POST['inputPax'] ?? '',
-            'inputDate' => $_POST['inputDate'] ?? '',
-            'startTime' => $_POST['startTime'] ?? '',
-            'endTime' => $_POST['endTime'] ?? '',
-        ]);
-
-        header("Location: /my-gathering/create?$query");
-        exit;
     }
 
     // POST: cancel-gathering

@@ -254,20 +254,13 @@ class GatheringDAO
     {
         try {
             $sql = "SELECT 
-                g.gatheringID, 
-                g.theme, 
-                g.currentParticipant, 
-                g.maxParticipant, 
-                g.date, 
-                g.startTime, 
-                g.endTime, 
-                g.status, 
+                g.*,
                 l.locationName AS venue, 
                 l.image, (g.hostProfileID = :pid) AS isHost, 
                 (p.profileID IS NOT NULL) AS isJoined
                 FROM `location` l
                 JOIN gathering g ON l.locationID = g.locationID
-                JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
+                LEFT JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
                 WHERE (g.hostProfileID = :pid) OR (p.profileID = :pid)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);
@@ -282,6 +275,13 @@ class GatheringDAO
     public function isProfileInvolved($gatheringId, $profileId)
     {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM profilegathering WHERE gatheringID = :gid AND profileID = :pid");
+        $stmt->execute([':gid' => $gatheringId, ':pid' => $profileId]);
+        return $stmt->fetchColumn() > 0;
+    }
+
+    public function isHostInvolved($gatheringId, $profileId)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM `gathering` WHERE gatheringID = :gid AND hostProfileID = :pid");
         $stmt->execute([':gid' => $gatheringId, ':pid' => $profileId]);
         return $stmt->fetchColumn() > 0;
     }

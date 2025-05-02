@@ -3,27 +3,6 @@ $_title = 'Selecet Location';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
-<style>
-    #searchBox:focus {
-        box-shadow: none;
-        outline: none;
-    }
-
-    input[type="search"]::-webkit-search-decoration,
-    input[type="search"]::-webkit-search-cancel-button,
-    input[type="search"]::-webkit-search-results-button,
-    input[type="search"]::-webkit-search-results-decoration {
-        display: none;
-    }
-
-    #resultsList {
-        max-height: 92vh;
-        ;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-</style>
-
 <script>
     // so JS knows where to send the user back
     window.redirectUrl = '<?= addslashes($redirectUrl) ?>';

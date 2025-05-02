@@ -11,35 +11,43 @@ class FileHelper
         $this->initializePaths();
     }
 
+    private function prefixWithRoot($paths)
+    {
+        foreach ($paths as $key => &$path) {
+            $path = ROOTPATH . $path;
+        }
+        return $paths;
+    }
+
     private function initializePaths()
     {
-        $basePaths = [
+        $basePaths = $this->prefixWithRoot([
             'Header' => "/Presentation/View/HomeView/header.php",
             'Footer' => "/Presentation/View/HomeView/footer.php",
-        ];
+        ]);
 
-        $homePaths = [
+        $homePaths = $this->prefixWithRoot([
             'HomePage' => "/Presentation/View/HomeView/home.php",
             'HomeController' => "/Presentation/Controller/HomeController/HomeController.php",
             'HomeModel' => "/BusinessLogic/Model/HomeModel/HomeModel.php",
             'Login' => "/Presentation/View/HomeView/login.php",
-        ];
+        ]);
 
-        $profilePaths = [
+        $profilePaths = $this->prefixWithRoot([
             'Profile' => "/Presentation/View/ProfileView/profile.php",
             'EditProfile' => "/Presentation/View/ProfileView/edit-profile.php",
             'CreateProfile' => "/Presentation/View/ProfileView/create-profile.php",
-        ];
+        ]);
 
-        $reflectionPaths = [
+        $reflectionPaths = $this->prefixWithRoot([
             'ReflectionList' => "/Presentation/View/ReflectionView/reflection-list.php",
             'CreateReflection' => "/Presentation/View/ReflectionView/create-reflection.php",
             'EditReflection' => "/Presentation/View/ReflectionView/edit-reflection.php",
             'DeleteReflection' => "/Presentation/View/ReflectionView/delete-reflection.php",
             'ViewReflection' => "/Presentation/View/ReflectionView/view-reflection.php",
-        ];
+        ]);
 
-        $gatheringPaths = [
+        $gatheringPaths = $this->prefixWithRoot([
             'MyGatheringList' => "/Presentation/View/GatheringView/my-gathering.php",
             'MyGatheringDetails' => "/Presentation/View/GatheringView/my-gathering-details.php",
             'CreateGathering' => "/Presentation/View/GatheringView/create-gathering.php",
@@ -47,7 +55,7 @@ class FileHelper
             'JoinGathering' => "/Presentation/View/GatheringView/join-gathering.php",
             'GatheringDetail' => "/Presentation/View/GatheringView/gathering-detail.php",
             'GatheringList' => "/Presentation/View/GatheringView/gathering-list.php",
-        ];
+        ]);
 
         $assetPaths = [
             "AppCSS" => "/css/app.css",
@@ -74,27 +82,38 @@ class FileHelper
                     $homePaths,
                     $profilePaths,
                     $reflectionPaths,
-                    $gatheringPaths
+                    $gatheringPaths,
+                    $assetPaths
                 );
                 break;
             case "profile":
-                $this->allowedPaths = $profilePaths;
+                $this->allowedPaths = array_merge(
+                    $profilePaths,
+                    $assetPaths
+                );
                 break;
             case "reflection":
-                $this->allowedPaths = $reflectionPaths;
+                $this->allowedPaths = array_merge(
+                    $reflectionPaths,
+                    $assetPaths
+                );
                 break;
             case "gathering":
-                $this->allowedPaths = $gatheringPaths;
+                $this->allowedPaths = array_merge(
+                    $gatheringPaths,
+                    $assetPaths
+                );
                 break;
             case "asset":
-                $this->allowedPaths = $assetPaths;
+                $this->allowedPaths = array_merge(
+                    $assetPaths
+                );
                 break;
         }
     }
 
     public function getFilePath($key)
     {
-        return $this->permission === 'asset' ? $this->allowedPaths[$key] ?? null
-            : ROOTPATH . $this->allowedPaths[$key] ?? null;
+        return $this->allowedPaths[$key] ?? null;
     }
 }
