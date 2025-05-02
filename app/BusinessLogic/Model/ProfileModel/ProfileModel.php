@@ -29,6 +29,50 @@ class ProfileModel
     //     }
     // }
 
+    public function getAllMbti()
+    {
+        return [
+            'INTJ',
+            'INTP',
+            'ENTJ',
+            'ENTP',
+            'INFJ',
+            'INFP',
+            'ENFJ',
+            'ENFP',
+            'ISTJ',
+            'ISFJ',
+            'ESTJ',
+            'ESFJ',
+            'ISTP',
+            'ISFP',
+            'ESTP',
+            'ESFP'
+        ];
+    }
+
+    public function getAllHobby()
+    {
+        return [
+            'Basketball',
+            'Badminton',
+            'Hiking',
+            'Singing',
+            'Photography',
+            'Reading',
+            'Jogging',
+            'Camping',
+            'Traveling',
+            'Swimming',
+            'Yoga',
+            'Meditation',
+            'Drawing',
+            'Painting',
+            'Squash',
+            'Gym'
+        ];
+    }
+
     public function validateLogin($phoneNumber, $password)
     {
         // $phoneNumber = $_POST['phoneNumber'];

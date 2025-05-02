@@ -91,9 +91,12 @@ class ProfileController
         header('Location: /profile');
     }
 
-
     public function editProfile()
     {
+        $types = $this->profileModel->getAllMbti();
+        $hobbyOptions = $this->profileModel->getAllHobby();
         include $this->fileHelper->getFilePath('EditProfile');
     }
+
+    public function saveProfile() {}
 }
