@@ -47,3 +47,53 @@ $(document).ready(function () {
     $title.on('input change', () => validateField('reflectionTitle'));
     $content.on('input change', () => validateField('reflectionContent'));
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const titleInput = document.getElementById('reflectionTitle');
+    const contentInput = document.getElementById('reflectionContent');
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const errorTitle = document.getElementById('errorReflectionTitle');
+    const errorContent = document.getElementById('errorReflectionContent');
+
+    function validateForm() {
+        let isValid = true;
+
+        const title = titleInput.value.trim();
+        const content = contentInput.value.trim();
+
+        if (!title) {
+            isValid = false;
+        } else if (title.length > 50) {
+            isValid = false;
+        }
+
+        if (!content) {
+            isValid = false;
+        } else if (content.length > 5000) {
+            isValid = false;
+        }
+
+        if (!isValid) {
+            submitBtn.disabled = true;
+            submitBtn.style.backgroundColor = 'grey';
+            submitBtn.style.borderColor = 'grey';
+            submitBtn.style.cursor = 'not-allowed';
+            submitBtn.style.opacity = '0.7';
+        } else {
+            submitBtn.disabled = false;
+            submitBtn.style.backgroundColor = ''; // Reset to Bootstrap default
+            submitBtn.style.borderColor = '';
+            submitBtn.style.cursor = '';
+            submitBtn.style.opacity = '';
+        }
+    }
+
+    titleInput.addEventListener('input', validateForm);
+    contentInput.addEventListener('input', validateForm);
+
+    validateForm();
+});
+
+
+
+
