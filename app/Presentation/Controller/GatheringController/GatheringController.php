@@ -8,7 +8,6 @@ use BusinessLogic\Model\GatheringModel\LocationModel;
 use Database;
 use Exception;
 use FileHelper;
-
 use PDOException;
 
 class GatheringController
@@ -25,6 +24,9 @@ class GatheringController
     // GET: create-gathering
     public function viewCreate()
     {
+        $preferenceTags = $this->gatheringModel->getPreferenceTags();
+        $paxLimit = $this->gatheringModel->getPaxLimit();
+        $allowedDate = $this->gatheringModel->getCreateAllowedDate();
         include $this->fileHelper->getFilePath('CreateGathering');
     }
 

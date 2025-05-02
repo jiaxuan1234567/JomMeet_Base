@@ -43,7 +43,7 @@ $asset = new FileHelper('asset');
                         </button>
                     </div>
                     <h5 class="mt-3 fw-bold mb-0" id="selectedTagLabel">Select A Preference</h5>
-                    <input type="hidden" name="gatheringTag" id="gatheringTag">
+                    <input type="hidden" name="gatheringTag" id="gatheringTag" value="">
                 </div>
 
                 <!-- Theme and Date -->
@@ -69,7 +69,8 @@ $asset = new FileHelper('asset');
                                 id="inputDate"
                                 name="inputDate"
                                 class="form-control gathering-input text-center"
-                                value="<?= htmlspecialchars($_GET['inputDate'] ?? '') ?>">
+                                value="<?= htmlspecialchars($_GET['inputDate'] ?? $allowedDate) ?>"
+                                min="<?= $allowedDate ?>">
                             <button type="button" id="triggerDatePicker"
                                 class="btn btn-primary button-blue-color text-white gathering-button">
                                 <i class="bi bi-calendar-event-fill"></i>
@@ -92,8 +93,8 @@ $asset = new FileHelper('asset');
                                 id="inputPax"
                                 name="inputPax"
                                 class="form-control gathering-input text-center"
-                                value="<?= htmlspecialchars($_GET['inputPax'] ?? '3') ?>"
-                                min="3" max="8" readonly
+                                value="<?= htmlspecialchars($_GET['inputPax'] ?? $paxLimit['minPax']) ?>"
+                                min="<?= $paxLimit['minPax'] ?>" max="<?= $paxLimit['maxPax'] ?>" readonly
                                 style="max-width: 60px;">
 
                             <button class="btn btn-primary button-blue-color text-white gathering-button"
@@ -179,7 +180,7 @@ $asset = new FileHelper('asset');
     <div id="selectLocationForm"></div>
 
     <!-- Select Preference Modal -->
-    <div class="modal fade" id="tagSelectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="tagSelectionModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-3 rounded-4 shadow-lg">
                 <div class="modal-header border-0">
@@ -188,27 +189,15 @@ $asset = new FileHelper('asset');
                 </div>
                 <div class="modal-body">
                     <div class="row row-cols-3 g-4 justify-content-center">
-                        <?php
-                        $tags = [
-                            ['label' => 'Food', 'value' => 'food'],
-                            ['label' => 'Chill', 'value' => 'chill'],
-                            ['label' => 'Study', 'value' => 'study'],
-                            ['label' => 'Natural', 'value' => 'natural'],
-                            ['label' => 'Shopping', 'value' => 'shopping'],
-                            ['label' => 'Workout', 'value' => 'workout'],
-                            ['label' => 'Entertainment', 'value' => 'entertainment'],
-                            ['label' => 'Music', 'value' => 'music'],
-                            ['label' => 'Movie', 'value' => 'movie'],
-                        ];
-                        foreach ($tags as $tag): ?>
+                        <?php foreach ($preferenceTags as $tag): ?>
                             <div class="col text-center tag-option px-2"
                                 data-value="<?= $tag['value'] ?>"
                                 data-label="<?= $tag['label'] ?>"
-                                data-image="<?= $asset->getFilePath($tag['value']) ?>"
+                                data-image="<?= $tag['image'] ?>"
                                 style="cursor: pointer;">
                                 <div class="position-relative mx-auto"
                                     style="width: 80px; height: 80px;">
-                                    <img src="<?= $tag['image'] ?? $asset->getFilePath($tag['value']) ?>"
+                                    <img src="<?= $tag['image'] ?>"
                                         class="rounded-circle border border-2 border-secondary shadow-sm tag-image w-100 h-100"
                                         style="object-fit: cover;">
                                 </div>
@@ -225,7 +214,7 @@ $asset = new FileHelper('asset');
 <script src="/js/gatheringMap.js"></script>
 
 <script>
-    // Preference 
+    // ====== Preference ======
     $('#selectTagBtn').on('click', function() {
         $('#tagSelectionModal').modal('show');
     });
@@ -235,14 +224,14 @@ $asset = new FileHelper('asset');
         const label = $(this).data('label');
         const image = $(this).data('image');
 
-        $('#gatheringTag').val(value);
+        $('#gatheringTag').val(value).trigger('input');
         $('#selectedTagLabel').text(label);
         $('#selectedTagImage').attr('src', image);
         $('#tagSelectionModal').modal('hide');
     });
 
     (function() {
-        //const $selectedTagLabel = $('selectedTagLabel');
+        const $inputTag = $('#gatheringTag');
         const $inputTheme = $('#inputTheme');
         const $inputDate = $('#inputDate');
         const $inputPax = $('#inputPax');
@@ -297,12 +286,6 @@ $asset = new FileHelper('asset');
 
         updateButtons();
 
-        // ====== Date Setup ======
-        const today = new Date().toISOString().split('T')[0];
-        $inputDate.attr('min', today);
-        if (!$inputDate.val()) $inputDate.val(today);
-        $inputDate.trigger('change');
-
         // ====== Open Date Picker on Icon Click ======
         $('#triggerDatePicker').on('click', function() {
             $inputDate[0].showPicker?.();
@@ -315,13 +298,10 @@ $asset = new FileHelper('asset');
             return now.toTimeString().slice(0, 5);
         }
 
-        function isToday(dateStr) {
-            return dateStr === today;
-        }
-
         // ====== Create Button Enable/Disable Logic ======
-        function isFormValid() {
-            return $inputTheme.val().trim() !== '' &&
+        function isFormFilled() {
+            return $inputTag.val().trim() !== '' &&
+                $inputTheme.val().trim() !== '' &&
                 $inputDate.val().trim() !== '' &&
                 $inputPax.val().trim() !== '' &&
                 $startTime.val().trim() !== '' &&
@@ -329,21 +309,30 @@ $asset = new FileHelper('asset');
                 $inputLocation.val().trim() !== '';
         }
 
-        const touched = new Set();
-        const fields = ['inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
+        console.log('Filled check:', {
+            tag: $inputTag.val(),
+            theme: $inputTheme.val(),
+            date: $inputDate.val(),
+            pax: $inputPax.val(),
+            start: $startTime.val(),
+            end: $endTime.val(),
+            location: $inputLocation.val()
+        });
 
+        const touched = new Set();
+        const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
+
+        // Create Button State
         function toggleSubmitButton() {
             const hasError = fields.some(id => $(`#${id}`).hasClass('is-invalid'));
-            $createBtn.prop('disabled', hasError || !isFormValid());
+            $createBtn.prop('disabled', hasError || !isFormFilled());
         }
-
-        $('#inputTheme, #inputDate, #inputPax, #startTime, #endTime, #inputLocation').on('input change', toggleSubmitButton);
         toggleSubmitButton();
 
         // ====== Reset Button ======
         $('#createResetBtn').on('click', function() {
             $('#inputTheme, #inputDate, #startTime, #endTime, #inputLocation, input[name="locationId"]').val('');
-            $inputPax.val(3);
+            $inputPax.val($inputPax.attr('min'));
             updateButtons();
             toggleSubmitButton();
             const cleanUrl = window.location.origin + window.location.pathname;
@@ -360,7 +349,8 @@ $asset = new FileHelper('asset');
                 startTime: $startTime.val(),
                 endTime: $endTime.val(),
                 inputLocation: $inputLocation.val(),
-                locationId: $('input[name="locationId"]').val()
+                locationId: $('input[name="locationId"]').val(),
+                inputTag: $('#gatheringTag').val()
             };
 
             console.log(data);
@@ -391,6 +381,7 @@ $asset = new FileHelper('asset');
                 }
 
                 validateField(fieldId);
+                toggleSubmitButton();
             });
         });
 

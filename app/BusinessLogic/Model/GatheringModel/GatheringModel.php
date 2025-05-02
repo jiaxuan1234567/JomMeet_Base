@@ -17,6 +17,7 @@ class GatheringModel
     private $locationDAO;
     private $chkStatusService;
     private $validatorService;
+    private $fileHelper;
 
     public function __construct()
     {
@@ -24,6 +25,32 @@ class GatheringModel
         $this->locationDAO = new LocationDAO();
         $this->chkStatusService = new CheckGatheringStatusService();
         $this->validatorService = new GatheringValidationService();
+        $this->fileHelper = new FileHelper('gathering');
+    }
+
+    public function getPreferenceTags()
+    {
+        return [
+            ['label' => 'Food', 'value' => 'food', 'image' =>  $this->fileHelper->getFilePath('food')],
+            ['label' => 'Chill', 'value' => 'chill', 'image' =>  $this->fileHelper->getFilePath('chill')],
+            ['label' => 'Study', 'value' => 'study', 'image' =>  $this->fileHelper->getFilePath('study')],
+            ['label' => 'Natural', 'value' => 'natural', 'image' =>  $this->fileHelper->getFilePath('natural')],
+            ['label' => 'Shopping', 'value' => 'shopping', 'image' =>  $this->fileHelper->getFilePath('shopping')],
+            ['label' => 'Workout', 'value' => 'workout', 'image' =>  $this->fileHelper->getFilePath('workout')],
+            ['label' => 'Entertainment', 'value' => 'entertainment', 'image' =>  $this->fileHelper->getFilePath('entertainment')],
+            ['label' => 'Music', 'value' => 'music', 'image' =>  $this->fileHelper->getFilePath('music')],
+            ['label' => 'Movie', 'value' => 'movie', 'image' =>  $this->fileHelper->getFilePath('movie')],
+        ];
+    }
+
+    public function getPaxLimit()
+    {
+        return ['minPax' => 3, 'maxPax' => 8];
+    }
+
+    public function getCreateAllowedDate()
+    {
+        return (new DateTime())->format('Y-m-d');
     }
 
     // Fetch all gatherings
