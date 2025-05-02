@@ -28,19 +28,25 @@ class GatheringModel
         $this->fileHelper = new FileHelper('gathering');
     }
 
+    public function getPreference()
+    {
+        return ['FOOD', 'CHILL', 'STUDY', 'NATURAL', 'SHOPPING', 'WORKOUT', 'ENTERTAINMENT', 'MUSIC', 'MOVIE'];
+    }
+
     public function getPreferenceTags()
     {
-        return [
-            ['label' => 'Food', 'value' => 'food', 'image' =>  $this->fileHelper->getFilePath('food')],
-            ['label' => 'Chill', 'value' => 'chill', 'image' =>  $this->fileHelper->getFilePath('chill')],
-            ['label' => 'Study', 'value' => 'study', 'image' =>  $this->fileHelper->getFilePath('study')],
-            ['label' => 'Natural', 'value' => 'natural', 'image' =>  $this->fileHelper->getFilePath('natural')],
-            ['label' => 'Shopping', 'value' => 'shopping', 'image' =>  $this->fileHelper->getFilePath('shopping')],
-            ['label' => 'Workout', 'value' => 'workout', 'image' =>  $this->fileHelper->getFilePath('workout')],
-            ['label' => 'Entertainment', 'value' => 'entertainment', 'image' =>  $this->fileHelper->getFilePath('entertainment')],
-            ['label' => 'Music', 'value' => 'music', 'image' =>  $this->fileHelper->getFilePath('music')],
-            ['label' => 'Movie', 'value' => 'movie', 'image' =>  $this->fileHelper->getFilePath('movie')],
-        ];
+        $tags = [];
+
+        foreach ($this->getPreference() as $preference) {
+            $value = strtolower($preference);
+            $tags[] = [
+                'label' => ucfirst($value),
+                'value' => $value,
+                'image' => $this->fileHelper->getFilePath($value)
+            ];
+        }
+
+        return $tags;
     }
 
     public function getPaxLimit()
@@ -461,9 +467,17 @@ class GatheringModel
     {
         // 1) fetch persistence‐backed facts
         $locRow = $this->locationDAO->getLocationById($post['locationId'] ?? '');
+        if ($locRow === false) $locRow = null;
         $joined = $this->gatheringDAO->getJoinedGatheringByUserId(
             $_SESSION['profile']['profileID'] ?? 0
         );
+
+        // $preference = $post['gatheringTag'] ?? '';
+        // if ($preference === '') {
+        //     return ['gatheringTag' => 'Choose a gathering preference'];
+        // } else if (in_array($preference, $this->getPreference())) {
+        //     return ['gatheringTag' => 'Invalid gathering preference'];
+        // }
 
         // 2) call pure helper
         return $this->validatorService->validate($post, $locRow, $joined);
