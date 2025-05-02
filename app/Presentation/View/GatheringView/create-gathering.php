@@ -242,20 +242,6 @@ $asset = new FileHelper('asset');
         const $increase = $('#increasePax');
         const $decrease = $('#decreasePax');
 
-        // // ====== Choose Location Button ======
-        // $('#chooseLocationBtn').on('click', function() {
-        //     const query = new URLSearchParams({
-        //         inputTag: $inputTag.val(),
-        //         inputTheme: $inputTheme.val(),
-        //         inputPax: $inputPax.val(),
-        //         inputDate: $inputDate.val(),
-        //         startTime: $startTime.val(),
-        //         endTime: $endTime.val()
-        //     }).toString();
-
-        //     window.location.href = `/my-gathering/create/location?${query}`;
-        // });
-
         // ====== Pax Button Adjustment ======
         function updateButtons() {
             const val = parseInt($inputPax.val());
@@ -304,13 +290,6 @@ $asset = new FileHelper('asset');
 
         // ====== Create Button Enable/Disable Logic ======
         function isFormFilled() {
-            // return $inputTag.val().trim() !== '' &&
-            //     $inputTheme.val().trim() !== '' &&
-            //     $inputDate.val().trim() !== '' &&
-            //     $inputPax.val().trim() !== '' &&
-            //     $startTime.val().trim() !== '' &&
-            //     $endTime.val().trim() !== '' &&
-            //     $inputLocation.val().trim() !== '';
             return fields.every(id => {
                 const val = $(`#${id}`).val();
                 return val !== null && val.trim() !== '';

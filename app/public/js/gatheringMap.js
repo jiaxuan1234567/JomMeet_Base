@@ -96,32 +96,6 @@ function submitLocationForm(loc) {
     sessionStorage.setItem('locationId', loc.locationID);
     sessionStorage.setItem('inputLocation', loc.locationName);
     window.location.href = '/my-gathering/create';
-
-    // const query = new URLSearchParams(window.location.search);
-    // query.set('locationID', loc.locationID);
-    // query.set('locationName', loc.locationName);
-    // window.location.href = `/my-gathering/create?${query.toString()}`;
-
-    // const form = document.createElement('form');
-    // form.method = 'POST';
-    // form.action = '/my-gathering/create/location';
-
-    // const fields = {
-    //     locationID: loc.locationID,
-    //     locationName: loc.locationName,
-    //     ...Object.fromEntries(new URLSearchParams(window.location.search).entries())
-    // };
-
-    // for (const [key, val] of Object.entries(fields)) {
-    //     const input = document.createElement('input');
-    //     input.type = 'hidden';
-    //     input.name = key;
-    //     input.value = val;
-    //     form.appendChild(input);
-    // }
-
-    // document.body.appendChild(form);
-    // form.submit();
 }
 
 async function performSearch() {
