@@ -27,7 +27,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                             <i class="bi bi-plus" style="font-size: 1.25rem;"></i>
                         </span>
                         <span class="fw-bold me-1">Create</span>
-                                </a>
+                    </a>
                 </div>
             </div>
         </div>

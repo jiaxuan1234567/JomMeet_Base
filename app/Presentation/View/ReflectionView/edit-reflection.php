@@ -40,7 +40,7 @@ unset($_SESSION['old']); //user no need to redo
                     </div>
 
                     <section class="d-flex justify-content-center my-3">
-                        <button class="btn btn-primary rounded-pill" type="submit" style="width:300px;">Submit</button>
+                        <button class="btn btn-primary rounded-pill" type="submit" style="width:300px;" data-confirm-updateReflection>Submit</button>
                     </section>
                 </form>
             </div>
