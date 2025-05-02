@@ -1,6 +1,8 @@
 <?php
 $_title = 'Create Gathering';
 require_once __DIR__ . '/../HomeView/header.php';
+
+$asset = new FileHelper('asset');
 ?>
 
 <div class="container-fluid" id="mainContent">
@@ -20,23 +22,28 @@ require_once __DIR__ . '/../HomeView/header.php';
 
                 <!-- Image + Gathering Tag -->
                 <div class="col-12 text-center mb-4">
-                    <div class="position-relative d-inline-block" style="height: 120px;">
-                        <!-- Outer ring -->
-                        <div class="rounded-circle border border-dark position-absolute top-50 start-50 translate-middle"
-                            style="width: 120px; height: 120px;"></div>
+                    <!-- Outer ring wrapper -->
+                    <div class="position-relative d-inline-block" style="width: 130px; height: 130px;">
+                        <!-- Ring border -->
+                        <div class="rounded-circle border border-dark w-100 h-100 position-absolute top-0 start-0"></div>
+                        <button type="button"
+                            class="btn rounded-circle overflow-hidden p-0 border-0 position-absolute top-50 start-50 translate-middle"
+                            id="selectTagBtn"
+                            style="width: 120px; height: 120px;">
 
-                        <!-- Inner ring -->
-                        <div class="rounded-circle border-1 bg-info position-absolute top-50 start-50 translate-middle"
-                            style="width: 100px; height: 100px;">
-                            <div class="d-flex align-items-center justify-content-center h-100 w-100">
-                                <img src="https://cdn-icons-png.flaticon.com/512/1161/1161388.png"
-                                    alt="icon"
-                                    style="width: 60%; height: auto;">
+                            <!-- Tag Image -->
+                            <img src="<?= $asset->getFilePath('iconPNG') ?>"
+                                id="selectedTagImage"
+                                class="w-100 h-100 rounded-circle object-fit-cover">
+
+                            <!-- Overlay with icon -->
+                            <div class="edit-icon-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center rounded-circle bg-opacity-25">
+                                <i class="bi bi-pencil-square text-white display-4"></i>
                             </div>
-                        </div>
+                        </button>
                     </div>
-
-                    <h5 class="mt-3 fw-bold mb-0">Entertainment</h5>
+                    <h5 class="mt-3 fw-bold mb-0" id="selectedTagLabel">Select A Preference</h5>
+                    <input type="hidden" name="gatheringTag" id="gatheringTag">
                 </div>
 
                 <!-- Theme and Date -->
@@ -170,11 +177,69 @@ require_once __DIR__ . '/../HomeView/header.php';
     </div>
 
     <div id="selectLocationForm"></div>
+
+    <!-- Select Preference Modal -->
+    <div class="modal fade" id="tagSelectionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3 rounded-4 shadow-lg">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Select a Preference</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row-cols-3 g-4 justify-content-center">
+                        <?php
+                        $tags = [
+                            ['label' => 'Food', 'value' => 'food'],
+                            ['label' => 'Chill', 'value' => 'chill'],
+                            ['label' => 'Study', 'value' => 'study'],
+                            ['label' => 'Natural', 'value' => 'natural'],
+                            ['label' => 'Shopping', 'value' => 'shopping'],
+                            ['label' => 'Workout', 'value' => 'workout'],
+                            ['label' => 'Entertainment', 'value' => 'entertainment'],
+                            ['label' => 'Music', 'value' => 'music'],
+                            ['label' => 'Movie', 'value' => 'movie'],
+                        ];
+                        foreach ($tags as $tag): ?>
+                            <div class="col text-center tag-option px-2"
+                                data-value="<?= $tag['value'] ?>"
+                                data-label="<?= $tag['label'] ?>"
+                                data-image="<?= $asset->getFilePath($tag['value']) ?>"
+                                style="cursor: pointer;">
+                                <div class="position-relative mx-auto"
+                                    style="width: 80px; height: 80px;">
+                                    <img src="<?= $tag['image'] ?? $asset->getFilePath($tag['value']) ?>"
+                                        class="rounded-circle border border-2 border-secondary shadow-sm tag-image w-100 h-100"
+                                        style="object-fit: cover;">
+                                </div>
+                                <p class="small fw-semibold mt-2 mb-0"><?= $tag['label'] ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="/js/gatheringMap.js"></script>
 
 <script>
+    $('#selectTagBtn').on('click', function() {
+        $('#tagSelectionModal').modal('show');
+    });
+
+    $('.tag-option').on('click', function() {
+        const value = $(this).data('value');
+        const label = $(this).data('label');
+        const image = $(this).data('image');
+
+        $('#gatheringTag').val(value);
+        $('#selectedTagLabel').text(label);
+        $('#selectedTagImage').attr('src', image);
+        $('#tagSelectionModal').modal('hide');
+    });
+
     (function() {
         const $inputTheme = $('#inputTheme');
         const $inputDate = $('#inputDate');

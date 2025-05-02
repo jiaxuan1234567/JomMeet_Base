@@ -25,7 +25,7 @@ class FileHelper
             'Login' => "/Presentation/View/HomeView/login.php",
         ];
 
-    $profilePaths = [
+        $profilePaths = [
             'Profile' => "/Presentation/View/ProfileView/profile.php",
             'EditProfile' => "/Presentation/View/ProfileView/edit-profile.php",
             'CreateProfile' => "/Presentation/View/ProfileView/create-profile.php",
@@ -56,6 +56,15 @@ class FileHelper
             "match" => "/asset/Random.png",
             "dinner" => "/asset/dinnerpic.png",
             "map" => "/asset/map.png",
+            "food" => "/asset/eat.png",
+            "chill" => "/asset/chill.png",
+            "study" => "/asset/study.png",
+            "natural" => "/asset/natural.png",
+            "shopping" => "/asset/shopping.png",
+            "workout" => "/asset/gym.png",
+            "entertainment" => "/asset/game.png",
+            "music" => "/asset/music.png",
+            "movie" => "/asset/movie.png",
         ];
 
         switch ($this->permission) {

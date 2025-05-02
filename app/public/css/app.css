@@ -45,6 +45,14 @@ body {
 }
 
 /* Global Use */
+.bg-color {
+    background-color: #F5F5F7;
+}
+
+.text-bg-color {
+    color: #F5F5F7;
+}
+
 .bg-blue-color {
     background-color: #DEECFF;
 }
@@ -169,3 +177,28 @@ button.gathering-button {
     filter: invert(1);
     cursor: pointer;
 }
+
+.edit-icon-overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    background-color: rgba(86, 159, 255, 0.4);
+    pointer-events: none;
+}
+
+#selectTagBtn:hover .edit-icon-overlay {
+    opacity: 1;
+}
+
+.tag-option:hover .tag-image {
+    border-color: #569FFF;
+    transform: scale(1.05);
+    transition: 0.2s ease-in-out;
+}
+
+.tag-image {
+    transition: 0.2s ease-in-out;
+}
+
+/* ============================================================================
+// 
+// ==========================================================================*/
