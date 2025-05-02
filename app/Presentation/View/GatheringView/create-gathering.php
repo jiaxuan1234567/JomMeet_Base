@@ -147,11 +147,6 @@ $asset = new FileHelper('asset');
 
                             <input type="hidden" name="locationId" id="locationId" value="<?= htmlspecialchars($_GET['locationID'] ?? '') ?>">
 
-                            <!-- <button type="button"
-                                class="btn btn-primary button-blue-color text-white gathering-button"
-                                id="chooseLocationBtn">
-                                Choose
-                            </button> -->
                             <a href="/my-gathering/create/location"
                                 class="btn btn-primary button-blue-color text-white gathering-button"
                                 id="chooseLocationBtn">
@@ -304,29 +299,23 @@ $asset = new FileHelper('asset');
             return now.toTimeString().slice(0, 5);
         }
 
-        // ====== Create Button Enable/Disable Logic ======
-        function isFormFilled() {
-            return $inputTag.val().trim() !== '' &&
-                $inputTheme.val().trim() !== '' &&
-                $inputDate.val().trim() !== '' &&
-                $inputPax.val().trim() !== '' &&
-                $startTime.val().trim() !== '' &&
-                $endTime.val().trim() !== '' &&
-                $inputLocation.val().trim() !== '';
-        }
-
-        console.log('Filled check:', {
-            tag: $inputTag.val(),
-            theme: $inputTheme.val(),
-            date: $inputDate.val(),
-            pax: $inputPax.val(),
-            start: $startTime.val(),
-            end: $endTime.val(),
-            location: $inputLocation.val()
-        });
-
         const touched = new Set();
         const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation', 'locationId'];
+
+        // ====== Create Button Enable/Disable Logic ======
+        function isFormFilled() {
+            // return $inputTag.val().trim() !== '' &&
+            //     $inputTheme.val().trim() !== '' &&
+            //     $inputDate.val().trim() !== '' &&
+            //     $inputPax.val().trim() !== '' &&
+            //     $startTime.val().trim() !== '' &&
+            //     $endTime.val().trim() !== '' &&
+            //     $inputLocation.val().trim() !== '';
+            return fields.every(id => {
+                const val = $(`#${id}`).val();
+                return val !== null && val.trim() !== '';
+            });
+        }
 
         // Create Button State
         function toggleSubmitButton() {
@@ -337,8 +326,14 @@ $asset = new FileHelper('asset');
 
         // ====== Reset Button ======
         $('#createResetBtn').on('click', function() {
-            $('#inputTheme, #inputDate, #startTime, #endTime, #inputLocation, #locationId').val('');
-            $inputPax.val($inputPax.attr('min'));
+            fields.forEach(fieldId => {
+                if (fieldId === 'inputPax') {
+                    const min = parseInt($('#inputPax').attr('min'));
+                    $('#inputPax').val(min);
+                } else {
+                    $(`#${fieldId}`).val('');
+                }
+            });
             updateButtons();
             toggleSubmitButton();
             const cleanUrl = window.location.origin + window.location.pathname;
