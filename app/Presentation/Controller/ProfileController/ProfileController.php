@@ -94,6 +94,7 @@ class ProfileController
 
     public function editProfile()
     {
+        
         include $this->fileHelper->getFilePath('EditProfile');
     }
 }

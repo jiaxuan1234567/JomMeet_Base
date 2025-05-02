@@ -194,7 +194,7 @@ $(function(){
   function updNick(){
     var l = $nick.val().length;
     $nCnt.text(l+'/'+maxNick+' characters')
-         .css('color', l>maxNick?'#dc3545':'');
+         .css('color', l>maxNick?'#ff0000':'');
     if(l===0 || l>maxNick){
       $nick.addClass('is-invalid');
     } else {
@@ -204,7 +204,7 @@ $(function(){
   function updAbout(){
     var l = $about.val().length;
     $aCnt.text(l+'/'+maxAbout+' characters')
-         .css('color', l>maxAbout?'#dc3545':'');
+         .css('color', l>maxAbout?'#ff0000':'');
     if(l===0 || l>maxAbout){
       $about.addClass('is-invalid');
     } else {
