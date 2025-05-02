@@ -25,7 +25,7 @@ unset($_SESSION['old']); //user no need to redo
     <div class="container mb-5">
         <div class="container border border-2 rounded-3 m-2 align-content-center" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
             <div class="container d-flex align-item-center justify-content-center">
-            <form method="post" action="/reflection/edit/<?php echo $reflectionSelected['selfreflectID']; ?>" class="form">
+            <form method="post" action="/reflection/edit/<?php echo $reflectionSelected['selfreflectID']; ?>" class="form" id="selfReflectionForm">
                     <div class="my-3">
                         <h4><label for="date">Date</label></h4>
                         <input type="text" id="reflectionDate" name="reflectionDate" value="<?php echo $reflectionSelected['date'] ?? '' ?>" style="width:500px;" readonly>
@@ -33,12 +33,14 @@ unset($_SESSION['old']); //user no need to redo
                     
                     <div class="my-3">
                         <h4><label for="title">Title</label></h4>
-                        <input type="text" id="reflectionTitle" name="reflectionTitle" value="<?php echo $reflectionSelected['title'] ?? '' ?>" maxlength="255" style="width:500px;">
+                        <input type="text" id="reflectionTitle" name="reflectionTitle" value="<?php echo $reflectionSelected['title'] ?? '' ?>" style="width:500px;">
+                        <div class="invalid-reflection" id="errorReflectionTitle"></div>
                     </div>
 
                     <div class="my-3">
-                    <h4><label for="content">Content</label></h4>
+                        <h4><label for="content">Content</label></h4>
                         <textarea id="reflectionContent" name="reflectionContent" style="width:500px;height:200px;"><?php echo htmlspecialchars($reflectionSelected['content'] ?? ''); ?></textarea>
+                        <div class="invalid-reflection" id="errorReflectionContent"></div>
                     </div>
 
                     <section class="d-flex justify-content-center my-3">
@@ -50,4 +52,5 @@ unset($_SESSION['old']); //user no need to redo
     </div>
 </div>
 
+<script src="/js/selfReflection.js"></script>
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
