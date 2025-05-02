@@ -18,7 +18,7 @@ class HomeModel
 
     public function getAllReflections()
     {
-        $profileId = $_SESSION['profile_id'];
+        $profileId = $_SESSION['profile']['profileID'];
         return (new ReflectionModel())->getAllReflections($profileId);
     }
 
