@@ -135,6 +135,15 @@ class ProfileModel
     //     return $this->profileDAO->getProfileById($id);
     // }
 
+
+    public function fetchProfile(string $phone): array|false
+    {
+        return $this->profileDAO->getUserByPhoneNumber($phone);
+    }
+
+
+
+
     public function submitProfile(
         string $nickname,
         string $aboutMe,

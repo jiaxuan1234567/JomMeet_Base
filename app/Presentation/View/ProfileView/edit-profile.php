@@ -164,180 +164,179 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 
 <script>
   $(function() {
-    // Initial data from PHP session
-    var init = {
-      nickname: <?= json_encode($profile['nickname']   ?? '') ?>,
-      about_me: <?= json_encode($profile['aboutme']    ?? '') ?>,
-      mbti: <?= json_encode($selectedMBTI          ?? '') ?>,
-      hobbies: <?= json_encode($savedHobbies) ?>,
-      preferences: <?= json_encode($savedPrefs) ?>
-    };
-    var maxNick = 20,
-      maxAbout = 255;
+        // Initial data from PHP session
+        var init = {
+          nickname: <?= json_encode($profile['nickname']   ?? '') ?>,
+          about_me: <?= json_encode($profile['aboutme']    ?? '') ?>,
+          mbti: <?= json_encode($selectedMBTI          ?? '') ?>,
+          hobbies: <?= json_encode($savedHobbies) ?>,
+          preferences: <?= json_encode($savedPrefs) ?>
+        };
+        var maxNick = 20,
+          maxAbout = 255;
 
-    // Cache elements
-    var $nick = $('input[name=nickname]'),
-      $nCnt = $nick.siblings('.text-end'),
-      $about = $('textarea[name=about_me]'),
-      $aCnt = $about.siblings('.text-end'),
-      $mbti = $('select[name=mbti]'),
-      $hBtns = $('#hobbiesList .hobby-btn'),
-      $pBtns = $('#preferencesList .pref-btn'),
-      $hContainer = $('#hobbiesList'),
-      $pContainer = $('#preferencesList'),
-      $save = $('button[type=submit]'),
-      $cancel = $('button:contains("Cancel")'),
-      $form = $('#editProfileForm');
+        // Cache elements
+        var $nick = $('input[name=nickname]'),
+          $nCnt = $nick.siblings('.text-end'),
+          $about = $('textarea[name=about_me]'),
+          $aCnt = $about.siblings('.text-end'),
+          $mbti = $('select[name=mbti]'),
+          $hBtns = $('#hobbiesList .hobby-btn'),
+          $pBtns = $('#preferencesList .pref-btn'),
+          $hContainer = $('#hobbiesList'),
+          $pContainer = $('#preferencesList'),
+          $save = $('button[type=submit]'),
+          $cancel = $('button:contains("Cancel")'),
+          $form = $('#editProfileForm');
 
-    // Style toggle helper
-    function styleBtn($b, on) {
-      if (on) {
-        $b.addClass('active')
-          .css({
-            backgroundColor: '#569FFF',
-            borderColor: '#569FFF',
-            color: '#000'
+        // Style toggle helper
+        function styleBtn($b, on) {
+          if (on) {
+            $b.addClass('active')
+              .css({
+                backgroundColor: '#569FFF',
+                borderColor: '#569FFF',
+                color: '#000'
+              });
+          } else {
+            $b.removeClass('active')
+              .css({
+                backgroundColor: '#fff',
+                borderColor: '#dee2e6',
+                color: '#000'
+              });
+          }
+        }
+
+        // Initialize fields and counters
+        $nick.val(init.nickname);
+        $about.val(init.about_me);
+        $mbti.val(init.mbti);
+
+        function updNick() {
+          var l = $nick.val().length;
+          $nCnt.text(l + '/' + maxNick + ' characters')
+            .css('color', l > maxNick ? '#ff0000' : '');
+          if (l === 0 || l > maxNick) {
+            $nick.addClass('is-invalid');
+          } else {
+            $nick.removeClass('is-invalid');
+          }
+        }
+
+        function updAbout() {
+          var l = $about.val().length;
+          $aCnt.text(l + '/' + maxAbout + ' characters')
+            .css('color', l > maxAbout ? '#ff0000' : '');
+          if (l === 0 || l > maxAbout) {
+            $about.addClass('is-invalid');
+          } else {
+            $about.removeClass('is-invalid');
+          }
+          updNick();
+          updAbout();
+
+          // Init and style buttons
+          $hBtns.each(function() {
+            styleBtn($(this), init.hobbies.includes($(this).data('value')));
           });
-      } else {
-        $b.removeClass('active')
-          .css({
-            backgroundColor: '#fff',
-            borderColor: '#dee2e6',
-            color: '#000'
+          $pBtns.each(function() {
+            styleBtn($(this), init.preferences.includes($(this).data('value')));
           });
-      }
-    }
 
-    // Initialize fields and counters
-    $nick.val(init.nickname);
-    $about.val(init.about_me);
-    $mbti.val(init.mbti);
+          // Bind live events
+          $nick.on('input', function() {
+            updNick();
+            validateForm();
+          });
+          $about.on('input', function() {
+            updAbout();
+            validateForm();
+          });
+          $mbti.on('change', function() {
+            if ($mbti.val() === '') $mbti.addClass('is-invalid');
+            else $mbti.removeClass('is-invalid');
+            validateForm();
+          });
 
-    function updNick() {
-      var l = $nick.val().length;
-      $nCnt.text(l + '/' + maxNick + ' characters')
-        .css('color', l > maxNick ? '#dc3545' : '');
-      if (l === 0 || l > maxNick) {
-        $nick.addClass('is-invalid');
-      } else {
-        $nick.removeClass('is-invalid');
-      }
-    }
+          // Toggling on click
+          $hBtns.on('click', function() {
+            var $btn = $(this);
+            styleBtn($btn, !$btn.hasClass('active'));
+            validateHobbies();
+            validateForm();
+          });
+          $pBtns.on('click', function() {
+            var $btn = $(this);
+            styleBtn($btn, !$btn.hasClass('active'));
+            validatePrefs();
+            validateForm();
+          });
 
-    function updAbout() {
-      var l = $about.val().length;
-      $aCnt.text(l + '/' + maxAbout + ' characters')
-        .css('color', l > maxAbout ? '#dc3545' : '');
-      if (l === 0 || l > maxAbout) {
-        $about.addClass('is-invalid');
-      } else {
-        $about.removeClass('is-invalid');
-      }
-    }
-    updNick();
-    updAbout();
+          // Validation helper for hobbies & prefs
+          function validateHobbies() {
+            if ($hBtns.filter('.active').length === 0) {
+              $hContainer.addClass('border-danger');
+            } else {
+              $hContainer.removeClass('border-danger');
+            }
+          }
 
-    // Init and style buttons
-    $hBtns.each(function() {
-      styleBtn($(this), init.hobbies.includes($(this).data('value')));
-    });
-    $pBtns.each(function() {
-      styleBtn($(this), init.preferences.includes($(this).data('value')));
-    });
+          function validatePrefs() {
+            if ($pBtns.filter('.active').length === 0) {
+              $pContainer.addClass('border-danger');
+            } else {
+              $pContainer.removeClass('border-danger');
+            }
+          }
 
-    // Bind live events
-    $nick.on('input', function() {
-      updNick();
-      validateForm();
-    });
-    $about.on('input', function() {
-      updAbout();
-      validateForm();
-    });
-    $mbti.on('change', function() {
-      if ($mbti.val() === '') $mbti.addClass('is-invalid');
-      else $mbti.removeClass('is-invalid');
-      validateForm();
-    });
+          // Main form validation
+          function validateForm() {
+            var okN = $nick.val().length > 0 && $nick.val().length <= maxNick,
+              okA = $about.val().length > 0 && $about.val().length <= maxAbout,
+              okM = $mbti.val() !== '',
+              okH = $hBtns.filter('.active').length > 0,
+              okP = $pBtns.filter('.active').length > 0;
+            validateHobbies();
+            validatePrefs();
+            if (okN && okA && okM && okH && okP) {
+              $save.prop('disabled', false);
+            } else {
+              $save.prop('disabled', true);
+            }
+          }
+          validateForm();
 
-    // Toggling on click
-    $hBtns.on('click', function() {
-      var $btn = $(this);
-      styleBtn($btn, !$btn.hasClass('active'));
-      validateHobbies();
-      validateForm();
-    });
-    $pBtns.on('click', function() {
-      var $btn = $(this);
-      styleBtn($btn, !$btn.hasClass('active'));
-      validatePrefs();
-      validateForm();
-    });
+          // Cancel resets everything
+          $cancel.on('click', function() {
+            $nick.val(init.nickname);
+            updNick();
+            $about.val(init.about_me);
+            updAbout();
+            $mbti.val(init.mbti).removeClass('is-invalid');
+            $hBtns.each(function() {
+              styleBtn($(this), init.hobbies.includes($(this).data('value')));
+            });
+            $pBtns.each(function() {
+              styleBtn($(this), init.preferences.includes($(this).data('value')));
+            });
+            $hContainer.removeClass('border-danger');
+            $pContainer.removeClass('border-danger');
+            validateForm();
+          });
 
-    // Validation helper for hobbies & prefs
-    function validateHobbies() {
-      if ($hBtns.filter('.active').length === 0) {
-        $hContainer.addClass('border-danger');
-      } else {
-        $hContainer.removeClass('border-danger');
-      }
-    }
-
-    function validatePrefs() {
-      if ($pBtns.filter('.active').length === 0) {
-        $pContainer.addClass('border-danger');
-      } else {
-        $pContainer.removeClass('border-danger');
-      }
-    }
-
-    // Main form validation
-    function validateForm() {
-      var okN = $nick.val().length > 0 && $nick.val().length <= maxNick,
-        okA = $about.val().length > 0 && $about.val().length <= maxAbout,
-        okM = $mbti.val() !== '',
-        okH = $hBtns.filter('.active').length > 0,
-        okP = $pBtns.filter('.active').length > 0;
-      validateHobbies();
-      validatePrefs();
-      if (okN && okA && okM && okH && okP) {
-        $save.prop('disabled', false);
-      } else {
-        $save.prop('disabled', true);
-      }
-    }
-    validateForm();
-
-    // Cancel resets everything
-    $cancel.on('click', function() {
-      $nick.val(init.nickname);
-      updNick();
-      $about.val(init.about_me);
-      updAbout();
-      $mbti.val(init.mbti).removeClass('is-invalid');
-      $hBtns.each(function() {
-        styleBtn($(this), init.hobbies.includes($(this).data('value')));
-      });
-      $pBtns.each(function() {
-        styleBtn($(this), init.preferences.includes($(this).data('value')));
-      });
-      $hContainer.removeClass('border-danger');
-      $pContainer.removeClass('border-danger');
-      validateForm();
-    });
-
-    // Save with confirmation
-    $form.on('submit', function(e) {
-      e.preventDefault();
-      if ($save.prop('disabled')) return;
-      if (confirm('Are you sure you want to update your profile?')) {
-        // unbind to avoid infinite loop, then submit
-        $form.off('submit').submit();
-      } else {
-        alert('Profile update canceled.');
-      }
-    });
-  });
+          // Save with confirmation
+          $form.on('submit', function(e) {
+            e.preventDefault();
+            if ($save.prop('disabled')) return;
+            if (confirm('Are you sure you want to update your profile?')) {
+              // unbind to avoid infinite loop, then submit
+              $form.off('submit').submit();
+            } else {
+              alert('Profile update canceled.');
+            }
+          });
+        });
 </script>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
