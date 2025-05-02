@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 30, 2025 at 02:32 PM
+-- Generation Time: May 02, 2025 at 06:02 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -57,7 +57,7 @@ CREATE TABLE `gathering` (
   `endTime` time NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `status` enum('NEW','START','END','CANCELLED') NOT NULL DEFAULT 'NEW',
-  `preference` enum('ENTERTAINMENT','SPORTS','DINING','NATURE','HANGOUT','COFFEE','PICNIC','CHILL') NOT NULL,
+  `preference` enum('FOOD','CHILL','STUDY','NATURAL','SHOPPING','WORKOUT','ENTERTAINMENT','MUSIC','MOVIE') NOT NULL,
   `hostProfileID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -66,20 +66,27 @@ CREATE TABLE `gathering` (
 --
 
 INSERT INTO `gathering` (`gatheringID`, `locationID`, `theme`, `maxParticipant`, `minParticipant`, `currentParticipant`, `date`, `startTime`, `endTime`, `createdAt`, `status`, `preference`, `hostProfileID`) VALUES
-(1, 39, 'Movie', 5, 3, 3, '2025-05-25', '20:00:00', '00:00:00', '2025-04-30 06:39:06', 'NEW', 'ENTERTAINMENT', 1),
+(1, 39, 'Movie', 5, 3, 3, '2025-05-25', '20:00:00', '21:00:00', '2025-05-01 16:11:42', 'NEW', 'ENTERTAINMENT', 1),
 (3, 31, 'JomMovie', 5, 1, 1, '2025-05-25', '22:00:00', '00:00:00', '2025-04-29 16:14:50', 'NEW', 'ENTERTAINMENT', 2),
 (4, 3, 'JomMovie', 5, 1, 1, '2025-06-25', '13:13:33', '15:13:33', '2025-04-29 15:34:06', 'NEW', 'ENTERTAINMENT', 1),
 (5, 55, 'happy', 4, 3, 1, '2025-01-01', '16:00:00', '19:00:00', '2025-04-29 16:17:58', 'END', 'ENTERTAINMENT', 1),
-(6, 59, 'do assignment', 6, 3, 1, '2025-05-01', '15:00:00', '19:00:00', '2025-04-29 15:34:10', 'NEW', 'ENTERTAINMENT', 1),
-(12, 3, 'g1', 4, 3, 2, '2025-05-01', '01:37:00', '04:37:00', '2025-04-30 09:08:06', 'CANCELLED', 'ENTERTAINMENT', 3),
+(6, 59, 'do assignment', 6, 3, 1, '2025-05-01', '15:00:00', '19:00:00', '2025-05-01 11:10:11', 'END', 'ENTERTAINMENT', 1),
+(12, 3, 'g1', 4, 3, 2, '2025-05-01', '01:37:00', '04:37:00', '2025-05-01 10:46:00', 'END', 'ENTERTAINMENT', 3),
 (13, 59, 'library vibe', 5, 3, 2, '2025-05-03', '14:54:00', '18:58:00', '2025-04-30 09:11:45', 'CANCELLED', 'ENTERTAINMENT', 3),
 (14, 15, 'stay', 6, 3, 2, '2025-05-01', '17:30:00', '19:30:00', '2025-04-30 09:08:31', 'CANCELLED', 'ENTERTAINMENT', 3),
-(15, 6, 'happy', 3, 3, 2, '2025-04-30', '20:31:00', '23:31:00', '2025-04-30 09:14:02', 'CANCELLED', 'ENTERTAINMENT', 3),
-(16, 3, 'happy', 3, 3, 2, '2025-04-30', '17:32:00', '21:32:00', '2025-04-30 08:32:41', 'NEW', 'ENTERTAINMENT', 3),
-(17, 8, 'g1', 5, 3, 3, '2025-04-30', '16:37:00', '18:35:00', '2025-04-30 12:02:39', 'END', 'ENTERTAINMENT', 3),
-(18, 15, 'Test 1', 4, 3, 2, '2025-04-30', '18:43:00', '21:43:00', '2025-04-30 09:43:17', 'NEW', 'ENTERTAINMENT', 3),
+(15, 6, 'happy', 3, 3, 2, '2025-04-30', '20:31:00', '23:31:00', '2025-04-30 16:17:03', 'END', 'ENTERTAINMENT', 3),
+(16, 3, 'happy', 3, 3, 2, '2025-04-30', '17:32:00', '21:32:00', '2025-04-30 16:17:03', 'END', 'ENTERTAINMENT', 3),
+(17, 8, 'g1', 5, 3, 3, '2025-04-30', '16:37:00', '18:35:00', '2025-05-01 13:30:45', 'END', 'ENTERTAINMENT', 3),
+(18, 15, 'Test 1', 4, 3, 2, '2025-04-30', '18:43:00', '21:43:00', '2025-05-01 13:30:45', 'END', 'ENTERTAINMENT', 3),
 (19, 58, 'Test 1', 6, 3, 2, '2025-05-02', '18:45:00', '20:45:00', '2025-04-30 09:45:33', 'CANCELLED', 'ENTERTAINMENT', 3),
-(20, 59, 'look', 5, 3, 2, '2025-05-03', '18:59:00', '20:01:00', '2025-04-30 09:58:58', 'NEW', 'ENTERTAINMENT', 3);
+(20, 59, 'look', 5, 3, 2, '2025-05-03', '18:59:00', '20:01:00', '2025-05-02 05:43:27', 'CANCELLED', 'ENTERTAINMENT', 3),
+(21, 4, 'happy', 8, 3, 2, '2025-05-02', '13:15:00', '15:15:00', '2025-05-02 05:43:02', 'START', 'ENTERTAINMENT', 3),
+(22, 51, 'Happy', 4, 3, 2, '2025-05-01', '19:18:00', '20:18:00', '2025-05-01 13:25:15', 'END', 'ENTERTAINMENT', 3),
+(23, 44, 'abc', 6, 3, 0, '2025-05-03', '23:30:00', '23:59:00', '2025-05-02 05:52:45', 'CANCELLED', 'ENTERTAINMENT', 3),
+(24, 51, 'abv', 4, 3, 1, '2025-05-03', '20:58:00', '22:58:00', '2025-05-02 05:48:27', 'CANCELLED', 'ENTERTAINMENT', 3),
+(25, 7, 'q', 4, 3, 1, '2025-05-03', '04:10:00', '13:10:00', '2025-05-02 14:12:09', 'NEW', 'ENTERTAINMENT', 3),
+(26, 33, 'a', 4, 3, 1, '2025-05-03', '14:35:00', '16:35:00', '2025-05-02 14:37:43', 'NEW', 'ENTERTAINMENT', 3),
+(27, 23, 'Lets go eat a dinner', 8, 3, 1, '2025-05-03', '03:00:00', '04:00:00', '2025-05-02 15:08:26', 'NEW', 'FOOD', 3);
 
 -- --------------------------------------------------------
 
@@ -206,14 +213,17 @@ INSERT INTO `profilegathering` (`profileGatheringID`, `profileID`, `gatheringID`
 (45, 1, 6),
 (46, 3, 12),
 (47, 3, 13),
-(48, 3, 1),
 (49, 3, 14),
 (50, 3, 15),
 (51, 3, 16),
 (52, 3, 17),
 (53, 1, 17),
 (54, 3, 18),
-(56, 3, 20);
+(57, 3, 21),
+(58, 3, 22),
+(61, 3, 25),
+(62, 3, 26),
+(63, 3, 27);
 
 -- --------------------------------------------------------
 
@@ -222,7 +232,7 @@ INSERT INTO `profilegathering` (`profileGatheringID`, `profileID`, `gatheringID`
 --
 
 CREATE TABLE `profile_hobby` (
-  `hobby` enum('Basketball','Badminton','Hiking','Singing','Photography','Reading','Jogging','Camping','Traveling','Swimming','Yoga','Mediation','Drawing','Painting','Squash','Gym') NOT NULL,
+  `hobby` enum('Basketball','Badminton','Hiking','Singing','Photography','Reading','Jogging','Camping','Traveling','Swimming','Yoga','Meditation','Drawing','Painting','Squash','Gym') NOT NULL,
   `profileID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -231,15 +241,14 @@ CREATE TABLE `profile_hobby` (
 --
 
 INSERT INTO `profile_hobby` (`hobby`, `profileID`) VALUES
-('Badminton', 3),
 ('Badminton', 1),
+('Badminton', 3),
 ('Hiking', 1),
 ('Singing', 3),
 ('Yoga', 2),
-('Mediation', 3),
-('Gym', 3),
+('Drawing', 2),
 ('Painting', 2),
-('Drawing', 2);
+('Gym', 3);
 
 -- --------------------------------------------------------
 
@@ -259,10 +268,10 @@ CREATE TABLE `profile_preference` (
 INSERT INTO `profile_preference` (`preference`, `profileID`) VALUES
 ('Entertainment', 3),
 ('Dining', 3),
-('Nature', 3),
-('Coffee', 3),
 ('Nature', 2),
+('Nature', 3),
 ('Coffee', 2),
+('Coffee', 3),
 ('Chill', 1);
 
 -- --------------------------------------------------------
@@ -348,7 +357,14 @@ ALTER TABLE `profilegathering`
 -- Indexes for table `profile_hobby`
 --
 ALTER TABLE `profile_hobby`
+  ADD PRIMARY KEY (`hobby`,`profileID`),
   ADD KEY `profileID` (`profileID`);
+
+--
+-- Indexes for table `profile_preference`
+--
+ALTER TABLE `profile_preference`
+  ADD PRIMARY KEY (`preference`,`profileID`);
 
 --
 -- Indexes for table `reminder`
@@ -378,7 +394,7 @@ ALTER TABLE `feedback`
 -- AUTO_INCREMENT for table `gathering`
 --
 ALTER TABLE `gathering`
-  MODIFY `gatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `gatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `location`
@@ -396,7 +412,7 @@ ALTER TABLE `profile`
 -- AUTO_INCREMENT for table `profilegathering`
 --
 ALTER TABLE `profilegathering`
-  MODIFY `profileGatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `profileGatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `reminder`
