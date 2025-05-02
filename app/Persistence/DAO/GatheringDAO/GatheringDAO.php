@@ -267,7 +267,7 @@ class GatheringDAO
                 (p.profileID IS NOT NULL) AS isJoined
                 FROM `location` l
                 JOIN gathering g ON l.locationID = g.locationID
-                JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
+                LEFT JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
                 WHERE (g.hostProfileID = :pid) OR (p.profileID = :pid)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);

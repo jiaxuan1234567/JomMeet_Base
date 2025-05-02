@@ -225,6 +225,7 @@ $asset = new FileHelper('asset');
 <script src="/js/gatheringMap.js"></script>
 
 <script>
+    // Preference 
     $('#selectTagBtn').on('click', function() {
         $('#tagSelectionModal').modal('show');
     });
@@ -241,6 +242,7 @@ $asset = new FileHelper('asset');
     });
 
     (function() {
+        //const $selectedTagLabel = $('selectedTagLabel');
         const $inputTheme = $('#inputTheme');
         const $inputDate = $('#inputDate');
         const $inputPax = $('#inputPax');
