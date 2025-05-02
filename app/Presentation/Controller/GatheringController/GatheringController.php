@@ -68,22 +68,23 @@ class GatheringController
         require_once $this->fileHelper->getFilePath('SelectLocation');
     }
 
-    // POST: select-location
-    public function selectLocationSubmit()
-    {
-        $query = http_build_query([
-            'locationID' => $_POST['locationID'],
-            'locationName' => $_POST['locationName'],
-            'inputTheme' => $_POST['inputTheme'] ?? '',
-            'inputPax' => $_POST['inputPax'] ?? '',
-            'inputDate' => $_POST['inputDate'] ?? '',
-            'startTime' => $_POST['startTime'] ?? '',
-            'endTime' => $_POST['endTime'] ?? '',
-        ]);
+    // // POST: select-location
+    // public function selectLocationSubmit()
+    // {
+    //     $query = http_build_query([
+    //         'gatheringTag' => $_POST['gatheringTag'],
+    //         'locationID' => $_POST['locationID'],
+    //         'locationName' => $_POST['locationName'],
+    //         'inputTheme' => $_POST['inputTheme'] ?? '',
+    //         'inputPax' => $_POST['inputPax'] ?? '',
+    //         'inputDate' => $_POST['inputDate'] ?? '',
+    //         'startTime' => $_POST['startTime'] ?? '',
+    //         'endTime' => $_POST['endTime'] ?? '',
+    //     ]);
 
-        header("Location: /my-gathering/create?$query");
-        exit;
-    }
+    //     header("Location: /my-gathering/create?$query");
+    //     exit;
+    // }
 
     // POST: cancel-gathering
     public function cancelGathering($id)

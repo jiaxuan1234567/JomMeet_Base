@@ -93,26 +93,35 @@ async function showDetailPanel(loc, pos, liElem) {
 }
 
 function submitLocationForm(loc) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/my-gathering/create/location';
+    sessionStorage.setItem('locationId', loc.locationID);
+    sessionStorage.setItem('inputLocation', loc.locationName);
+    window.location.href = '/my-gathering/create';
 
-    const fields = {
-        locationID: loc.locationID,
-        locationName: loc.locationName,
-        ...Object.fromEntries(new URLSearchParams(window.location.search).entries())
-    };
+    // const query = new URLSearchParams(window.location.search);
+    // query.set('locationID', loc.locationID);
+    // query.set('locationName', loc.locationName);
+    // window.location.href = `/my-gathering/create?${query.toString()}`;
 
-    for (const [key, val] of Object.entries(fields)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = val;
-        form.appendChild(input);
-    }
+    // const form = document.createElement('form');
+    // form.method = 'POST';
+    // form.action = '/my-gathering/create/location';
 
-    document.body.appendChild(form);
-    form.submit();
+    // const fields = {
+    //     locationID: loc.locationID,
+    //     locationName: loc.locationName,
+    //     ...Object.fromEntries(new URLSearchParams(window.location.search).entries())
+    // };
+
+    // for (const [key, val] of Object.entries(fields)) {
+    //     const input = document.createElement('input');
+    //     input.type = 'hidden';
+    //     input.name = key;
+    //     input.value = val;
+    //     form.appendChild(input);
+    // }
+
+    // document.body.appendChild(form);
+    // form.submit();
 }
 
 async function performSearch() {
@@ -238,7 +247,6 @@ $(document).ready(function () {
         $('#vertBar').toggleClass('d-none', !hasText);
     });
 });
-
 
 
 /* ------------------------ use to add location ---------------------------------------- */

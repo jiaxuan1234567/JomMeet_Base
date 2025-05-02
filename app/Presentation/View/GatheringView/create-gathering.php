@@ -43,7 +43,7 @@ $asset = new FileHelper('asset');
                         </button>
                     </div>
                     <h5 class="mt-3 fw-bold mb-0" id="selectedTagLabel">Select A Preference</h5>
-                    <input type="hidden" name="gatheringTag" id="gatheringTag" value="">
+                    <input type="hidden" name="gatheringTag" id="gatheringTag" value="<?= htmlspecialchars($_GET['inputTag'] ?? '') ?>">
                 </div>
 
                 <!-- Theme and Date -->
@@ -145,13 +145,18 @@ $asset = new FileHelper('asset');
                                 readonly
                                 style="cursor: default;">
 
-                            <input type="hidden" name="locationId" value="<?= htmlspecialchars($_GET['locationID'] ?? '') ?>">
+                            <input type="hidden" name="locationId" id="locationId" value="<?= htmlspecialchars($_GET['locationID'] ?? '') ?>">
 
-                            <button type="button"
+                            <!-- <button type="button"
                                 class="btn btn-primary button-blue-color text-white gathering-button"
                                 id="chooseLocationBtn">
                                 Choose
-                            </button>
+                            </button> -->
+                            <a href="/my-gathering/create/location"
+                                class="btn btn-primary button-blue-color text-white gathering-button"
+                                id="chooseLocationBtn">
+                                Choose
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -242,18 +247,19 @@ $asset = new FileHelper('asset');
         const $increase = $('#increasePax');
         const $decrease = $('#decreasePax');
 
-        // ====== Choose Location Button ======
-        $('#chooseLocationBtn').on('click', function() {
-            const query = new URLSearchParams({
-                inputTheme: $inputTheme.val(),
-                inputPax: $inputPax.val(),
-                inputDate: $inputDate.val(),
-                startTime: $startTime.val(),
-                endTime: $endTime.val()
-            }).toString();
+        // // ====== Choose Location Button ======
+        // $('#chooseLocationBtn').on('click', function() {
+        //     const query = new URLSearchParams({
+        //         inputTag: $inputTag.val(),
+        //         inputTheme: $inputTheme.val(),
+        //         inputPax: $inputPax.val(),
+        //         inputDate: $inputDate.val(),
+        //         startTime: $startTime.val(),
+        //         endTime: $endTime.val()
+        //     }).toString();
 
-            window.location.href = `/my-gathering/create/location?${query}`;
-        });
+        //     window.location.href = `/my-gathering/create/location?${query}`;
+        // });
 
         // ====== Pax Button Adjustment ======
         function updateButtons() {
@@ -268,7 +274,7 @@ $asset = new FileHelper('asset');
             let current = parseInt($inputPax.val());
             const max = parseInt($inputPax.attr('max'));
             if (current < max) {
-                $inputPax.val(current + 1);
+                $inputPax.val(current + 1).trigger('input');
                 updateButtons();
                 toggleSubmitButton();
             }
@@ -278,7 +284,7 @@ $asset = new FileHelper('asset');
             let current = parseInt($inputPax.val());
             const min = parseInt($inputPax.attr('min'));
             if (current > min) {
-                $inputPax.val(current - 1);
+                $inputPax.val(current - 1).trigger('input');
                 updateButtons();
                 toggleSubmitButton();
             }
@@ -320,7 +326,7 @@ $asset = new FileHelper('asset');
         });
 
         const touched = new Set();
-        const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
+        const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation', 'locationId'];
 
         // Create Button State
         function toggleSubmitButton() {
@@ -331,7 +337,7 @@ $asset = new FileHelper('asset');
 
         // ====== Reset Button ======
         $('#createResetBtn').on('click', function() {
-            $('#inputTheme, #inputDate, #startTime, #endTime, #inputLocation, input[name="locationId"]').val('');
+            $('#inputTheme, #inputDate, #startTime, #endTime, #inputLocation, #locationId').val('');
             $inputPax.val($inputPax.attr('min'));
             updateButtons();
             toggleSubmitButton();
@@ -371,8 +377,16 @@ $asset = new FileHelper('asset');
             }, 'json');
         }
 
+        // Input Fields On Change
         fields.forEach(fieldId => {
+            const val = sessionStorage.getItem(fieldId);
+            if (val !== null) {
+                $(`#${fieldId}`).val(val).trigger('input');
+                if (fieldId === 'inputPax') updateButtons();
+            }
+
             $(`#${fieldId}`).on('input change', function() {
+                sessionStorage.setItem(fieldId, $(this).val());
                 touched.add(fieldId);
 
                 // when date changes, also force re-validate times
@@ -385,6 +399,11 @@ $asset = new FileHelper('asset');
             });
         });
 
+        // Form Submitted Clear Saved State
+        $('#createBtn').on('submit', function() {
+            formFields.forEach(id => sessionStorage.removeItem(id));
+        });
+
         function showValidationError(fieldId, message) {
             const $input = $(`#${fieldId}`);
             $input.addClass('is-invalid');
@@ -395,6 +414,19 @@ $asset = new FileHelper('asset');
             const $input = $(`#${fieldId}`);
             $input.removeClass('is-invalid');
             $(`#error-${fieldId}`).text('').hide();
+        }
+
+        const tagValue = $inputTag.val();
+        if (tagValue) {
+            // Match it with your PHP-rendered tag list
+            const $selectedOption = $(`.tag-option[data-value="${tagValue}"]`);
+            if ($selectedOption.length) {
+                const label = $selectedOption.data('label');
+                const image = $selectedOption.data('image');
+
+                $('#selectedTagLabel').text(label);
+                $('#selectedTagImage').attr('src', image);
+            }
         }
     })();
 </script>
