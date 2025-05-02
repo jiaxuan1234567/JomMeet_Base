@@ -4,29 +4,7 @@ require_once __DIR__ . '/../HomeView/header.php';
 // $userid = $_SESSION['profile_id'] ?? null;
 $profile = $_SESSION['profile'] ?? [];
 $selectedMBTI = $profile['mbti']    ?? '';
-// $types = [
-//     'INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP', 'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP'
-// ];
 $savedHobbies = $_SESSION['profile']['hobbies'] ?? [];
-// Your full list of hobby options
-// $hobbyOptions = [
-//   'Basketball',
-//   'Badminton',
-//   'Hiking',
-//   'Singing',
-//   'Photography',
-//   'Reading',
-//   'Jogging',
-//   'Camping',
-//   'Traveling',
-//   'Swimming',
-//   'Yoga',
-//   'Meditation',
-//   'Drawing',
-//   'Painting',
-//   'Squash',
-//   'Gym'
-// ];
 $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 ?>
 
@@ -91,7 +69,7 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
   <div class="row mb-4">
     <div class="col-md-10 offset-md-1">
       <label class="form-label fw-bold fs-5">About Me</label>
-      <textarea name="about_me" class="form-control" rows="4" maxlength="270" style="resize: none;" required><?php echo htmlspecialchars($profile['aboutme']) ?></textarea>
+      <textarea name="aboutme" class="form-control" rows="4" maxlength="270" style="resize: none;" required><?php echo htmlspecialchars($profile['aboutme']) ?></textarea>
       <div class="d-block text-end fs-6" style="color:#0C0C0D; opacity:40%;">0/255 characters</div>
     </div>
   </div>
@@ -125,18 +103,7 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
       <h6 class="fw-bold fs-5">Preference Gathering</h6>
       <div class="border rounded p-3 mb-4" id="preferencesList" style="display: grid;grid-template-columns: repeat(8, 1fr); gap: 1.5rem; background-color: #ffffff;">
 
-        <?php
-        $options = [
-          'Entertainment',
-          'Sports',
-          'Dining',
-          'Nature',
-          'Hangout',
-          'Coffee',
-          'Picnic',
-          'Chill'
-        ];
-        foreach ($options as $pref):
+        <?php foreach ($preferenceOptions as $pref):
           $active = in_array($pref, $savedPrefs, true);
           $btnCls = $active
             ? 'background-color: #569FFF; btn btn-primary text-dark w-100 fw-bold'
@@ -154,6 +121,9 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
     </div>
   </div>
 
+  <input type="hidden" name="hobbies"     id="hiddenHobbies">
+  <input type="hidden" name="preferences" id="hiddenPrefs">
+
   <!-- Form Buttons -->
   <div class="col-12 d-flex justify-content-center gap-3 mt-4 mb-5">
     <button type="button" class="btn py-2 px-4" style="border-color: #000000; color:#000000; background-color:#ffffff; width: 7%;">Cancel</button>
@@ -167,7 +137,7 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
         // Initial data from PHP session
         var init = {
           nickname: <?= json_encode($profile['nickname']   ?? '') ?>,
-          about_me: <?= json_encode($profile['aboutme']    ?? '') ?>,
+          aboutme: <?= json_encode($profile['aboutme']    ?? '') ?>,
           mbti: <?= json_encode($selectedMBTI          ?? '') ?>,
           hobbies: <?= json_encode($savedHobbies) ?>,
           preferences: <?= json_encode($savedPrefs) ?>
@@ -178,7 +148,7 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
         // Cache elements
         var $nick = $('input[name=nickname]'),
           $nCnt = $nick.siblings('.text-end'),
-          $about = $('textarea[name=about_me]'),
+          $about = $('textarea[name=aboutme]'),
           $aCnt = $about.siblings('.text-end'),
           $mbti = $('select[name=mbti]'),
           $hBtns = $('#hobbiesList .hobby-btn'),
@@ -210,7 +180,7 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 
         // Initialize fields and counters
         $nick.val(init.nickname);
-        $about.val(init.about_me);
+        $about.val(init.aboutme);
         $mbti.val(init.mbti);
 
         function updNick() {
@@ -233,9 +203,10 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
           } else {
             $about.removeClass('is-invalid');
           }
+        }
           updNick();
           updAbout();
-
+      
           // Init and style buttons
           $hBtns.each(function() {
             styleBtn($(this), init.hobbies.includes($(this).data('value')));
@@ -311,7 +282,7 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
           $cancel.on('click', function() {
             $nick.val(init.nickname);
             updNick();
-            $about.val(init.about_me);
+            $about.val(init.aboutme);
             updAbout();
             $mbti.val(init.mbti).removeClass('is-invalid');
             $hBtns.each(function() {
@@ -327,6 +298,12 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 
           // Save with confirmation
           $form.on('submit', function(e) {
+            $('#hiddenHobbies').val(
+    $hBtns.filter('.active').map((_,b)=>b.dataset.value).get().join(',')
+  );
+  $('#hiddenPrefs').val(
+    $pBtns.filter('.active').map((_,b)=>b.dataset.value).get().join(',')
+  );
             e.preventDefault();
             if ($save.prop('disabled')) return;
             if (confirm('Are you sure you want to update your profile?')) {

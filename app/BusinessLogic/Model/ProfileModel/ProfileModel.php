@@ -73,6 +73,19 @@ class ProfileModel
         ];
     }
 
+    public function getAllPreferences() {
+        return [
+            'Entertainment',
+            'Sports',
+            'Dining',
+            'Nature',
+            'Hangout',
+            'Coffee',
+            'Picnic',
+            'Chill'
+        ];
+    }
+
     public function validateLogin($phoneNumber, $password)
     {
         // $phoneNumber = $_POST['phoneNumber'];
@@ -136,10 +149,10 @@ class ProfileModel
     // }
 
 
-    public function fetchProfile(string $phone): array|false
-    {
-        return $this->profileDAO->getUserByPhoneNumber($phone);
-    }
+    // public function fetchProfile(string $phone): array|false
+    // {
+    //     return $this->profileDAO->getUserByPhoneNumber($phone);
+    // }
 
 
 
@@ -230,5 +243,187 @@ class ProfileModel
             'password'    => $_SESSION['profile']['password'] ?? null,
         ];
         return $this->profileDAO->submitProfile($data);
+    }
+
+    public function saveProfile(
+        int    $userId,
+        string $nickname,
+        string $aboutMe,
+        string $mbti,
+        array  $hobbies,
+        array  $preferences
+    ) {
+        
+        //Validation
+        $nickLen = mb_strlen($nickname);
+        if ($nickLen === 0) {
+            $errors['nickname'] = 'Nickname is required.';
+        } elseif ($nickLen > 20) {
+            $errors['nickname'] = 'Nickname must not exceed 20 characters.';
+        }
+
+        $aboutLen = mb_strlen($aboutMe);
+        if ($aboutLen === 0) {
+            $errors['aboutme'] = 'About Me is required.';
+        } elseif ($aboutLen > 255) {
+            $errors['aboutme'] = 'About Me must not exceed 255 characters.';
+        }
+
+        $validMbti = $this->getAllMbti();
+        if (trim($mbti) === '') {
+            $errors['mbti'] = 'Please select your MBTI.';
+        } elseif (!in_array($mbti, $validMbti, true)) {
+            $errors['mbti'] = 'Invalid MBTI selection.';
+        }
+
+        if (empty($hobbies)) {
+            $errors['hobbies'] = 'Select at least one hobby.';
+        }
+
+        if (empty($preferences)) {
+            $errors['preferences'] = 'Select at least one preference.';
+        }
+
+        // 3) If validation failed, stash errors + old input and bail
+        if (!empty($errors)) {
+            $_SESSION['profileErrors'] = $errors;
+            $_SESSION['oldProfile']    = [
+                'nickname'    => $nickname,
+                'aboutme'    => $aboutMe,
+                'mbti'        => $mbti,
+                'hobbies'     => $hobbies,
+                'preferences' => $preferences,
+            ];
+            header("Location: /profile/edit");
+            exit;
+        }
+
+        // 4) All good → update in DB
+        $data = [
+            'nickname'    => $nickname,
+            'aboutme'     => $aboutMe,
+            'mbti'        => $mbti,
+            'hobbies'     => $hobbies,
+            'preferences' => $preferences,
+        ];
+
+        return $this->profileDAO->saveProfile($userId, $data);
+    }
+
+    public function getUserByProfileID(int $userId): array
+    {
+        // Delegate to the DAO
+        $profile = $this->profileDAO->getUserByProfileID($userId);
+
+        // If the DAO returned false or empty, ensure we return an empty array
+        if (!is_array($profile) || empty($profile)) {
+            return [];
+        }
+
+        return $profile;
+    }
+
+    // public function validateProfile(string $field, $value): array
+    // {
+    //     switch ($field) {
+    //         case 'nickname':
+    //             $len = mb_strlen(trim((string)$value));
+    //             if ($len === 0) {
+    //                 return ['success'=>false, 'field'=>'nickname', 'message'=>'Nickname cannot be empty.'];
+    //             }
+    //             if ($len > 20) {
+    //                 return ['success'=>false, 'field'=>'nickname', 'message'=>'Nickname must be ≤20 characters.'];
+    //             }
+    //             break;
+
+    //         case 'aboutme':
+    //             $len = mb_strlen(trim((string)$value));
+    //             if ($len === 0) {
+    //                 return ['success'=>false, 'field'=>'aboutme', 'message'=>'About Me cannot be empty.'];
+    //             }
+    //             if ($len > 255) {
+    //                 return ['success'=>false, 'field'=>'aboutme', 'message'=>'About Me must be ≤255 characters.'];
+    //             }
+    //             break;
+
+    //         case 'mbti':
+    //             $valid = $this->getAllMbti();
+    //             if (trim((string)$value) === '' || !in_array($value, $valid, true)) {
+    //                 return ['success'=>false, 'field'=>'mbti', 'message'=>'Please select a valid MBTI.'];
+    //             }
+    //             break;
+
+    //         case 'hobbies':
+    //             // value arrives as CSV string
+    //             $arr = array_filter(array_map('trim', explode(',', (string)$value)));
+    //             if (count($arr) === 0) {
+    //                 return ['success'=>false, 'field'=>'hobbies', 'message'=>'Select at least one hobby.'];
+    //             }
+    //             break;
+
+    //         case 'preferences':
+    //             $arr = array_filter(array_map('trim', explode(',', (string)$value)));
+    //             if (count($arr) === 0) {
+    //                 return ['success'=>false, 'field'=>'preferences', 'message'=>'Select at least one preference.'];
+    //             }
+    //             break;
+
+    //         default:
+    //             return ['success'=>false, 'field'=>$field, 'message'=>'Unknown field.'];
+    //     }
+
+    //     return ['success'=>true];
+    // }
+
+    public function validateProfile(string $field, $value): array
+    {
+        switch ($field) {
+            case 'nickname':
+                $len = mb_strlen(trim((string)$value));
+                if ($len === 0) {
+                    return ['success'=>false,'field'=>'nickname','message'=>'Nickname cannot be empty.'];
+                }
+                if ($len > 20) {
+                    return ['success'=>false,'field'=>'nickname','message'=>'Nickname must be ≤20 chars.'];
+                }
+                break;
+
+            case 'aboutme':
+                $len = mb_strlen(trim((string)$value));
+                if ($len === 0) {
+                    return ['success'=>false,'field'=>'aboutme','message'=>'About Me cannot be empty.'];
+                }
+                if ($len > 255) {
+                    return ['success'=>false,'field'=>'aboutme','message'=>'About Me must be ≤255 chars.'];
+                }
+                break;
+
+            case 'mbti':
+                $valid = $this->getAllMbti();
+                if (!in_array((string)$value, $valid, true)) {
+                    return ['success'=>false,'field'=>'mbti','message'=>'Please select a valid MBTI.'];
+                }
+                break;
+
+            case 'hobbies':
+                // value is comma‐separated
+                $arr = array_filter(array_map('trim', explode(',', (string)$value)));
+                if (count($arr) === 0) {
+                    return ['success'=>false,'field'=>'hobbies','message'=>'Select at least one hobby.'];
+                }
+                break;
+
+            case 'preferences':
+                $arr = array_filter(array_map('trim', explode(',', (string)$value)));
+                if (count($arr) === 0) {
+                    return ['success'=>false,'field'=>'preferences','message'=>'Select at least one preference.'];
+                }
+                break;
+
+            default:
+                return ['success'=>false,'field'=>$field,'message'=>'Unknown field.'];
+        }
+
+        return ['success'=>true,'field'=>$field,'message'=>''];
     }
 }

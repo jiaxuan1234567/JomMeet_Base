@@ -28,9 +28,12 @@ class HomeController
     public function profileHome()
     {
         // $profile = (new HomeModel())->getProfileDetails();
-        $profile = $_SESSION['profile'];
+        $userId = (int) ($_SESSION['profile_id'] ?? 0);
+        $profile = (new HomeModel())->getUserProfileById($userId);
         // include $this->fileHelper->getFilePath('Profile');
+
         include $this->fileHelper->getFilePath('Profile');
+        error_log('[DEBUG] profileHome() called');
     }
 
     public function reflectionHome()
