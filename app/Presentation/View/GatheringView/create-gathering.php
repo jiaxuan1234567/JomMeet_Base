@@ -43,7 +43,7 @@ $asset = new FileHelper('asset');
                         </button>
                     </div>
                     <h5 class="mt-3 fw-bold mb-0" id="selectedTagLabel">Select A Preference</h5>
-                    <input type="hidden" name="gatheringTag" id="gatheringTag" value="<?= htmlspecialchars($_GET['inputTag'] ?? '') ?>">
+                    <input type="hidden" name="gatheringTag" id="gatheringTag">
                 </div>
 
                 <!-- Theme and Date -->
@@ -55,8 +55,7 @@ $asset = new FileHelper('asset');
                         <div class="gathering-input-wrapper position-relative">
                             <input type="text" id="inputTheme" name="inputTheme"
                                 class="form-control gathering-input w-100 text-start"
-                                placeholder="Enter Gathering Theme"
-                                value="<?= htmlspecialchars($_GET['inputTheme'] ?? '') ?>">
+                                placeholder="Enter Gathering Theme">
                         </div>
                     </div>
 
@@ -69,7 +68,7 @@ $asset = new FileHelper('asset');
                                 id="inputDate"
                                 name="inputDate"
                                 class="form-control gathering-input text-center"
-                                value="<?= htmlspecialchars($_GET['inputDate'] ?? $allowedDate) ?>"
+                                value="<?= htmlspecialchars($allowedDate) ?>"
                                 min="<?= $allowedDate ?>">
                             <button type="button" id="triggerDatePicker"
                                 class="btn btn-primary button-blue-color text-white gathering-button">
@@ -93,7 +92,7 @@ $asset = new FileHelper('asset');
                                 id="inputPax"
                                 name="inputPax"
                                 class="form-control gathering-input text-center"
-                                value="<?= htmlspecialchars($_GET['inputPax'] ?? $paxLimit['minPax']) ?>"
+                                value="<?= htmlspecialchars($paxLimit['minPax']) ?>"
                                 min="<?= $paxLimit['minPax'] ?>" max="<?= $paxLimit['maxPax'] ?>" readonly
                                 style="max-width: 60px;">
 
@@ -111,8 +110,7 @@ $asset = new FileHelper('asset');
                                 <input type="time"
                                     id="startTime"
                                     name="startTime"
-                                    class="form-control gathering-input text-center time-blue btn btn-primary"
-                                    value="<?= htmlspecialchars($_GET['startTime'] ?? '') ?>">
+                                    class="form-control gathering-input text-center time-blue btn btn-primary">
                             </div>
 
                             <span class="fw-bold d-flex align-items-center">to</span>
@@ -121,9 +119,7 @@ $asset = new FileHelper('asset');
                                 <input type="time"
                                     id="endTime"
                                     name="endTime"
-                                    class="form-control gathering-input text-center time-blue btn btn-primary"
-                                    value="<?= htmlspecialchars($_GET['endTime'] ?? '') ?>"
-                                    <?= isset($_GET['endTime']) ? 'data-persisted="true"' : '' ?>>
+                                    class="form-control gathering-input text-center time-blue btn btn-primary">
                             </div>
                         </div>
                     </div>
@@ -141,11 +137,10 @@ $asset = new FileHelper('asset');
                                 name="inputLocation"
                                 class="form-control gathering-input"
                                 placeholder="Select a location"
-                                value="<?= htmlspecialchars($_GET['locationName'] ?? '') ?>"
                                 readonly
                                 style="cursor: default;">
 
-                            <input type="hidden" name="locationId" id="locationId" value="<?= htmlspecialchars($_GET['locationID'] ?? '') ?>">
+                            <input type="hidden" name="locationId" id="locationId">
 
                             <a href="/my-gathering/create/location"
                                 class="btn btn-primary button-blue-color text-white gathering-button"
@@ -232,12 +227,12 @@ $asset = new FileHelper('asset');
 
     (function() {
         const $inputTag = $('#gatheringTag');
-        const $inputTheme = $('#inputTheme');
+        //const $inputTheme = $('#inputTheme');
         const $inputDate = $('#inputDate');
         const $inputPax = $('#inputPax');
-        const $startTime = $('#startTime');
-        const $endTime = $('#endTime');
-        const $inputLocation = $('#inputLocation');
+        //const $startTime = $('#startTime');
+        //const $endTime = $('#endTime');
+        //const $inputLocation = $('#inputLocation');
         const $createBtn = $('#createBtn');
         const $increase = $('#increasePax');
         const $decrease = $('#decreasePax');
@@ -320,30 +315,24 @@ $asset = new FileHelper('asset');
         });
 
         // ====== AJAX Field Validation with Native Popup ======
-        function validateField(fieldId) {
-            const $input = $(`#${fieldId}`);
-            const data = {
-                inputTheme: $inputTheme.val(),
-                inputDate: $inputDate.val(),
-                inputPax: $inputPax.val(),
-                startTime: $startTime.val(),
-                endTime: $endTime.val(),
-                inputLocation: $inputLocation.val(),
-                locationId: $('input[name="locationId"]').val(),
-                inputTag: $('#gatheringTag').val()
-            };
+        function validateFields(fieldIds) {
+            const data = {};
+            fields.forEach(id => {
+                data[id] = $(`#${id}`).val();
+            });
 
             console.log(data);
 
             $.post('/api/validate-gathering', data, function(response) {
                 const errors = response.errors || {};
 
-                // only update the fields the user has touched
-                touched.forEach(fieldId => {
-                    if (errors[fieldId]) {
-                        showValidationError(fieldId, errors[fieldId]);
+                fieldIds.forEach(id => {
+                    if (!touched.has(id)) return;
+
+                    if (errors[id]) {
+                        showValidationError(id, errors[id]);
                     } else {
-                        clearValidationError(fieldId);
+                        clearValidationError(id);
                     }
                 });
 
@@ -353,22 +342,33 @@ $asset = new FileHelper('asset');
 
         // Input Fields On Change
         fields.forEach(fieldId => {
+            const timeFields = ['inputDate', 'startTime', 'endTime'];
             const val = sessionStorage.getItem(fieldId);
             if (val !== null) {
                 $(`#${fieldId}`).val(val).trigger('input');
+                // ✅ Mark as touched
+                touched.add(fieldId);
+
+                // ✅ Validate field (especially for hidden errors)
+                if (timeFields.includes(fieldId)) {
+                    validateFields(timeFields);
+                } else {
+                    validateFields([fieldId]);
+                }
+
+                // ✅ Update UI buttons like Pax + submit
                 if (fieldId === 'inputPax') updateButtons();
             }
 
             $(`#${fieldId}`).on('input change', function() {
                 sessionStorage.setItem(fieldId, $(this).val());
-                touched.add(fieldId);
 
-                // when date changes, also force re-validate times
-                if (fieldId === 'inputDate') {
-                    touched.add('startTime');
+                if (timeFields.includes(fieldId)) {
+                    touched.add(fieldId);
+                    validateFields(timeFields);
+                } else {
+                    validateFields([fieldId]);
                 }
-
-                validateField(fieldId);
                 toggleSubmitButton();
             });
         });

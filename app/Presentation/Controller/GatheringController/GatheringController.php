@@ -43,7 +43,7 @@ class GatheringController
             'startTime'         => $_POST['startTime'] ?? '',
             'endTime'           => $_POST['endTime'] ?? '',
             'status'            => 'NEW',
-            'preference'        => $_POST['preference'] ?? 'ENTERTAINMENT',
+            'preference'        => $_POST['gatheringTag'] ?? '',
             'hostProfileID' => $_SESSION['profile']['profileID']
         ];
 

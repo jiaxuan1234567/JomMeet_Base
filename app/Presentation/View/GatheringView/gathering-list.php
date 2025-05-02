@@ -59,7 +59,7 @@ $userid = $_SESSION['profile']['profileID'];
                 <?php foreach ($gatherings as $gathering): ?>
                     <div class="col-md-6">
                         <div class="d-flex border rounded shadow-sm p-2 bg-white">
-                            <img src="<?= $asset->getFilePath('dinner') ?>" alt="Dinner" class="rounded" style="width: 120px; height: auto; object-fit: cover;">
+                            <img src="<?= $asset->getFilePath(strtolower($gathering['preference'])) ?>" alt="Dinner" class="rounded" style="width: 120px; height: auto; object-fit: cover;">
                             <div class="ms-3 d-flex flex-column justify-content-between flex-grow-1">
                                 <div>
                                     <strong><?php echo htmlspecialchars($gathering['theme']); ?></strong><br>

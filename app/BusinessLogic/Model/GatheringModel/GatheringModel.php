@@ -115,7 +115,9 @@ class GatheringModel
     public function getUserGatheringById($profileId, $gatheringId)
     {
         $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
-        if (!$gathering || !$this->gatheringDAO->isProfileInvolved($gatheringId, $profileId)) {
+        if (!$gathering) return false;
+
+        if (!$this->gatheringDAO->isProfileInvolved($gatheringId, $profileId) && !$this->gatheringDAO->isHostInvolved($gatheringId, $profileId)) {
             return false;
         }
         return $gathering;
@@ -257,6 +259,7 @@ class GatheringModel
                     'maxPax'       => (int)$g['maxParticipant'],
                     'venue'     => $g['venue'],
                     'status'    => strtolower($g['status']),
+                    'cover' => $this->fileHelper->getFilePath(strtolower($g['preference'])),
                     'isHost'    => (bool)$g['isHost'],
                     'isJoined'  => (bool)$g['isJoined'],
                 ];

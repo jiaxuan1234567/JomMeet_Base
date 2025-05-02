@@ -204,14 +204,12 @@ $asset = new FileHelper('asset');
             }
             var html = '';
             list.forEach(function(g) {
-
                 html += `
       <div class="col-6 mb-0 mt-4 pb-0">
         <div class="card border-0 rounded">
             <div class="row g-0 align-items-center">
                 <div class="col-4 text-center p-2">
-                <img src="/asset/${g.cover}" class="img-fluid" style="max-height:100px"
-                    onerror="this.src='https://cdn-icons-png.flaticon.com/512/1161/1161388.png'">
+                <img src="${g.cover}" class="img-fluid" style="max-height:100px">
                 </div>
                 <div class="col-8">
                     <div class="card-body py-2 px-3">

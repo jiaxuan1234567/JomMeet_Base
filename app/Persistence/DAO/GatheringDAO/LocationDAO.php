@@ -27,7 +27,7 @@ class LocationDAO
     try {
       $stmt = $this->db->prepare("SELECT * FROM `location` WHERE locationID = :id");
       $stmt->execute([':id' => $id]);
-      return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+      return $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
       error_log("LocationDAO Error: " . $e->getMessage());
       return null;
