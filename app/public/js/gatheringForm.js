@@ -1,4 +1,3 @@
-//$(() => {
 // ====== Preference ======
 $('#selectTagBtn').on('click', function () {
     $('#tagSelectionModal').modal('show');
@@ -106,28 +105,37 @@ $(function () {
 
     // ====== AJAX Field Validation with Native Popup ======
     function validateFields(fieldIds) {
-        const data = {};
+        const data = {
+            touchedFields: fieldIds
+        };
         fields.forEach(id => {
             data[id] = $(`#${id}`).val();
         });
 
         console.log(data);
+        console.log(data.touchedFields);
 
-        $.post('/api/validate-gathering', data, function (response) {
-            const errors = response.errors || {};
+        $.ajax({
+            url: '/api/validate-gathering',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                const errors = response.errors || {};
 
-            fieldIds.forEach(id => {
-                if (!touched.has(id)) return;
-
-                if (errors[id]) {
-                    showValidationError(id, errors[id]);
-                } else {
-                    clearValidationError(id);
-                }
-            });
-
-            toggleSubmitButton();
-        }, 'json');
+                touched.forEach(fieldId => {
+                    if (errors[fieldId]) {
+                        showValidationError(fieldId, errors[fieldId]);
+                    } else {
+                        clearValidationError(fieldId);
+                    }
+                });
+                toggleSubmitButton();
+            },
+            error: function (xhr) {
+                console.error('Validation failed:', xhr.responseText);
+            }
+        });
     }
 
     // Input Fields On Change
@@ -148,6 +156,7 @@ $(function () {
         }
 
         $(`#${fieldId}`).on('input change', function () {
+            touched.add(fieldId);
             sessionStorage.setItem(fieldId, $(this).val());
 
             if (timeFields.includes(fieldId)) {
@@ -179,7 +188,6 @@ $(function () {
 
     const tagValue = $inputTag.val();
     if (tagValue) {
-        // Match it with your PHP-rendered tag list
         const $selectedOption = $(`.tag-option[data-value="${tagValue}"]`);
         if ($selectedOption.length) {
             const label = $selectedOption.data('label');
@@ -190,4 +198,3 @@ $(function () {
         }
     }
 });
-//});

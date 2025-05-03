@@ -92,7 +92,13 @@ class GatheringController
     public function ajaxValidateGathering()
     {
         header('Content-Type: application/json');
-        $errors = $this->gatheringModel->validateGatheringFields($_POST);
+        $json = file_get_contents('php://input');
+        $post = json_decode($json, true);
+
+        $fields = $post['touchedFields'] ?? [];
+        $data = $post;
+
+        $errors = $this->gatheringModel->validateGatheringFields($data, $fields);
 
         echo json_encode(['errors' => $errors]);
     }

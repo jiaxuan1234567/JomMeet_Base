@@ -463,23 +463,17 @@ class GatheringModel
     }
 
     // validate
-    public function validateGatheringFields($post)
+    public function validateGatheringFields($data, $fields)
     {
         // 1) fetch persistence‐backed facts
+        $validTags = $this->getPreference();
         $locRow = $this->locationDAO->getLocationById($post['locationId'] ?? '');
         if ($locRow === false) $locRow = null;
         $joined = $this->gatheringDAO->getJoinedGatheringByUserId(
             $_SESSION['profile']['profileID'] ?? 0
         );
 
-        // $preference = $post['gatheringTag'] ?? '';
-        // if ($preference === '') {
-        //     return ['gatheringTag' => 'Choose a gathering preference'];
-        // } else if (in_array($preference, $this->getPreference())) {
-        //     return ['gatheringTag' => 'Invalid gathering preference'];
-        // }
-
         // 2) call pure helper
-        return $this->validatorService->validate($post, $locRow, $joined);
+        return $this->validatorService->validate($data, $validTags, $locRow, $joined, $fields);
     }
 }

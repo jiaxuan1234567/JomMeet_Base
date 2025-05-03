@@ -152,6 +152,7 @@ $asset = new FileHelper('asset');
                 </div>
 
                 <div class="col-12 text-start">
+                    <div class="text-danger small error-message" id="error-gatheringTag"></div>
                     <div class="text-danger small error-message" id="error-inputTheme"></div>
                     <div class="text-danger small error-message" id="error-inputDate"></div>
                     <div class="text-danger small error-message" id="error-inputPax"></div>
