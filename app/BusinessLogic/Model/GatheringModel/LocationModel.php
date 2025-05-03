@@ -7,7 +7,7 @@ use Exception;
 
 class LocationModel
 {
-    private LocationDAO $locationDAO;
+    private $locationDAO;
 
     public function __construct()
     {
@@ -27,5 +27,15 @@ class LocationModel
     public function getLocationById($id)
     {
         return $this->locationDAO->getLocationById($id);
+    }
+
+    public function searchLocations($query)
+    {
+        try {
+            return $this->locationDAO->searchLocations($query);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return false;
+        }
     }
 }

@@ -95,16 +95,15 @@ function storeInitialValues(fields) {
 }
 
 function isFormFilled(fields) {
-    return fields.every(id => {
-        const currentVal = $(`#${id}`).val()?.trim() || '';
-        const initialVal = initialValues[id]?.trim() || '';
-        return currentVal !== '' && currentVal !== initialVal;
-    });
-
     // return fields.every(id => {
-    //     const val = $(`#${id}`).val();
-    //     return val !== null && val.trim() !== '';
+    //     const currentVal = $(`#${id}`).val()?.trim() || '';
+    //     const initialVal = initialValues[id]?.trim() || '';
+    //     return currentVal !== '' && currentVal !== initialVal;
     // });
+    return fields.every(id => {
+        const val = $(`#${id}`).val();
+        return val !== null && val.trim() !== '';
+    });
 }
 
 // ====== Submit Button ======
@@ -112,13 +111,16 @@ const $submitBtn = $('#createBtn');
 
 function toggleSubmitButton(fields) {
     const hasError = fields.some(id => $(`#${id}`).hasClass('is-invalid'));
-    $submitBtn.prop('disabled', hasError || !isFormFilled(fields));
+    $('#createBtn').prop('disabled', hasError || !isFormFilled(fields));
 }
 
 function setupSubmitButton(fields) {
-    $submitBtn.on('submit', function () {
+    $('#createGatheringFormEl').on('submit', function () {
         fields.forEach(id => sessionStorage.removeItem(id));
     });
+    // $submitBtn.on('submit', function () {
+    //     fields.forEach(id => sessionStorage.removeItem(id));
+    // });
 }
 
 
@@ -152,37 +154,37 @@ function setupResetButton(fields) {
 }
 
 // ====== AJAX Field Validation with Native Popup ======
-function validateFields(fieldIds, allFields, touched) {
-    const data = {
-        touchedFields: fieldIds
-    };
-    allFields.forEach(id => {
-        data[id] = $(`#${id}`).val();
-    });
+// function validateFields(fieldIds, allFields, touched, urlEndpoint) {
+//     const data = {
+//         touchedFields: fieldIds
+//     };
+//     allFields.forEach(id => {
+//         data[id] = $(`#${id}`).val();
+//     });
 
-    console.log(data);
-    console.log(data.touchedFields);
+//     console.log(data);
+//     console.log(data.touchedFields);
 
-    $.ajax({
-        url: '/api/validate-gathering',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: function (response) {
-            const errors = response.errors || {};
+//     $.ajax({
+//         url: urlEndpoint,
+//         method: 'POST',
+//         contentType: 'application/json',
+//         data: JSON.stringify(data),
+//         success: function (response) {
+//             const errors = response.errors || {};
 
-            touched.forEach(fieldId => {
-                if (errors[fieldId]) {
-                    showValidationError(fieldId, errors[fieldId]);
-                } else {
-                    clearValidationError(fieldId);
-                }
-            });
-            toggleSubmitButton(allFields);
-        },
-        error: function (xhr) {
-            console.error('Validation failed:', xhr.responseText);
-        }
-    });
-}
+//             touched.forEach(fieldId => {
+//                 if (errors[fieldId]) {
+//                     showValidationError(fieldId, errors[fieldId]);
+//                 } else {
+//                     clearValidationError(fieldId);
+//                 }
+//             });
+//             toggleSubmitButton(allFields);
+//         },
+//         error: function (xhr) {
+//             console.error('Validation failed:', xhr.responseText);
+//         }
+//     });
+// }
 // });

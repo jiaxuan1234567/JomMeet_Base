@@ -33,4 +33,15 @@ class LocationDAO
       return null;
     }
   }
+
+  public function searchLocations($query)
+  {
+    $stmt = $this->db->prepare("
+      SELECT * FROM `location`
+      WHERE locationName LIKE :query OR address LIKE :query
+      ORDER BY locationName
+  ");
+    $stmt->execute([':query' => '%' . $query . '%']);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 }

@@ -98,7 +98,7 @@ class GatheringController
     public function viewSelectLocation()
     {
         $redirectUrl = $_GET['redirect'] ?? '/my-gathering/create';
-        require_once $this->fileHelper->getFilePath('SelectLocation');
+        include $this->fileHelper->getFilePath('SelectLocation');
     }
 
     // POST: cancel-gathering
@@ -121,7 +121,7 @@ class GatheringController
         exit;
     }
 
-    // AJAX Validation: Gathering Fields
+    // AJAX Validation: CREATE Gathering Fields
     public function ajaxValidateGathering()
     {
         header('Content-Type: application/json');
@@ -132,6 +132,22 @@ class GatheringController
         $data = $post;
 
         $errors = $this->gatheringModel->validateGatheringFields($data, $fields);
+
+        echo json_encode(['errors' => $errors]);
+    }
+
+    // AJAX Validation: EDIT Gathering Fields
+    public function ajaxValidateEditGathering()
+    {
+        header('Content-Type: application/json');
+        $json = file_get_contents('php://input');
+        $post = json_decode($json, true);
+
+        $fields = $post['touchedFields'] ?? [];
+        $gatheringId = $post['gatheringId'] ?? null;
+        $data = $post;
+
+        $errors = $this->gatheringModel->validateGatheringFields($data, $fields, $gatheringId);
 
         echo json_encode(['errors' => $errors]);
     }
@@ -190,6 +206,17 @@ class GatheringController
         echo json_encode((new LocationModel())->getAllLocations());
     }
 
+    public function ajaxSearchLocation()
+    {
+        header('Content-Type: application/json');
+
+        $query = $_GET['q'] ?? '';
+        $model = new LocationModel();
+        $results = (new LocationModel())->searchLocations($query);
+
+        echo json_encode($results);
+    }
+
     // -- Join Gathering --
     public function joinGathering()
     {
@@ -211,20 +238,20 @@ class GatheringController
         }
     }
 
-    public function verifyUserInGathering($userID, $gatheringID)
-    {
-        return $this->gatheringModel->verifyUserInGathering($userID, $gatheringID);
-    }
+    // public function verifyUserInGathering($userID, $gatheringID)
+    // {
+    //     return $this->gatheringModel->verifyUserInGathering($userID, $gatheringID);
+    // }
 
-    public function isBeforeStartTime($gatheringID)
-    {
-        try {
-            return $this->gatheringModel->isBeforeStartTime($gatheringID);
-        } catch (Exception $e) {
-            error_log("Error in isBeforeStartTime: " . $e->getMessage());
-            return false;
-        }
-    }
+    // public function isBeforeStartTime($gatheringID)
+    // {
+    //     try {
+    //         return $this->gatheringModel->isBeforeStartTime($gatheringID);
+    //     } catch (Exception $e) {
+    //         error_log("Error in isBeforeStartTime: " . $e->getMessage());
+    //         return false;
+    //     }
+    // }
 
     public function listGatherings()
     {
@@ -265,15 +292,15 @@ class GatheringController
         }
     }
 
-    public function isNewGatheringConflicting($userID, $gatheringID)
-    {
-        try {
-            return $this->gatheringModel->isNewGatheringConflicting($userID, $gatheringID);
-        } catch (Exception $e) {
-            error_log("Error in isNewGatheringConflicting: " . $e->getMessage());
-            return false;
-        }
-    }
+    // public function isNewGatheringConflicting($userID, $gatheringID)
+    // {
+    //     try {
+    //         return $this->gatheringModel->isNewGatheringConflicting($userID, $gatheringID);
+    //     } catch (Exception $e) {
+    //         error_log("Error in isNewGatheringConflicting: " . $e->getMessage());
+    //         return false;
+    //     }
+    // }
 
     public function matchGathering($userid)
     {

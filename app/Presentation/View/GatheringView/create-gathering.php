@@ -110,6 +110,7 @@ $asset = new FileHelper('asset');
                                 <input type="time"
                                     id="startTime"
                                     name="startTime"
+                                    step="60"
                                     class="form-control gathering-input text-center time-blue btn btn-primary">
                             </div>
 
@@ -119,6 +120,7 @@ $asset = new FileHelper('asset');
                                 <input type="time"
                                     id="endTime"
                                     name="endTime"
+                                    step="60"
                                     class="form-control gathering-input text-center time-blue btn btn-primary">
                             </div>
                         </div>

@@ -6,48 +6,8 @@ use DateTime;
 
 class GatheringValidationService
 {
-    public function validate(array $form, array $validTags, ?array $locationRow, array $joinedRows, array $onlyFields = []): array
+    public function validate(array $form, array $validTags, ?array $locationRow, array $joinedRows, array $onlyFields = [], ?int $editingId = null): array
     {
-        // $errors = [];
-
-        // // 1. Theme
-        // $errors = $this->validateTheme(trim($form['inputTheme'] ?? ''), $errors);
-
-        // // 2. Pax
-        // $errors = $this->validatePax((int)($form['inputPax'] ?? 0), $errors);
-
-        // // 3. Location
-        // $errors = $this->validateLocation(
-        //     $form['locationId']    ?? '',
-        //     trim($form['inputLocation'] ?? ''),
-        //     $locationRow,
-        //     $errors
-        // );
-
-        // // 4. Date
-        // $date  = $form['inputDate'] ?? '';
-        // $errors = $this->validateDate($date, $errors);
-
-        // // 5. Time presence
-        // $start = $form['startTime'] ?? '';
-        // $end   = $form['endTime']   ?? '';
-        // $errors = $this->validateTime($start, $end, $errors);
-
-        // // NEW: Enforce start buffer as soon as we have a valid date and startTime
-        // if (empty($errors['inputDate']) && empty($errors['startTime']) && $start !== '') {
-        //     $errors = $this->validateStartTimeBuffer($date, $start, $errors);
-        // }
-
-        // // 6. Date+Time logic, only if date & time fields passed
-        // if (empty($errors['inputDate']) && empty($errors['startTime']) && empty($errors['endTime'])) {
-        //     $errors = $this->validateDateTime($date, $start, $end, $errors);
-        // }
-
-        // // 7. Overlap check always re-runs (clearing stale errors)
-        // $errors = $this->validateOverlap($date, $start, $joinedRows, $errors);
-
-        // return $errors;
-
         $errors = [];
 
         // 1. Theme
@@ -101,7 +61,7 @@ class GatheringValidationService
         }
 
         // 9. Overlap always runs
-        $errors = $this->validateOverlap($date, $start, $joinedRows, $errors);
+        $errors = $this->validateOverlap($date, $start, $joinedRows, $errors, $editingId);
 
         return $errors;
     }
@@ -207,11 +167,8 @@ class GatheringValidationService
         return $e;
     }
 
-    private function validateOverlap(string $date, string $start, array $joined, array $e): array
+    private function validateOverlap(string $date, string $start, array $joined, array $e, ?int $editingId = null): array
     {
-        // clear any old overlap error
-        //unset($e['startTime']);
-
         if ($date === '' || $start === '' || !$joined) {
             return $e;
         }
@@ -222,6 +179,10 @@ class GatheringValidationService
         }
 
         foreach ($joined as $g) {
+            if ($editingId && $g['gatheringID'] == $editingId) {
+                continue;
+            }
+
             if (in_array(strtoupper($g['status']), ['END', 'CANCELLED'], true)) {
                 continue;
             }

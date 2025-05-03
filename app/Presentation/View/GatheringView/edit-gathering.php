@@ -111,6 +111,7 @@ $asset = new FileHelper('asset');
                                 <input type="time"
                                     id="startTime"
                                     name="startTime"
+                                    step="60"
                                     class="form-control gathering-input text-center time-blue btn btn-primary"
                                     value="<?= htmlspecialchars($gathering['startTime']) ?>">
                             </div>
@@ -121,6 +122,7 @@ $asset = new FileHelper('asset');
                                 <input type="time"
                                     id="endTime"
                                     name="endTime"
+                                    step="60"
                                     class="form-control gathering-input text-center time-blue btn btn-primary"
                                     value="<?= htmlspecialchars($gathering['endTime']) ?>">
                             </div>
@@ -166,7 +168,7 @@ $asset = new FileHelper('asset');
                     </button>
                     <button type="submit" class="btn btn-primary py-2 px-4 button-blue-color border-0" id="createBtn">Update</button>
                 </div>
-
+                <input type="hidden" name="gatheringId" id="gatheringId" value="<?= $gathering['gatheringID'] ?>">
             </form>
         </div>
     </div>

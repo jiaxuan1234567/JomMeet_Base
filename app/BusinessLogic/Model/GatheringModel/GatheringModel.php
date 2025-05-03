@@ -340,32 +340,6 @@ class GatheringModel
         }
     }
 
-    // Helper Function
-    private function determineActions($status, $isHost, $isJoined)
-    {
-        if ($status === 'cancelled') {
-            return [];
-        }
-
-        if ($status === 'new') {
-            return $isHost
-                ? ['send reminder', 'edit gathering', 'cancel gathering']
-                : ['reply reminder', 'leave gathering'];
-        }
-
-        if ($status === 'start') {
-            return $isHost
-                ? ['send reminder', 'reply reminder']
-                : ['reply reminder'];
-        }
-
-        if ($status === 'end') {
-            return ['gathering feedback', 'location feedback'];
-        }
-
-        return [];
-    }
-
     // Create Gathering
     public function createGathering($data)
     {
@@ -542,6 +516,20 @@ class GatheringModel
             return [];
         }
     }
+    // validate Gathering Fields
+    public function validateGatheringFields($data, $fields, $editingId = null)
+    {
+        // 1) fetch persistence‐backed facts
+        $validTags = $this->getPreference();
+        $locRow = $this->locationDAO->getLocationById($post['locationId'] ?? '');
+        if ($locRow === false) $locRow = null;
+        $joined = $this->gatheringDAO->getJoinedGatheringByUserId(
+            $_SESSION['profile']['profileID'] ?? 0
+        );
+
+        // 2) call pure helper
+        return $this->validatorService->validate($data, $validTags, $locRow, $joined, $fields, $editingId);
+    }
 
     // Status Service (run job)
     public function checkAndTransitionGatherings()
@@ -563,18 +551,29 @@ class GatheringModel
         return $updated;
     }
 
-    // validate
-    public function validateGatheringFields($data, $fields)
+    // Helper Function
+    private function determineActions($status, $isHost, $isJoined)
     {
-        // 1) fetch persistence‐backed facts
-        $validTags = $this->getPreference();
-        $locRow = $this->locationDAO->getLocationById($post['locationId'] ?? '');
-        if ($locRow === false) $locRow = null;
-        $joined = $this->gatheringDAO->getJoinedGatheringByUserId(
-            $_SESSION['profile']['profileID'] ?? 0
-        );
+        if ($status === 'cancelled') {
+            return [];
+        }
 
-        // 2) call pure helper
-        return $this->validatorService->validate($data, $validTags, $locRow, $joined, $fields);
+        if ($status === 'new') {
+            return $isHost
+                ? ['send reminder', 'edit gathering', 'cancel gathering']
+                : ['reply reminder', 'leave gathering'];
+        }
+
+        if ($status === 'start') {
+            return $isHost
+                ? ['send reminder', 'reply reminder']
+                : ['reply reminder'];
+        }
+
+        if ($status === 'end') {
+            return ['gathering feedback', 'location feedback'];
+        }
+
+        return [];
     }
 }
