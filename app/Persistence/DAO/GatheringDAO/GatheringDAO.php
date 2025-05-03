@@ -233,21 +233,44 @@ class GatheringDAO
         return $stmt->fetchColumn() > 0;
     }
 
+    // public function hasTimeConflict($profileId, $startTime)
+    // {
+    //     $stmt = $this->db->prepare("
+    //         SELECT g.* FROM gathering g
+    //         JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
+    //         WHERE pg.profileID = :pid
+    //         AND g.status = 'ACTIVE'
+    //         AND CONCAT(g.date, ' ', g.startTime) = :start
+    //     ");
+    //     $stmt->execute([
+    //         ':pid' => $profileId,
+    //         ':start' => $startTime->format('Y-m-d H:i:s')
+    //     ]);
+    //     return $stmt->rowCount() > 0;
+    // }
+
     public function hasTimeConflict($profileId, $startTime)
-    {
-        $stmt = $this->db->prepare("
-            SELECT g.* FROM gathering g
-            JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
-            WHERE pg.profileID = :pid
-            AND g.status = 'ACTIVE'
-            AND CONCAT(g.date, ' ', g.startTime) = :start
-        ");
-        $stmt->execute([
-            ':pid' => $profileId,
-            ':start' => $startTime->format('Y-m-d H:i:s')
-        ]);
-        return $stmt->rowCount() > 0;
-    }
+{
+    $formatted = $startTime->format('Y-m-d H:i:s');
+    error_log("[hasTimeConflict] Checking time conflict for profile $profileId at $formatted");
+
+    $stmt = $this->db->prepare("
+        SELECT g.* FROM gathering g
+        JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
+        WHERE pg.profileID = :pid
+        AND g.status = 'NEW'
+        AND CONCAT(g.date, ' ', g.startTime) = :start
+    ");
+    $stmt->execute([
+        ':pid' => $profileId,
+        ':start' => $formatted
+    ]);
+    $conflict = $stmt->rowCount() > 0;
+
+    error_log("[hasTimeConflict] Conflict found: " . ($conflict ? "YES" : "NO"));
+
+    return $conflict;
+}
 
 
     // my-gathering

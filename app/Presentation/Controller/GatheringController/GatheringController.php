@@ -268,6 +268,17 @@ class GatheringController
         }
     }
 
+
+    public function getPublicGatheringById($userID, $gatheringID)
+    {
+        try {
+            return $this->gatheringModel->getPublicGatheringById($userID, $gatheringID);
+        } catch (Exception $e) {
+            error_log("Error in getPublicGatheringById: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function searchGatherings()
     {
         try {
@@ -277,13 +288,32 @@ class GatheringController
             if ($searchTerm === '' || $searchTerm === null) {
                 $gatherings = $this->listGatherings($userID);
                 header("Location: /gathering");
-                // return include $this->fileHelper->getFilePath('GatheringList');
+                return;
+            }
+
+            $searchResults = $this->gatheringModel->searchGatherings($searchTerm);
+
+            if (!$searchResults) {
+                error_log("[GatheringController] Search returned no results for term: '" . $searchTerm . "', showing all gatherings");
+                $gatherings = $this->listGatherings($userID);
+                header("Location: /gathering");
             } else {
-                $gatherings = $this->gatheringModel->searchGatherings($searchTerm);
-                if (!$gatherings) {
-                    error_log("[GatheringController] Search returned no results for term: '" . $searchTerm . "', showing all gatherings");
-                    $gatherings = $this->listGatherings($userID);
+                $filteredGatherings = [];
+
+                foreach ($searchResults as $gathering) {
+                    $gatheringID = $gathering['gatheringID'];
+
+                    // Delegate condition filtering to getPublicGatheringById
+                    $validGathering = $this->getPublicGatheringById($userID, $gatheringID);
+
+                    if (!empty($validGathering)) {
+                        $filteredGatherings[] = $validGathering;
+                    } else {
+                        error_log("[searchGatherings] Skipping gathering $gatheringID: not eligible (joined, private, or time conflict)");
+                    }
                 }
+
+                $gatherings = $filteredGatherings;
             }
 
             return include $this->fileHelper->getFilePath('GatheringList');
@@ -292,6 +322,8 @@ class GatheringController
             return [];
         }
     }
+
+
 
     // public function isNewGatheringConflicting($userID, $gatheringID)
     // {

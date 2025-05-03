@@ -84,34 +84,83 @@ class GatheringModel
     // get getAvailableGatherings
     public function getAvailableGatherings($profileId)
     {
-        return $this->gatheringDAO->getAvailableGatherings($profileId);
+        $allGatherings = $this->gatheringDAO->getAvailableGatherings($profileId);
+        if (!$allGatherings) {
+            error_log("[getAvailableGatherings] DAO returned false or empty");
+            return [];
+        }
+
+        $validGatherings = [];
+        foreach ($allGatherings as $gathering) {
+            $valid = $this->getPublicGatheringById($profileId, $gathering['gatheringID']);
+            if ($valid) {
+                $validGatherings[] = $valid;
+            } else {
+                error_log("[getAvailableGatherings] Skipping gathering {$gathering['gatheringID']}: not eligible.");
+            }
+        }
+
+        return $validGatherings;
     }
+
 
     // replace getAvailableGatherings
     public function getPublicGatheringById($profileId, $gatheringId)
     {
         $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
-        if (!$gathering) return false;
+        if (!$gathering) {
+            error_log("[getPublicGatheringById] Gathering ID $gatheringId not found.");
+            return false;
+        }
 
         // 1. Must be ACTIVE
-        if ($gathering['status'] !== 'NEW') return false;
+        if ($gathering['status'] !== 'NEW') {
+            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: status is '{$gathering['status']}', not 'NEW'.");
+            return false;
+        }
 
         // 2. Not hosted by user
-        if ($gathering['hostProfileID'] == $profileId) return false;
+        if ($gathering['hostProfileID'] == $profileId) {
+            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: hosted by profile ID $profileId.");
+            return false;
+        }
 
         // 3. No.Pax not full
-        if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) return false;
+        if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
+            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: max participants reached ({$gathering['currentParticipant']}/{$gathering['maxParticipant']}).");
+            return false;
+        }
 
         // 4. Not joined already
-        if ($this->gatheringDAO->isUserJoined($gatheringId, $profileId)) return false;
+        if ($this->gatheringDAO->isUserJoined($gatheringId, $profileId)) {
+            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: user $profileId already joined.");
+            return false;
+        }
 
         // 5. Not started
         $now = new DateTime();
         $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
-        if ($startTime <= $now) return false;
+        if ($startTime <= $now) {
+            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
+            return false;
+        }
+
+        // 5. Not started
+        $now = new DateTime();
+        $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+        if ($startTime <= $now) {
+            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
+            return false;
+        }
+
 
         // 6. Not clashing with user’s active joined gatherings
-        if ($this->gatheringDAO->hasTimeConflict($profileId, $startTime)) return false;
+        if ($this->gatheringDAO->hasTimeConflict($profileId, $startTime)) {
+            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: time conflict with another joined gathering.");
+            return false;
+        }
+
+        error_log("[getPublicGatheringById] Passed all checks before time conflict for gathering $gatheringId.");
 
         return $gathering;
     }
