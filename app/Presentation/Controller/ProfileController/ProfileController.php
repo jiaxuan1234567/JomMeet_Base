@@ -83,9 +83,12 @@ class ProfileController
     //     include $this->fileHelper->getFilePath('Profile');
     // }
 
-
     public function createProfile()
     {
+        $types = $this->profileModel->getAllMbti();
+        $hobbyOptions = $this->profileModel->getAllHobby();
+        $preferenceOptions = $this->profileModel->getAllPreferences();
+
         include $this->fileHelper->getFilePath('CreateProfile');
     }
 
@@ -94,12 +97,17 @@ class ProfileController
         $nickname   = trim($_POST['nickname']);
         $aboutMe    = trim($_POST['aboutme']);
         $mbti       = $_POST['mbti'];
-        $hobbies    = $_POST['hobbies'] ?? [];
-        $preferences = $_POST['preferences'] ?? [];
+        $hobbies     = $_POST['hobbies'] 
+        ? explode(',', $_POST['hobbies']) 
+        : [];
+$preferences = $_POST['preferences']
+        ? explode(',', $_POST['preferences'])
+        : [];
 
         $this->profileModel->submitProfile($nickname, $aboutMe, $mbti, $hobbies, $preferences);
 
         header('Location: /profile');
+        exit;
     }
 
     public function editProfile()
@@ -150,34 +158,57 @@ $preferences = $_POST['preferences']
     //     echo json_encode($result);
     // }
 
-    public function validateProfile(): void
+    // public function validateProfile(): void
+    // {
+    //     header('Content-Type: application/json');
+
+    //     // Determine which field was sent
+    //     $fields = ['nickname','aboutme','mbti','hobbies','preferences'];
+    //     $field  = null;
+    //     $value  = null;
+    //     foreach ($fields as $f) {
+    //         if (isset($_POST[$f])) {
+    //             $field = $f;
+    //             $value = $_POST[$f];
+    //             break;
+    //         }
+    //     }
+
+    //     // If nothing matched, bail out
+    //     if ($field === null) {
+    //         echo json_encode([
+    //             'success' => false,
+    //             'field'   => '',
+    //             'message' => 'No data provided.'
+    //         ]);
+    //         return;
+    //     }
+
+    //     // Delegate to model
+    //     $result = $this->profileModel->validateProfile($field, $value);
+    //     echo json_encode($result);
+    // }
+
+    public function validateProfileData()
     {
         header('Content-Type: application/json');
 
-        // Determine which field was sent
-        $fields = ['nickname','aboutme','mbti','hobbies','preferences'];
-        $field  = null;
-        $value  = null;
-        foreach ($fields as $f) {
-            if (isset($_POST[$f])) {
-                $field = $f;
-                $value = $_POST[$f];
-                break;
-            }
-        }
+        $nickname    = trim($_POST['nickname']    ?? '');
+        $aboutMe     = trim($_POST['aboutme']     ?? '');
+        $mbti        = $_POST['mbti']             ?? '';
+        $hobbies     = !empty($_POST['hobbies'])
+                       ? explode(',', $_POST['hobbies'])
+                       : [];
+        $preferences = !empty($_POST['preferences'])
+                       ? explode(',', $_POST['preferences'])
+                       : [];
 
-        // If nothing matched, bail out
-        if ($field === null) {
-            echo json_encode([
-                'success' => false,
-                'field'   => '',
-                'message' => 'No data provided.'
-            ]);
-            return;
-        }
+        $result = $this->profileModel->validateProfileData(
+            $nickname, $aboutMe, $mbti, $hobbies, $preferences
+        );
 
-        // Delegate to model
-        $result = $this->profileModel->validateProfile($field, $value);
         echo json_encode($result);
+        exit;
     }
+
 }
