@@ -67,12 +67,6 @@ class GatheringController
         $profileId = $_SESSION['profile']['profileID'];
         $gathering = $this->gatheringModel->getEditableGatheringById($gatheringId, $profileId);
 
-        // if (!$gathering) {
-        //     $_SESSION['flash_message'] = "You are not allowed to edit this gathering.";
-        //     $_SESSION['flash_type'] = "error";
-        //     header("Location: /my-gathering");
-        //     exit;
-        // }
         if (!empty($gathering['error'])) {
             $_SESSION['flash_message'] = $gathering['error'];
             $_SESSION['flash_type'] = "error";
@@ -82,6 +76,7 @@ class GatheringController
 
         $paxLimit = $this->gatheringModel->getEditPaxLimit($gathering);
         $preferenceTags = $this->gatheringModel->getPreferenceTags();
+        $allowedDate = $this->gatheringModel->getCreateAllowedDate();
 
         include $this->fileHelper->getFilePath('EditGathering');
     }

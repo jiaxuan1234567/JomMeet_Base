@@ -32,7 +32,6 @@ class HomeModel
     {
         $hostProfileId = $_SESSION['profile']['profileID'];
         return (new GatheringModel())->getMyGatheringsWithTab($hostProfileId);
-        //return (new GatheringModel())->getMyGatherings($hostProfileId);
     }
 
     // public function getAllProfiles()

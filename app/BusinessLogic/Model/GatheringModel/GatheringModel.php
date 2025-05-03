@@ -281,61 +281,6 @@ class GatheringModel
 
 
     // my-gathering
-    public function getMyGatherings($profileId)
-    {
-        // try {
-        //     $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
-
-        //     return array_map(function (array $g) {
-        //         $status = strtolower($g['status']);
-        //         $isHost = (bool)$g['isHost'];
-        //         $isJoined = (bool)$g['isJoined'];
-
-        //         return [
-        //             'id'        => (int)$g['gatheringID'],
-        //             'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
-        //             'theme'     => $g['theme'],
-        //             'date'      => date('d F Y', strtotime($g['date'])),
-        //             'startTime' => date('g:i A', strtotime($g['startTime'])),
-        //             'endTime'   => date('g:i A', strtotime($g['endTime'])),
-        //             'pax'       => (int)$g['currentParticipant'],
-        //             'maxPax'    => (int)$g['maxParticipant'],
-        //             'venue'     => $g['venue'],
-        //             'status'    => $status,
-        //             'isHost'    => $isHost,
-        //             'isJoined'  => $isJoined,
-        //             'action'    => $this->determineActions($status, $isHost, $isJoined),
-        //         ];
-        //     }, $rows ?: []);
-        // } catch (Exception $e) {
-        //     error_log("[GatheringModel] Error in getMyGatherings: " . $e->getMessage());
-        //     return [];
-        // }
-        try {
-            $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
-            return array_map(function (array $g) {
-                return [
-                    'id'        => (int)$g['gatheringID'],
-                    'cover'     => $g['image'],
-                    'theme'     => $g['theme'],
-                    'date'      => date('d F Y', strtotime($g['date'])),
-                    'startTime' => date('g:i A',   strtotime($g['startTime'])),
-                    'endTime'   => date('g:i A',   strtotime($g['endTime'])),
-                    'pax'       => (int)$g['currentParticipant'],
-                    'maxPax'       => (int)$g['maxParticipant'],
-                    'venue'     => $g['venue'],
-                    'status'    => strtolower($g['status']),
-                    'cover' => $this->fileHelper->getFilePath(strtolower($g['preference'])),
-                    'isHost'    => (bool)$g['isHost'],
-                    'isJoined'  => (bool)$g['isJoined'],
-                ];
-            }, $rows ?: []);
-        } catch (Exception $e) {
-            error_log("[GatheringModel] Error in getMyGatherings: " . $e->getMessage());
-            return [];
-        }
-    }
-
     public function getMyGatheringsWithTab($profileId)
     {
         try {
@@ -393,22 +338,9 @@ class GatheringModel
             error_log("[GatheringModel] Error in getMyGatheringsByCategory: " . $e->getMessage());
             return [];
         }
-
-        // try {
-        //     return [
-        //         'all'       => $this->transformRows($this->gatheringDAO->getUserAllGatherings($profileId)),
-        //         'hosted'    => $this->transformRows($this->gatheringDAO->getUserHostedGatherings($profileId)),
-        //         'upcoming'  => $this->transformRows($this->gatheringDAO->getUserUpcomingGatherings($profileId)),
-        //         'ongoing'   => $this->transformRows($this->gatheringDAO->getUserOngoingGatherings($profileId)),
-        //         'completed' => $this->transformRows($this->gatheringDAO->getUserCompletedGatherings($profileId)),
-        //         'cancelled' => $this->transformRows($this->gatheringDAO->getUserCancelledGatherings($profileId)),
-        //     ];
-        // } catch (Exception $e) {
-        //     error_log("[GatheringModel] Error in getMyGatherings: " . $e->getMessage());
-        //     return [];
-        // }
     }
 
+    // Helper Function
     private function determineActions($status, $isHost, $isJoined)
     {
         if ($status === 'cancelled') {
@@ -433,27 +365,6 @@ class GatheringModel
 
         return [];
     }
-
-    private function transformRows(array $rows): array
-    {
-        return array_map(function (array $g) {
-            return [
-                'id'        => (int)$g['gatheringID'],
-                'theme'     => $g['theme'],
-                'date'      => date('d F Y', strtotime($g['date'])),
-                'startTime' => date('g:i A', strtotime($g['startTime'])),
-                'endTime'   => date('g:i A', strtotime($g['endTime'])),
-                'pax'       => (int)$g['currentParticipant'],
-                'maxPax'    => (int)$g['maxParticipant'],
-                'venue'     => $g['venue'],
-                'status'    => strtolower($g['status']),
-                'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
-                'isHost'    => (bool)$g['isHost'],
-                'isJoined'  => (bool)$g['isJoined'],
-            ];
-        }, $rows);
-    }
-
 
     // Create Gathering
     public function createGathering($data)

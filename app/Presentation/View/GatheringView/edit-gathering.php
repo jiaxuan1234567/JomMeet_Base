@@ -70,7 +70,7 @@ $asset = new FileHelper('asset');
                                 name="inputDate"
                                 class="form-control gathering-input text-center"
                                 value="<?= htmlspecialchars($gathering['date']) ?>"
-                                min="<?= htmlspecialchars($gathering['date']) ?>">
+                                min="<?= $allowedDate ?>">
                             <button type="button" id="triggerDatePicker"
                                 class="btn btn-primary button-blue-color text-white gathering-button">
                                 <i class="bi bi-calendar-event-fill"></i>

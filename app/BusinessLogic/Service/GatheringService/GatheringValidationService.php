@@ -82,8 +82,10 @@ class GatheringValidationService
         }
 
         // 6. Time presence
-        $start = $form['startTime'] ?? '';
-        $end   = $form['endTime'] ?? '';
+        // $start = $form['startTime'] ?? '';
+        // $end   = $form['endTime'] ?? '';
+        $start = isset($form['startTime']) ? substr($form['startTime'], 0, 5) : '';
+        $end   = isset($form['endTime']) ? substr($form['endTime'], 0, 5) : '';
         if ($this->shouldValidate('startTime', $onlyFields) || $this->shouldValidate('endTime', $onlyFields)) {
             $errors = $this->validateTime($start, $end, $errors);
         }
