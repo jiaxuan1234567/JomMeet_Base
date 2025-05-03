@@ -182,7 +182,6 @@ class GatheringModel
     public function isBeforeStartTime($gatheringID)
     {
         try {
-            error_log("[GatheringModel] Starting isBeforeStartTime check for gathering ID: " . $gatheringID);
             // Get the specific gathering by gatheringID
             $gathering = $this->gatheringDAO->getGatheringById($gatheringID);
             if (!$gathering) {
@@ -192,7 +191,6 @@ class GatheringModel
 
             // Get current system time
             $currentTime = new DateTime();
-            error_log("[GatheringModel] Current system time: " . $currentTime->format('Y-m-d H:i:s'));
 
             // Create DateTime object for gathering
             $gatheringDateTime = DateTime::createFromFormat(
@@ -200,14 +198,11 @@ class GatheringModel
                 $gathering['date'] . ' ' . $gathering['startTime']
             );
 
-            error_log("[GatheringModel] Gathering time: " . $gatheringDateTime->format('Y-m-d H:i:s'));
-
             // Compare current time with gathering time
             if ($currentTime > $gatheringDateTime) {
                 error_log("[GatheringModel] Gathering has already started. Returning false");
                 return false;
             }
-            error_log("[GatheringModel] Gathering is in the future. Returning true");
             return true;
         } catch (Exception $e) {
             error_log("[GatheringModel] Error in isBeforeStartTime: " . $e->getMessage());
@@ -442,80 +437,133 @@ class GatheringModel
         }
     }
 
-    // !!!
     public function matchGathering($userID)
     {
         try {
-            // Get user's profile to access their preferences
+            error_log("[matchGathering] Start matching for userID: $userID");
+
+            // Get user's profile to access their preferences and hobbies
             $userProfile = $this->gatheringDAO->getProfileByUserId($userID);
+            $userHobbies = $this->gatheringDAO->getAllProfileHobby($userID); // array of strings
+            $userPreferences = $this->gatheringDAO->getAllProfilePreference($userID); // array of strings
+            $allGatherings = $this->getAvailableGatherings($userID);
+
+            // Log user data for debugging
+            error_log("[matchGathering] Retrieved profile for userID $userID: " . json_encode($userProfile));
+            error_log("[matchGathering] User hobbies: " . json_encode($userHobbies));
+            error_log("[matchGathering] User preferences: " . json_encode($userPreferences));
+
+            // Check if profile exists
             if (!$userProfile) {
-                error_log("[GatheringModel] User profile not found for userID: $userID");
+                error_log("[matchGathering] User profile not found for userID: $userID");
                 return [];
             }
 
-            // Get all available gatherings
-            $allGatherings = $this->getAllGatherings();
+            // Check if there are gatherings to match
             if (empty($allGatherings)) {
-                error_log("[GatheringModel] No gatherings available for matching");
+                error_log("[matchGathering] No gatherings available for matching");
                 return [];
             }
+            error_log("[matchGathering] Total gatherings retrieved: " . count($allGatherings));
 
             // Get gatherings the user has already joined
             $joinedGatherings = $this->getJoinedGatheringByUserId($userID);
             $joinedGatheringIds = array_column($joinedGatherings, 'gatheringID');
+            error_log("[matchGathering] User already joined gatherings: " . json_encode($joinedGatheringIds));
 
-            // Filter and score gatherings based on preferences
             $matchedGatherings = [];
+
+            // Normalize user preferences and hobbies to lowercase for comparison
+            $userPreferences = array_map('strtolower', $userPreferences);
+            $userHobbies = array_map('strtolower', $userHobbies);
+
+            // Loop through all gatherings to check for matching preferences and hobbies
             foreach ($allGatherings as $gathering) {
+                $gatheringID = $gathering['gatheringID'];
+                $hostProfileID = $gathering['hostProfileID'];
+
                 // Skip gatherings the user has already joined
-                if (in_array($gathering['gatheringID'], $joinedGatheringIds)) {
+                if (in_array($gatheringID, $joinedGatheringIds)) {
+                    error_log("[matchGathering] Skipping gathering $gatheringID: already joined");
                     continue;
                 }
 
                 // Skip gatherings that are full
                 if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
+                    error_log("[matchGathering] Skipping gathering $gatheringID: full");
                     continue;
                 }
 
                 // Skip gatherings that have already started
-                if (!$this->isBeforeStartTime($gathering['gatheringID'])) {
+                if (!$this->isBeforeStartTime($gatheringID)) {
+                    error_log("[matchGathering] Skipping gathering $gatheringID: already started");
                     continue;
                 }
 
-                // Calculate matching score based on preferences
                 $score = 0;
+                $matchedPrefs = [];
+                $matchedHobbies = [];
 
-                // Basic preference matching
-                if (isset($userProfile['preference']) && $userProfile['preference'] === $gathering['preference']) {
-                    $score += 10;
+                // Match user preferences (case-insensitive)
+                if (isset($gathering['preference']) && !empty($gathering['preference'])) {
+                    error_log("[matchGathering] Checking if gathering preference '{$gathering['preference']}' is in userPreferences");
+                    if (in_array(strtolower($gathering['preference']), $userPreferences)) {
+                        $matchedPrefs[] = $gathering['preference'];
+                        $score += 5; // Award 5 points for each matched preference
+                        error_log("[matchGathering] Matched preference '{$gathering['preference']}' for gathering $gatheringID. Score: 5");
+                    }
                 }
 
-                // Add more matching criteria here in the future
-                // For example:
-                // - Location proximity
-                // - Time of day preference
-                // - Group size preference
-                // - Theme matching
-                // - MBTI compatibility
-                // - Hobbies matching
+                // Match user hobbies (case-insensitive)
+                if (isset($gathering['hobby']) && !empty($gathering['hobby'])) {
+                    error_log("[matchGathering] Checking if gathering hobby '{$gathering['hobby']}' is in userHobbies");
+                    if (in_array(strtolower($gathering['hobby']), $userHobbies)) {
+                        $matchedHobbies[] = $gathering['hobby'];
+                        $score += 3; // Award 3 points for each matched hobby
+                    }
+                }
 
+                // Fetch host's hobbies
+                $hostHobbies = $this->gatheringDAO->getAllProfileHobby($hostProfileID);
+                $hostHobbies = array_map('strtolower', $hostHobbies); // Normalize host hobbies to lowercase
+
+                // Match host's hobbies (case-insensitive)
+                if (!empty($hostHobbies)) {
+                    error_log("[matchGathering] Checking if gathering host hobbies " . json_encode($hostHobbies) . " match user hobbies");
+                    $commonHobbies = array_intersect($hostHobbies, $userHobbies);
+                    if (!empty($commonHobbies)) {
+                        $matchedHobbies = array_merge($matchedHobbies, $commonHobbies);
+                        $score += 2; // Award 2 points for each common hobby with the host
+                    }
+                }
+
+                // Log match score and details for debugging
+                error_log("[matchGathering] Gathering $gatheringID match score: $score (Prefs: " . json_encode($matchedPrefs) . ", Hobbies: " . json_encode($matchedHobbies) . ")");
+
+                // If there's a match, add gathering to the matched list
                 if ($score > 0) {
                     $gathering['matchScore'] = $score;
                     $matchedGatherings[] = $gathering;
                 }
             }
 
-            // Sort gatherings by match score in descending order
+            // Sort matched gatherings by match score in descending order
             usort($matchedGatherings, function ($a, $b) {
                 return $b['matchScore'] <=> $a['matchScore'];
             });
 
+            // Log total matched gatherings for debugging
+            error_log("[matchGathering] Total matched gatherings: " . count($matchedGatherings));
+
             return $matchedGatherings;
         } catch (Exception $e) {
-            error_log("[GatheringModel] Error in matchGathering: " . $e->getMessage());
+            error_log("[matchGathering] Error: " . $e->getMessage());
             return [];
         }
     }
+
+
+
     // validate Gathering Fields
     public function validateGatheringFields($data, $fields, $editingId = null)
     {
