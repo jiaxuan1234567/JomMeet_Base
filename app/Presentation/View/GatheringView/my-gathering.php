@@ -32,75 +32,32 @@ $asset = new FileHelper('asset');
     </div>
     <div class="container">
         <ul class="nav justify-content-center nav-pills nav-justified mb-4 fw-semibold" id="gatheringTabs" role="tablist">
-            <li class="nav-item m-3" role="presentation">
-                <button
-                    class="nav-link text-white border border-black"
-                    id="all-tab"
-                    data-status="all"
-                    type="button"
-                    role="tab"
-                    style="background-color: #569FFF; border-radius: 10px;">All</button>
-            </li>
-            <li class="nav-item m-3" role="presentation">
-                <button
-                    class="nav-link bg-white text-black border border-black"
-                    id="hosted-tab"
-                    data-status="hosted"
-                    type="button"
-                    role="tab"
-                    style="border-radius: 10px;">Hosted</button>
-            </li>
-            <li class="nav-item m-3" role="presentation">
-                <button
-                    class="nav-link bg-white text-black border border-black"
-                    id="upcoming-tab"
-                    data-status="upcoming"
-                    type="button"
-                    role="tab"
-                    style="border-radius: 10px;">Up Coming</button>
-            </li>
-            <li class="nav-item m-3" role="presentation">
-                <button
-                    class="nav-link bg-white text-black border border-black"
-                    id="ongoing-tab"
-                    data-status="ongoing"
-                    type="button"
-                    role="tab"
-                    style="border-radius: 10px;">On Going</button>
-            </li>
-            <li class="nav-item m-3" role="presentation">
-                <button
-                    class="nav-link bg-white text-black border border-black"
-                    id="completed-tab"
-                    data-status="completed"
-                    type="button"
-                    role="tab"
-                    style="border-radius: 10px;">Completed</button>
-            </li>
-            <li class="nav-item m-3" role="presentation">
-                <button
-                    class="nav-link bg-white text-black border border-black"
-                    id="cancelled-tab"
-                    data-status="cancelled"
-                    type="button"
-                    role="tab"
-                    style="border-radius: 10px;">Cancelled</button>
-            </li>
+            <?php
+            $tabs = array_keys($myGatherings);
+            foreach ($tabs as $tab): ?>
+                <li class="nav-item m-3" role="presentation">
+                    <button
+                        class="nav-link text-white border border-black"
+                        id="<?= $tab ?>-tab"
+                        data-status="<?= $tab ?>"
+                        type="button"
+                        role="tab"
+                        style="border-radius: 10px;"><?= ucwords($tab) ?></button>
+                </li>
+            <?php endforeach; ?>
         </ul>
 
         <!-- Tab Contents -->
         <div class="tab-content" id="gatheringTabsContent">
             <!-- All tab pane -->
             <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
-                <div id="gatheringList" class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;">
-                    <!-- empty: JS will render here -->
+                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;">
                 </div>
             </div>
 
             <!-- Hosted tab pane -->
             <div class="tab-pane fade" id="hosted" role="tabpanel" aria-labelledby="hosted-tab">
                 <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;">
-                    <!-- JS will render hosted gatherings into the same #gatheringList container above -->
                 </div>
             </div>
 
@@ -129,158 +86,121 @@ $asset = new FileHelper('asset');
     <div style="height: 300px;"></div>
 </div>
 
-
 <script>
     $(function() {
-        var allGatherings = <?= json_encode($myGatherings) ?>;
-        var $container = $('#gatheringList');
-        var $tabs = $('#gatheringTabs button');
+        const allGatherings = <?= json_encode($myGatherings) ?>;
+        const $tabs = $('#gatheringTabs button');
+        const $tabContent = $('#gatheringTabsContent .tab-pane');
 
-        function renderPostList(url, btnTitle, cfmTitle) {
-            return `
-                <li>
-                    <form method="POST" action="${url}" onsubmit="return confirm('${cfmTitle}')" style="margin:0;">
-                        <button type="submit" class="dropdown-item fw-bold">${btnTitle}</button>
-                    </form>
-                </li>
-            `;
+        // Render all tabs at once based on the key
+        Object.entries(allGatherings).forEach(([key, gatherings]) => {
+            const $container = $(`#${key} .row`);
+            renderGatheringList($container, gatherings);
+        });
+
+        // Update tab UI (active color)
+        function setActiveTab(status) {
+            $tabs.each(function() {
+                const $btn = $(this);
+                const isActive = $btn.data('status') === status;
+                $btn.toggleClass('text-white', isActive)
+                    .toggleClass('bg-white text-black border border-black', !isActive)
+                    .css('background-color', isActive ? '#569FFF' : '');
+            });
         }
 
-        function buildActionMenu(g) {
-            if (g.status === 'cancelled') return ''; // No actions
-
-            let items = [];
-
-            switch (g.status) {
-                case 'new':
-                    if (g.isHost) {
-                        items.push(actionLink('Send Reminder'));
-                        items.push(actionLink('Edit Gathering'));
-                        items.push(renderPostList(`my-gathering/cancel/${g.id}`, 'Cancel Gathering', 'Confirm to cancel the gathering?'));
-                    } else {
-                        items.push(actionLink('Reply Reminder'));
-                        items.push(renderPostList(`my-gathering/leave/${g.id}`, 'Leave Gathering', 'Confirm to leave the gathering?'));
-                    }
-                    break;
-
-                case 'start':
-                    if (g.isHost) {
-                        items.push(actionLink('Send Reminder'));
-                    } else {
-                        items.push(actionLink('Reply Reminder'));
-                    }
-                    break;
-
-                case 'end':
-                    items.push(actionLink('Gathering Feedback'));
-                    items.push(actionLink('Location Feedback'));
-                    break;
-            }
-
-            if (!items.length) return '';
-
-            return `
-                <div class="dropdown rounded border-0">
-                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
-                        Action
-                    </button>
-                    <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
-                        ${items.join('')}
-                    </ul>
-                </div>`;
-        }
-
-        // Helper to build a <li><a></a></li>
-        function actionLink(label) {
-            return `<li><a class="dropdown-item fw-bold" href="#">${label}</a></li>`;
-        }
-
-        function renderGatherings(list) {
-            if (!list.length) {
-                return $container.html(`
+        function renderGatheringList($container, gatherings) {
+            if (!gatherings || !gatherings.length) {
+                $container.html(`
                 <img src="<?= $asset->getFilePath('iconPNG'); ?>" alt="" class="mx-auto d-block w-25">
                 <p class="text-center text-black fw-semibold mt-4">No gatherings found.</p>
-                `);
+            `);
+                return;
             }
-            var html = '';
-            list.forEach(function(g) {
-                html += `
-      <div class="col-6 mb-0 mt-4 pb-0">
-        <div class="card border-0 rounded">
-            <div class="row g-0 align-items-center">
-                <div class="col-4 text-center p-2">
-                <img src="${g.cover}" class="img-fluid" style="max-height:100px">
-                </div>
-                <div class="col-8">
-                    <div class="card-body py-2 px-3">
-                        <div class="bg-blue-color card-text small px-3 py-2 mb-1 rounded" style="background-color: #DEECFF;">
-                            <h6 class="fw-bold mb-1">${g.theme}</h6>
-                            <p class="mb-0 small">Date: ${g.date}</p>
-                            <p class="mb-0 small">Time: ${g.startTime}–${g.endTime}</p>
-                            <p class="mb-0 small text-truncate">Venue: ${g.venue}</p>
-                            <p class="mb-0 small">Pax: ${g.pax}/${g.maxPax}</p>
+
+            const html = gatherings.map(g => `
+            <div class="col-6 mb-0 mt-4 pb-0">
+                <div class="card border-0 rounded">
+                    <div class="row g-0 align-items-center">
+                        <div class="col-4 text-center p-2">
+                            <img src="${g.cover}" class="img-fluid" style="max-height:100px">
                         </div>
-                        <div class="d-flex gap-2">
-                            <a href="/my-gathering/view/${g.id}" class="btn btn-sm w-100 px-3 fw-bold text-white" style="background-color: #569FFF; border: none; border-radius: 20px;">View Details</a>
-            ${buildActionMenu(g)}
+                        <div class="col-8">
+                            <div class="card-body py-2 px-3">
+                                <div class="bg-blue-color card-text small px-3 py-2 mb-1 rounded" style="background-color: #DEECFF;">
+                                    <h6 class="fw-bold mb-1">${g.theme}</h6>
+                                    <p class="mb-0 small">Date: ${g.date}</p>
+                                    <p class="mb-0 small">Time: ${g.startTime}–${g.endTime}</p>
+                                    <p class="mb-0 small text-truncate">Venue: ${g.venue}</p>
+                                    <p class="mb-0 small">Pax: ${g.pax}/${g.maxPax}</p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a href="/my-gathering/view/${g.id}" class="btn btn-sm w-100 px-3 fw-bold text-white" style="background-color: #569FFF; border: none; border-radius: 20px;">View Details</a>
+                                    ${renderActions(g)}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>`;
-            });
+        `).join('');
+
             $container.html(html);
         }
 
-        function setActiveTab(status) {
-            $tabs.each(function() {
-                var $b = $(this);
-                if ($b.data('status') === status) {
-                    $b
-                        .removeClass('bg-white text-black border border-black')
-                        .addClass('text-white')
-                        .css('background-color', '#569FFF');
-                } else {
-                    $b
-                        .removeClass('text-white')
-                        .addClass('bg-white text-black border border-black')
-                        .css('background-color', '');
+        function renderActions(g) {
+            if (!g.action || !g.action.length) return '';
+            const actions = g.action.map(label => {
+                switch (label.toLowerCase()) {
+                    case 'send reminder':
+                        return `<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>`;
+                    case 'edit gathering':
+                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
+                    case 'cancel gathering':
+                        return `<li><form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
+                                <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
+                            </form></li>`;
+                    case 'reply reminder':
+                        return `<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>`;
+                    case 'leave gathering':
+                        return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
+                                <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
+                            </form></li>`;
+                    case 'gathering feedback':
+                        return `<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>`;
+                    case 'location feedback':
+                        return `<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>`;
+                    default:
+                        return '';
                 }
-            });
+            }).join('');
+
+            return `
+            <div class="dropdown rounded border-0">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
+                    Action
+                </button>
+                <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
+                    ${actions}
+                </ul>
+            </div>
+        `;
         }
 
-        function filterByTab(tab) {
-            switch (tab) {
-                case 'all':
-                    return allGatherings;
-                    //return allGatherings.filter(g => g.isHost || g.isJoined);
-                case 'hosted':
-                    return allGatherings.filter(g => g.isHost && g.status !== 'cancelled');
-                case 'upcoming':
-                    return allGatherings.filter(g => g.status === 'new');
-                case 'ongoing':
-                    return allGatherings.filter(g => g.status === 'start');
-                case 'completed':
-                    return allGatherings.filter(g => g.status === 'end');
-                case 'cancelled':
-                    return allGatherings.filter(g => g.isHost && g.status === 'cancelled');
-                default:
-                    return [];
-            }
-        }
-
-        var init = window.location.hash.slice(1) || 'all';
-        setActiveTab(init);
-        renderGatherings(filterByTab(init));
-
+        // Tab switch behavior
         $tabs.on('click', function(e) {
             e.preventDefault();
-            var st = $(this).data('status');
-            setActiveTab(st);
-            renderGatherings(filterByTab(st));
-            history.replaceState(null, '', st === 'all' ? '/my-gathering' : '#' + st);
+            const status = $(this).data('status');
+            setActiveTab(status);
+            $tabContent.removeClass('show active');
+            $(`#${status}`).addClass('show active');
+            history.replaceState(null, '', status === 'all' ? '/my-gathering' : '#' + status);
         });
+
+        const initialTab = window.location.hash.slice(1) || 'all';
+        setActiveTab(initialTab);
+        $tabContent.removeClass('show active');
+        $(`#${initialTab}`).addClass('show active');
     });
 </script>
 

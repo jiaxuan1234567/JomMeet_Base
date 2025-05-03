@@ -6,47 +6,79 @@ use DateTime;
 
 class GatheringValidationService
 {
-    public function validate(array $form, ?array $locationRow, array $joinedRows): array
+    public function validate(array $form, array $validTags, ?array $locationRow, array $joinedRows, array $onlyFields = [], ?int $editingId = null): array
     {
         $errors = [];
 
         // 1. Theme
-        $errors = $this->validateTheme(trim($form['inputTheme'] ?? ''), $errors);
+        if ($this->shouldValidate('inputTheme', $onlyFields)) {
+            $errors = $this->validateTheme(trim($form['inputTheme'] ?? ''), $errors);
+        }
 
         // 2. Pax
-        $errors = $this->validatePax((int)($form['inputPax'] ?? 0), $errors);
+        if ($this->shouldValidate('inputPax', $onlyFields)) {
+            $errors = $this->validatePax((int)($form['inputPax'] ?? 0), $errors);
+        }
 
         // 3. Location
-        $errors = $this->validateLocation(
-            $form['locationId']    ?? '',
-            trim($form['inputLocation'] ?? ''),
-            $locationRow,
-            $errors
-        );
+        if ($this->shouldValidate('inputLocation', $onlyFields)) {
+            $errors = $this->validateLocation(
+                $form['locationId'] ?? '',
+                trim($form['inputLocation'] ?? ''),
+                $locationRow,
+                $errors
+            );
+        }
 
-        // 4. Date
-        $date  = $form['inputDate'] ?? '';
-        $errors = $this->validateDate($date, $errors);
+        // 4. Tag
+        if ($this->shouldValidate('gatheringTag', $onlyFields)) {
+            $errors = $this->validateTag($form['gatheringTag'] ?? '', $validTags, $errors);
+        }
 
-        // 5. Time presence
-        $start = $form['startTime'] ?? '';
-        $end   = $form['endTime']   ?? '';
-        $errors = $this->validateTime($start, $end, $errors);
+        // 5. Date
+        $date = $form['inputDate'] ?? '';
+        if ($this->shouldValidate('inputDate', $onlyFields)) {
+            $errors = $this->validateDate($date, $errors);
+        }
 
-        // NEW: Enforce start buffer as soon as we have a valid date and startTime
+        // 6. Time presence
+        // $start = $form['startTime'] ?? '';
+        // $end   = $form['endTime'] ?? '';
+        $start = isset($form['startTime']) ? substr($form['startTime'], 0, 5) : '';
+        $end   = isset($form['endTime']) ? substr($form['endTime'], 0, 5) : '';
+        if ($this->shouldValidate('startTime', $onlyFields) || $this->shouldValidate('endTime', $onlyFields)) {
+            $errors = $this->validateTime($start, $end, $errors);
+        }
+
+        // 7. Time buffer
         if (empty($errors['inputDate']) && empty($errors['startTime']) && $start !== '') {
             $errors = $this->validateStartTimeBuffer($date, $start, $errors);
         }
 
-        // 6. Date+Time logic, only if date & time fields passed
+        // 8. Date+Time logic
         if (empty($errors['inputDate']) && empty($errors['startTime']) && empty($errors['endTime'])) {
             $errors = $this->validateDateTime($date, $start, $end, $errors);
         }
 
-        // 7. Overlap check always re-runs (clearing stale errors)
-        $errors = $this->validateOverlap($date, $start, $joinedRows, $errors);
+        // 9. Overlap always runs
+        $errors = $this->validateOverlap($date, $start, $joinedRows, $errors, $editingId);
 
         return $errors;
+    }
+
+    private function shouldValidate(string $field, array $only): bool
+    {
+        return empty($only) || in_array($field, $only, true);
+    }
+
+    private function validateTag(string $tag, array $validTags, array $e): array
+    {
+        if ($tag === '') {
+            $e['gatheringTag'] = 'Preference is required.';
+        } elseif (!in_array(strtoupper($tag), $validTags, true)) {
+            $e['gatheringTag'] = 'Invalid preference selected.';
+        }
+        return $e;
     }
 
     private function validateTheme(string $theme, array $e): array
@@ -135,11 +167,8 @@ class GatheringValidationService
         return $e;
     }
 
-    private function validateOverlap(string $date, string $start, array $joined, array $e): array
+    private function validateOverlap(string $date, string $start, array $joined, array $e, ?int $editingId = null): array
     {
-        // clear any old overlap error
-        //unset($e['startTime']);
-
         if ($date === '' || $start === '' || !$joined) {
             return $e;
         }
@@ -150,6 +179,10 @@ class GatheringValidationService
         }
 
         foreach ($joined as $g) {
+            if ($editingId && $g['gatheringID'] == $editingId) {
+                continue;
+            }
+
             if (in_array(strtoupper($g['status']), ['END', 'CANCELLED'], true)) {
                 continue;
             }
