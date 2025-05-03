@@ -7,13 +7,9 @@ require_once __DIR__ . '/../HomeView/header.php';
 
 <div class="main d-flex flex-column min-vh-100">
     <?php if (!empty($_SESSION['flash_message'])): ?>
-        <div class="position-fixed top-0 start-50 translate-middle-x mt-3 z-3" style="z-index: 1050;">
-            <div class="alert alert-success d-flex align-items-center shadow rounded-3 py-2 px-4" role="alert" style="min-width: 300px;">
-                <i class="bi bi-check-circle-fill me-2" style="font-size: 1.5rem;"></i>
-                <div><?= htmlspecialchars($_SESSION['flash_message']['text']) ?></div>
-            </div>
+        <div id="flashMessage" class="flash-message" data-type="<?=$_SESSION['flash_type'] ?? '' ?>" data-msg="<?=$_SESSION['flash_message'] ?>">
         </div>
-        <?php unset($_SESSION['flash_message']); ?>
+        <?php unset($_SESSION['flash_message']); unset($_SESSION['flash_type']) ?>
     <?php endif; ?>
     <section class="page-header page-header-classic page-header-sm">
         <div class="container-fluid">
@@ -65,9 +61,11 @@ require_once __DIR__ . '/../HomeView/header.php';
                                         </a>
                                     </div>
                                     <div class="col-md-1 w-50">
-                                        <a href="/reflection/delete/<?= $reflection['selfreflectID'] ?>" data-confirm-deleteReflection>
-                                            <i class="bi bi-trash" style="font-size: 3.0rem; color:red;"></i>
-                                        </a>
+                                        <form method="POST" action="/reflection/delete/<?= $reflection['selfreflectID'] ?>" style="display: inline;">
+                                            <button type="submit" style="background: none; border: none;" data-confirm-deleteReflection>
+                                                <i class="bi bi-trash" style="font-size: 3.0rem; color:red;"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
