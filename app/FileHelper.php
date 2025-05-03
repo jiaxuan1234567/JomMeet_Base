@@ -63,6 +63,7 @@ class FileHelper
             "iconPNG" => "/asset/bubble.png",
             "match" => "/asset/Random.png",
             "dinner" => "/asset/dinnerpic.png",
+            "defaultTag" => "/asset/default-tag.png",
             "map" => "/asset/map.png",
             "food" => "/asset/eat.png",
             "chill" => "/asset/chill.png",

@@ -32,7 +32,7 @@ $asset = new FileHelper('asset');
                             style="width: 120px; height: 120px;">
 
                             <!-- Tag Image -->
-                            <img src="<?= $asset->getFilePath('iconPNG') ?>"
+                            <img src="<?= $asset->getFilePath('defaultTag') ?>"
                                 id="selectedTagImage"
                                 class="w-100 h-100 rounded-circle object-fit-cover">
 
@@ -135,7 +135,7 @@ $asset = new FileHelper('asset');
                             <input type="text"
                                 id="inputLocation"
                                 name="inputLocation"
-                                class="form-control gathering-input"
+                                class="form-control gathering-input text-start"
                                 placeholder="Select a location"
                                 readonly
                                 style="cursor: default;">
