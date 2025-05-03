@@ -253,10 +253,10 @@ class GatheringController
     //     }
     // }
 
-    public function listGatherings()
+    public function listGatherings($userID)
     {
         try {
-            $gatherings = $this->gatheringModel->getAllGatherings();
+            $gatherings = $this->gatheringModel->getAvailableGatherings($userID);
             if ($gatherings === false) {
                 error_log("getAllGatherings returned false");
                 return [];
@@ -271,17 +271,18 @@ class GatheringController
     public function searchGatherings()
     {
         try {
+            $userID = $_POST['userid'] ?? null;
             $searchTerm = $_POST['searchTerm'] ?? '';
 
             if ($searchTerm === '' || $searchTerm === null) {
-                $gatherings = $this->listGatherings();
+                $gatherings = $this->listGatherings($userID);
                 header("Location: /gathering");
                 // return include $this->fileHelper->getFilePath('GatheringList');
             } else {
                 $gatherings = $this->gatheringModel->searchGatherings($searchTerm);
                 if (!$gatherings) {
                     error_log("[GatheringController] Search returned no results for term: '" . $searchTerm . "', showing all gatherings");
-                    $gatherings = $this->listGatherings();
+                    $gatherings = $this->listGatherings($userID);
                 }
             }
 
