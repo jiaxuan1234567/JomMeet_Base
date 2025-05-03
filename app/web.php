@@ -45,6 +45,8 @@ Route::post('/my-gathering/create', [GatheringController::class, 'createGatherin
 Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSelectLocation']);
 Route::post('/my-gathering/leave/{gatheringId}', [GatheringController::class, 'leaveGathering']);
 Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGathering']);
+Route::get('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'viewEdit']);
+Route::post('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'editSubmit']);
 
 //AJAX
 Route::get('/api/savedLocations', [GatheringController::class, 'apiSavedLocations']);

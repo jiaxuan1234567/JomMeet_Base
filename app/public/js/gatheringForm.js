@@ -41,7 +41,7 @@ $(function () {
         if (current < max) {
             $inputPax.val(current + 1).trigger('input');
             updateButtons();
-            toggleSubmitButton();
+            //toggleSubmitButton();
         }
     });
 
@@ -51,7 +51,7 @@ $(function () {
         if (current > min) {
             $inputPax.val(current - 1).trigger('input');
             updateButtons();
-            toggleSubmitButton();
+            //toggleSubmitButton();
         }
     });
 

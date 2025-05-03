@@ -162,6 +162,7 @@ class GatheringDAO
         }
     }
 
+    // !!! why got profile here
     public function getProfileByUserId($userID)
     {
         try {
@@ -271,7 +272,81 @@ class GatheringDAO
         }
     }
 
-    // Get User-related gathering only
+    public function getUserHostedGatherings($profileId)
+    {
+        $stmt = $this->db->prepare("SELECT g.*, l.*, 1 as isHost, EXISTS (
+            SELECT 1 FROM profilegathering pg WHERE pg.profileID = :pid AND pg.gatheringID = g.gatheringID
+        ) as isJoined
+        FROM gathering g
+        JOIN `location` l ON g.locationID = l.locationID
+        WHERE g.hostProfileID = :pid");
+        $stmt->execute([':pid' => $profileId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getUserUpcomingGatherings($profileId)
+    {
+        $stmt = $this->db->prepare("SELECT g.*, l.*, 
+            g.hostProfileID = :pid as isHost,
+            EXISTS (SELECT 1 FROM profilegathering pg WHERE pg.profileID = :pid AND pg.gatheringID = g.gatheringID) as isJoined
+            FROM gathering g
+            JOIN `location` l ON g.locationID = l.locationID
+            WHERE g.status = 'NEW' AND CONCAT(g.date, ' ', g.startTime) > NOW()
+            AND EXISTS (
+                SELECT 1 FROM profilegathering pg WHERE pg.profileID = :pid AND pg.gatheringID = g.gatheringID
+            )");
+        $stmt->execute([':pid' => $profileId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getUserOngoingGatherings($profileId)
+    {
+        $stmt = $this->db->prepare("SELECT g.*, l.*, 
+            g.hostProfileID = :pid as isHost,
+            EXISTS (SELECT 1 FROM profilegathering pg WHERE pg.profileID = :pid AND pg.gatheringID = g.gatheringID) as isJoined
+            FROM gathering g
+            JOIN `location` l ON g.locationID = l.locationID
+            WHERE g.status = 'NEW'
+            AND CONCAT(g.date, ' ', g.startTime) <= NOW() 
+            AND CONCAT(g.date, ' ', g.endTime) > NOW()
+            AND EXISTS (
+                SELECT 1 FROM profilegathering pg WHERE pg.profileID = :pid AND pg.gatheringID = g.gatheringID
+            )");
+        $stmt->execute([':pid' => $profileId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getUserCompletedGatherings($profileId)
+    {
+        $stmt = $this->db->prepare("SELECT g.*, l.*, 
+            g.hostProfileID = :pid as isHost,
+            EXISTS (SELECT 1 FROM profilegathering pg WHERE pg.profileID = :pid AND pg.gatheringID = g.gatheringID) as isJoined
+            FROM gathering g
+            JOIN `location` l ON g.locationID = l.locationID
+            WHERE g.status = 'END'
+            AND EXISTS (
+                SELECT 1 FROM profilegathering pg WHERE pg.profileID = :pid AND pg.gatheringID = g.gatheringID
+            )");
+        $stmt->execute([':pid' => $profileId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getUserCancelledGatherings($profileId)
+    {
+        $stmt = $this->db->prepare("SELECT g.*, l.*, 
+            g.hostProfileID = :pid as isHost,
+            EXISTS (SELECT 1 FROM profilegathering pg WHERE pg.profileID = :pid AND pg.gatheringID = g.gatheringID) as isJoined
+            FROM gathering g
+            JOIN `location` l ON g.locationID = l.locationID
+            WHERE g.status = 'CANCELLED'
+            AND EXISTS (
+                SELECT 1 FROM profilegathering pg WHERE pg.profileID = :pid AND pg.gatheringID = g.gatheringID
+            )");
+        $stmt->execute([':pid' => $profileId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Check if user-related gathering only
     public function isProfileInvolved($gatheringId, $profileId)
     {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM profilegathering WHERE gatheringID = :gid AND profileID = :pid");
@@ -358,6 +433,29 @@ class GatheringDAO
             error_log("[GatheringDAO] cancelWithParticipants failed: " . $e->getMessage());
             return false;
         }
+    }
+
+    public function updateGathering($d, $hostProfileId, $gatheringId)
+    {
+        $stmt = $this->db->prepare("
+            UPDATE `gathering`
+            SET theme = :theme, maxParticipant = :maxPax, date = :date,
+                startTime = :start, endTime = :end, preference = :preference,
+                locationID = :locationID
+            WHERE gatheringID = :id AND hostProfileID = :hostId
+        ");
+
+        return $stmt->execute([
+            ':theme' => $d['inputTheme'],
+            ':maxPax' => $d['inputPax'],
+            ':date' => $d['inputDate'],
+            ':start' => $d['startTime'],
+            ':end' => $d['endTime'],
+            ':preference' => $d['gatheringTag'],
+            ':locationID' => $d['locationId'],
+            ':id' => $gatheringId,
+            ':hostId' => $hostProfileId
+        ]);
     }
 
     public function leaveGathering($profileId, $gatheringId)

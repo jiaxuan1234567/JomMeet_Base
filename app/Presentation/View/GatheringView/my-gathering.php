@@ -32,7 +32,21 @@ $asset = new FileHelper('asset');
     </div>
     <div class="container">
         <ul class="nav justify-content-center nav-pills nav-justified mb-4 fw-semibold" id="gatheringTabs" role="tablist">
-            <li class="nav-item m-3" role="presentation">
+            <?php
+            $tabs = array_keys($myGatherings);
+            foreach ($tabs as $tab): ?>
+                <li class="nav-item m-3" role="presentation">
+                    <button
+                        class="nav-link text-white border border-black"
+                        id="<?= $tab ?>-tab"
+                        data-status="<?= $tab ?>"
+                        type="button"
+                        role="tab"
+                        style="border-radius: 10px;"><?= ucwords($tab) ?></button>
+                </li>
+            <?php endforeach; ?>
+
+            <!-- <li class="nav-item m-3" role="presentation">
                 <button
                     class="nav-link text-white border border-black"
                     id="all-tab"
@@ -85,11 +99,65 @@ $asset = new FileHelper('asset');
                     type="button"
                     role="tab"
                     style="border-radius: 10px;">Cancelled</button>
-            </li>
+            </li> -->
         </ul>
 
         <!-- Tab Contents -->
         <div class="tab-content" id="gatheringTabsContent">
+            <?php
+            $gTabs = array_keys($myGatherings);
+            foreach ($gTabs as $tab): ?>
+                <div class="tab-pane fade show active" id="<?= $tab ?>" role="tabpanel" aria-labelledby="<?= $tab ?>-tab">
+                    <div id="gatheringList" class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;">
+                        <?php
+                        $gatherings = $myGatherings[$tab];
+                        foreach ($gatherings as $g):
+                            if (empty($gatherings)): ?>
+
+                                <img src="<?= $asset->getFilePath('iconPNG'); ?>" alt="" class="mx-auto d-block w-25">
+                                <p class="text-center text-black fw-semibold mt-4">No gatherings found.</p>
+                            <?php else: ?>
+                                <div class="col-6 mb-0 mt-4 pb-0">
+                                    <div class="card border-0 rounded">
+                                        <div class="row g-0 align-items-center">
+                                            <div class="col-4 text-center p-2">
+                                                <img src="${g.cover}" class="img-fluid" style="max-height:100px">
+                                            </div>
+                                            <div class="col-8">
+                                                <div class="card-body py-2 px-3">
+                                                    <div class="bg-blue-color card-text small px-3 py-2 mb-1 rounded" style="background-color: #DEECFF;">
+                                                        <h6 class="fw-bold mb-1"><?= $g['theme'] ?></h6>
+                                                        <p class="mb-0 small">Date: <?= $g['date'] ?></p>
+                                                        <p class="mb-0 small">Time: <?= $g['startTime'] ?>–<?= $g['endTime'] ?></p>
+                                                        <p class="mb-0 small text-truncate">Venue: <?= $g['venue'] ?></p>
+                                                        <p class="mb-0 small">Pax: <?= $g['pax'] ?>/<?= $g['maxPax'] ?></p>
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="/my-gathering/view/${g.id}" class="btn btn-sm w-100 px-3 fw-bold text-white" style="background-color: #569FFF; border: none; border-radius: 20px;">View Details</a>
+                                                        <?php if (!empty($g['action'])): ?>
+                                                            <div class="dropdown rounded border-0">
+                                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
+                                                                    Action
+                                                                </button>
+                                                                <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
+
+                                                                </ul>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
+
+                            <?php endif; ?>
+                        <?php endforeach;
+                        ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
             <!-- All tab pane -->
             <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
                 <div id="gatheringList" class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;">
@@ -129,7 +197,6 @@ $asset = new FileHelper('asset');
     <div style="height: 300px;"></div>
 </div>
 
-
 <script>
     $(function() {
         var allGatherings = <?= json_encode($myGatherings) ?>;
@@ -154,26 +221,26 @@ $asset = new FileHelper('asset');
             switch (g.status) {
                 case 'new':
                     if (g.isHost) {
-                        items.push(actionLink('Send Reminder'));
-                        items.push(actionLink('Edit Gathering'));
+                        items.push(actionLink('Send Reminder', '#'));
+                        items.push(actionLink('Edit Gathering', `my-gathering/edit/${g.id}`));
                         items.push(renderPostList(`my-gathering/cancel/${g.id}`, 'Cancel Gathering', 'Confirm to cancel the gathering?'));
                     } else {
-                        items.push(actionLink('Reply Reminder'));
+                        items.push(actionLink('Reply Reminder', '#'));
                         items.push(renderPostList(`my-gathering/leave/${g.id}`, 'Leave Gathering', 'Confirm to leave the gathering?'));
                     }
                     break;
 
                 case 'start':
                     if (g.isHost) {
-                        items.push(actionLink('Send Reminder'));
+                        items.push(actionLink('Send Reminder', '#'));
                     } else {
-                        items.push(actionLink('Reply Reminder'));
+                        items.push(actionLink('Reply Reminder', '#'));
                     }
                     break;
 
                 case 'end':
-                    items.push(actionLink('Gathering Feedback'));
-                    items.push(actionLink('Location Feedback'));
+                    items.push(actionLink('Gathering Feedback', '#'));
+                    items.push(actionLink('Location Feedback', '#'));
                     break;
             }
 
@@ -191,8 +258,8 @@ $asset = new FileHelper('asset');
         }
 
         // Helper to build a <li><a></a></li>
-        function actionLink(label) {
-            return `<li><a class="dropdown-item fw-bold" href="#">${label}</a></li>`;
+        function actionLink(label, endpoint) {
+            return `<li><a class="dropdown-item fw-bold" href="${endpoint}">${label}</a></li>`;
         }
 
         function renderGatherings(list) {
@@ -233,6 +300,28 @@ $asset = new FileHelper('asset');
             $container.html(html);
         }
 
+        // function filterByTab(tab) {
+        //     switch (tab) {
+        //         case 'all':
+        //             return allGatherings;
+        //             //return allGatherings.filter(g => g.isHost || g.isJoined);
+        //         case 'hosted':
+        //             return allGatherings.filter(g => g.isHost && g.status !== 'cancelled');
+        //         case 'upcoming':
+        //             return allGatherings.filter(g => g.status === 'new');
+        //         case 'ongoing':
+        //             return allGatherings.filter(g => g.status === 'start');
+        //         case 'completed':
+        //             return allGatherings.filter(g => g.status === 'end');
+        //         case 'cancelled':
+        //             return allGatherings.filter(g => g.isHost && g.status === 'cancelled');
+        //         default:
+        //             return [];
+        //     }
+        // }
+
+
+
         function setActiveTab(status) {
             $tabs.each(function() {
                 var $b = $(this);
@@ -250,35 +339,15 @@ $asset = new FileHelper('asset');
             });
         }
 
-        function filterByTab(tab) {
-            switch (tab) {
-                case 'all':
-                    return allGatherings;
-                    //return allGatherings.filter(g => g.isHost || g.isJoined);
-                case 'hosted':
-                    return allGatherings.filter(g => g.isHost && g.status !== 'cancelled');
-                case 'upcoming':
-                    return allGatherings.filter(g => g.status === 'new');
-                case 'ongoing':
-                    return allGatherings.filter(g => g.status === 'start');
-                case 'completed':
-                    return allGatherings.filter(g => g.status === 'end');
-                case 'cancelled':
-                    return allGatherings.filter(g => g.isHost && g.status === 'cancelled');
-                default:
-                    return [];
-            }
-        }
-
         var init = window.location.hash.slice(1) || 'all';
         setActiveTab(init);
-        renderGatherings(filterByTab(init));
+        //renderGatherings(filterByTab(init));
 
         $tabs.on('click', function(e) {
             e.preventDefault();
             var st = $(this).data('status');
             setActiveTab(st);
-            renderGatherings(filterByTab(st));
+            //renderGatherings(filterByTab(st));
             history.replaceState(null, '', st === 'all' ? '/my-gathering' : '#' + st);
         });
     });

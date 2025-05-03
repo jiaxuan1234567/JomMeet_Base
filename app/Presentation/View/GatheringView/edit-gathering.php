@@ -18,7 +18,7 @@ $asset = new FileHelper('asset');
         </div>
 
         <div class="container">
-            <form class="row my-4" id="createGatheringFormEl" action="/my-gathering/create" method="post">
+            <form class="row my-4" id="createGatheringFormEl" action="/my-gathering/edit/<?= $gathering['gatheringID'] ?>" method="post">
 
                 <!-- Image + Gathering Tag -->
                 <div class="col-12 text-center mb-4">
@@ -43,7 +43,7 @@ $asset = new FileHelper('asset');
                         </button>
                     </div>
                     <h5 class="mt-3 fw-bold mb-0" id="selectedTagLabel">Select A Preference</h5>
-                    <input type="hidden" name="gatheringTag" id="gatheringTag">
+                    <input type="hidden" name="gatheringTag" id="gatheringTag" value="<?= htmlspecialchars(strtolower($gathering['preference'])) ?>">
                 </div>
 
                 <!-- Theme and Date -->
@@ -55,7 +55,8 @@ $asset = new FileHelper('asset');
                         <div class="gathering-input-wrapper position-relative">
                             <input type="text" id="inputTheme" name="inputTheme"
                                 class="form-control gathering-input w-100 text-start"
-                                placeholder="Enter Gathering Theme">
+                                placeholder="Enter Gathering Theme"
+                                value="<?= htmlspecialchars($gathering['theme']) ?>">
                         </div>
                     </div>
 
@@ -68,8 +69,8 @@ $asset = new FileHelper('asset');
                                 id="inputDate"
                                 name="inputDate"
                                 class="form-control gathering-input text-center"
-                                value="<?= htmlspecialchars($allowedDate) ?>"
-                                min="<?= $allowedDate ?>">
+                                value="<?= htmlspecialchars($gathering['date']) ?>"
+                                min="<?= htmlspecialchars($gathering['date']) ?>">
                             <button type="button" id="triggerDatePicker"
                                 class="btn btn-primary button-blue-color text-white gathering-button">
                                 <i class="bi bi-calendar-event-fill"></i>
@@ -92,7 +93,7 @@ $asset = new FileHelper('asset');
                                 id="inputPax"
                                 name="inputPax"
                                 class="form-control gathering-input text-center"
-                                value="<?= htmlspecialchars($paxLimit['minPax']) ?>"
+                                value="<?= $paxLimit['minPax'] ?>"
                                 min="<?= $paxLimit['minPax'] ?>" max="<?= $paxLimit['maxPax'] ?>" readonly
                                 style="max-width: 60px;">
 
@@ -110,7 +111,8 @@ $asset = new FileHelper('asset');
                                 <input type="time"
                                     id="startTime"
                                     name="startTime"
-                                    class="form-control gathering-input text-center time-blue btn btn-primary">
+                                    class="form-control gathering-input text-center time-blue btn btn-primary"
+                                    value="<?= htmlspecialchars($gathering['startTime']) ?>">
                             </div>
 
                             <span class="fw-bold d-flex align-items-center">to</span>
@@ -119,7 +121,8 @@ $asset = new FileHelper('asset');
                                 <input type="time"
                                     id="endTime"
                                     name="endTime"
-                                    class="form-control gathering-input text-center time-blue btn btn-primary">
+                                    class="form-control gathering-input text-center time-blue btn btn-primary"
+                                    value="<?= htmlspecialchars($gathering['endTime']) ?>">
                             </div>
                         </div>
                     </div>
@@ -138,15 +141,10 @@ $asset = new FileHelper('asset');
                                 class="form-control gathering-input text-start"
                                 placeholder="Select a location"
                                 readonly
-                                style="cursor: default;">
+                                style="cursor: default;"
+                                value="<?= htmlspecialchars($gathering['locationName']) ?>">
 
-                            <input type="hidden" name="locationId" id="locationId">
-
-                            <a href="/my-gathering/create/location"
-                                class="btn btn-primary button-blue-color text-white gathering-button border-0"
-                                id="chooseLocationBtn">
-                                Choose
-                            </a>
+                            <input type="hidden" name="locationId" id="locationId" value="<?= htmlspecialchars($gathering['locationID']) ?>">
                         </div>
                     </div>
                 </div>
@@ -166,7 +164,7 @@ $asset = new FileHelper('asset');
                     <button type="reset" class="btn border-black rounded-1 px-4 py-2 fw-semibold" id="createResetBtn">
                         Reset
                     </button>
-                    <button type="submit" class="btn btn-primary py-2 px-4 button-blue-color border-0" id="createBtn">Create</button>
+                    <button type="submit" class="btn btn-primary py-2 px-4 button-blue-color border-0" id="createBtn">Update</button>
                 </div>
 
             </form>
@@ -209,6 +207,6 @@ $asset = new FileHelper('asset');
 
 <!-- <script src="/js/gatheringForm.js"></script> -->
 <script src="/js/gatheringFormCommon.js"></script>
-<script src="/js/gatheringCreate.js"></script>
+<script src="/js/gatheringEdit.js"></script>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

@@ -54,9 +54,25 @@ class GatheringModel
         return ['minPax' => 3, 'maxPax' => 8];
     }
 
+    public function getEditPaxLimit($gathering)
+    {
+        return [
+            'minPax' => ($gathering['currentParticipant'] > 3) ? ($gathering['currentParticipant']) : 3,
+            'maxPax' => 8
+        ];
+    }
+
     public function getCreateAllowedDate()
     {
         return (new DateTime())->format('Y-m-d');
+    }
+
+    public function isValidTimeConstraint($startTime, $date)
+    {
+        $start = new DateTime($date . ' ' . $startTime);
+        $hoursDiff = ($start->getTimestamp() - (new DateTime())->getTimestamp()) / 3600;
+
+        return $hoursDiff > 3;
     }
 
     // Fetch all gatherings
@@ -126,6 +142,22 @@ class GatheringModel
         if (!$this->gatheringDAO->isProfileInvolved($gatheringId, $profileId) && !$this->gatheringDAO->isHostInvolved($gatheringId, $profileId)) {
             return false;
         }
+        return $gathering;
+    }
+
+    // Fetch user editable gathering by gathering ID (hosted AND start > 3 hours from current)
+    public function getEditableGatheringById($gatheringId, $profileId)
+    {
+        $isHost = $this->gatheringDAO->isHostInvolved($gatheringId, $profileId);
+
+        if (!$isHost) return ['error' => 'Not Host'];
+
+        $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
+
+        if (!$this->isValidTimeConstraint($gathering['startTime'], $gathering['date'])) {
+            return ['error' => 'Invalid Time Constraint'];
+        }
+
         return $gathering;
     }
 
@@ -251,6 +283,34 @@ class GatheringModel
     // my-gathering
     public function getMyGatherings($profileId)
     {
+        // try {
+        //     $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
+
+        //     return array_map(function (array $g) {
+        //         $status = strtolower($g['status']);
+        //         $isHost = (bool)$g['isHost'];
+        //         $isJoined = (bool)$g['isJoined'];
+
+        //         return [
+        //             'id'        => (int)$g['gatheringID'],
+        //             'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
+        //             'theme'     => $g['theme'],
+        //             'date'      => date('d F Y', strtotime($g['date'])),
+        //             'startTime' => date('g:i A', strtotime($g['startTime'])),
+        //             'endTime'   => date('g:i A', strtotime($g['endTime'])),
+        //             'pax'       => (int)$g['currentParticipant'],
+        //             'maxPax'    => (int)$g['maxParticipant'],
+        //             'venue'     => $g['venue'],
+        //             'status'    => $status,
+        //             'isHost'    => $isHost,
+        //             'isJoined'  => $isJoined,
+        //             'action'    => $this->determineActions($status, $isHost, $isJoined),
+        //         ];
+        //     }, $rows ?: []);
+        // } catch (Exception $e) {
+        //     error_log("[GatheringModel] Error in getMyGatherings: " . $e->getMessage());
+        //     return [];
+        // }
         try {
             $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
             return array_map(function (array $g) {
@@ -276,6 +336,124 @@ class GatheringModel
         }
     }
 
+    public function getMyGatheringsWithTab($profileId)
+    {
+        try {
+            $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
+            $grouped = [
+                'all'       => [],
+                'hosted'    => [],
+                'upcoming'  => [],
+                'ongoing'   => [],
+                'completed' => [],
+                'cancelled' => [],
+            ];
+
+            foreach ($rows as $g) {
+                $status = strtolower($g['status']);
+                $isHost = (bool)$g['isHost'];
+                $isJoined = (bool)$g['isJoined'];
+
+                $gathering = [
+                    'id'        => (int)$g['gatheringID'],
+                    'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
+                    'theme'     => $g['theme'],
+                    'date'      => date('d F Y', strtotime($g['date'])),
+                    'startTime' => date('g:i A', strtotime($g['startTime'])),
+                    'endTime'   => date('g:i A', strtotime($g['endTime'])),
+                    'pax'       => (int)$g['currentParticipant'],
+                    'maxPax'    => (int)$g['maxParticipant'],
+                    'venue'     => $g['venue'],
+                    'status'    => $status,
+                    'isHost'    => $isHost,
+                    'isJoined'  => $isJoined,
+                    'action'    => $this->determineActions($status, $isHost, $isJoined),
+                ];
+
+                $grouped['all'][] = $gathering;
+
+                if ($isHost) {
+                    $grouped['hosted'][] = $gathering;
+                    if ($status === 'cancelled') {
+                        $grouped['cancelled'][] = $gathering;
+                    }
+                }
+
+                if ($status === 'new') {
+                    $grouped['upcoming'][] = $gathering;
+                } elseif ($status === 'start') {
+                    $grouped['ongoing'][] = $gathering;
+                } elseif ($status === 'end') {
+                    $grouped['completed'][] = $gathering;
+                }
+            }
+
+            return $grouped;
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error in getMyGatheringsByCategory: " . $e->getMessage());
+            return [];
+        }
+
+        // try {
+        //     return [
+        //         'all'       => $this->transformRows($this->gatheringDAO->getUserAllGatherings($profileId)),
+        //         'hosted'    => $this->transformRows($this->gatheringDAO->getUserHostedGatherings($profileId)),
+        //         'upcoming'  => $this->transformRows($this->gatheringDAO->getUserUpcomingGatherings($profileId)),
+        //         'ongoing'   => $this->transformRows($this->gatheringDAO->getUserOngoingGatherings($profileId)),
+        //         'completed' => $this->transformRows($this->gatheringDAO->getUserCompletedGatherings($profileId)),
+        //         'cancelled' => $this->transformRows($this->gatheringDAO->getUserCancelledGatherings($profileId)),
+        //     ];
+        // } catch (Exception $e) {
+        //     error_log("[GatheringModel] Error in getMyGatherings: " . $e->getMessage());
+        //     return [];
+        // }
+    }
+
+    private function determineActions($status, $isHost, $isJoined)
+    {
+        if ($status === 'cancelled') {
+            return [];
+        }
+
+        if ($status === 'new') {
+            return $isHost
+                ? ['send reminder', 'edit gathering', 'cancel gathering']
+                : ['reply reminder', 'leave gathering'];
+        }
+
+        if ($status === 'start') {
+            return $isHost
+                ? ['send reminder', 'reply reminder']
+                : ['reply reminder'];
+        }
+
+        if ($status === 'end') {
+            return ['gathering feedback', 'location feedback'];
+        }
+
+        return [];
+    }
+
+    private function transformRows(array $rows): array
+    {
+        return array_map(function (array $g) {
+            return [
+                'id'        => (int)$g['gatheringID'],
+                'theme'     => $g['theme'],
+                'date'      => date('d F Y', strtotime($g['date'])),
+                'startTime' => date('g:i A', strtotime($g['startTime'])),
+                'endTime'   => date('g:i A', strtotime($g['endTime'])),
+                'pax'       => (int)$g['currentParticipant'],
+                'maxPax'    => (int)$g['maxParticipant'],
+                'venue'     => $g['venue'],
+                'status'    => strtolower($g['status']),
+                'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
+                'isHost'    => (bool)$g['isHost'],
+                'isJoined'  => (bool)$g['isJoined'],
+            ];
+        }, $rows);
+    }
+
 
     // Create Gathering
     public function createGathering($data)
@@ -287,7 +465,18 @@ class GatheringModel
             return $newId;
         } catch (Exception $e) {
             error_log("[GatheringModel] Error creating gathering: " . $e->getMessage());
-            throw $e;
+            return false;
+        }
+    }
+
+    // Edit Gathering
+    public function updateGathering($data, $profileId, $gatheringId)
+    {
+        try {
+            return $this->gatheringDAO->updateGathering($data, $profileId, $gatheringId);
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error updating gathering: " . $e->getMessage());
+            return false;
         }
     }
 
@@ -368,6 +557,7 @@ class GatheringModel
         }
     }
 
+    // !!!
     public function matchGathering($userID)
     {
         try {

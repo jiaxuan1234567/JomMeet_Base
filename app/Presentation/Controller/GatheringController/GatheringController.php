@@ -61,6 +61,44 @@ class GatheringController
         }
     }
 
+    // GET: edit-gathering
+    public function viewEdit($gatheringId)
+    {
+        $profileId = $_SESSION['profile']['profileID'];
+        $gathering = $this->gatheringModel->getEditableGatheringById($gatheringId, $profileId);
+
+        // if (!$gathering) {
+        //     $_SESSION['flash_message'] = "You are not allowed to edit this gathering.";
+        //     $_SESSION['flash_type'] = "error";
+        //     header("Location: /my-gathering");
+        //     exit;
+        // }
+        if (!empty($gathering['error'])) {
+            $_SESSION['flash_message'] = $gathering['error'];
+            $_SESSION['flash_type'] = "error";
+            header("Location: /my-gathering");
+            exit;
+        }
+
+        $paxLimit = $this->gatheringModel->getEditPaxLimit($gathering);
+        $preferenceTags = $this->gatheringModel->getPreferenceTags();
+
+        include $this->fileHelper->getFilePath('EditGathering');
+    }
+
+    // POST: edit-gathering
+    public function editSubmit($gatheringId)
+    {
+        $data = $_POST;
+        $profileId = $_SESSION['profile']['profileID'];
+
+        $this->gatheringModel->updateGathering($data, $profileId, $gatheringId);
+        $_SESSION['flash_message'] = 'Gathering updated successfully!';
+        $_SESSION['flash_type'] = 'success';
+        header("Location: /my-gathering/view/$gatheringId");
+        exit;
+    }
+
     // GET: select-location
     public function viewSelectLocation()
     {
