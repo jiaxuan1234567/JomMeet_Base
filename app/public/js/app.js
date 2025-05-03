@@ -129,6 +129,14 @@ $(() => {
         }
     });
 
+    $('[data-confirm-updateReflection]').on('click', function (e) {
+        const text = e.currentTarget.dataset.confirm || 'Confirm to update your self-reflection record?';
+        if (!confirm(text)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    });
+    
 
 
     // Initiate GET request

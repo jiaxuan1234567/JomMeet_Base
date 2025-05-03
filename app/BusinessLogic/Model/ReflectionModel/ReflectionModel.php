@@ -68,12 +68,14 @@ class ReflectionModel
         // businesss logic validation
         if (empty($reflectionTitle)) {
             $_err['reflectionTitle'] = 'Required';
-        } elseif (strlen($reflectionTitle) > 255) {
-            $_err['reflectionTitle'] = 'Maximum length 255 characters';
+        } elseif (strlen($reflectionTitle) > 50) {
+            $_err['reflectionTitle'] = 'Maximum length 50 characters';
         }
 
         if (empty($reflectionContent)) {
             $_err['reflectionContent'] = 'Required';
+        } elseif (strlen($reflectionContent) > 5000) {
+            $_err['reflectionContent'] = 'Maximum length 5000 characters';
         }
 
         if (!empty($_err)) {
@@ -108,6 +110,7 @@ class ReflectionModel
     // }
     public function validateReflection($reflectionTitle, $reflectionContent)
     {
+        
         // Validate Title
         if ($reflectionTitle !== null) {
             if (trim($reflectionTitle) === '') {
