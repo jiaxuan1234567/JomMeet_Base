@@ -10,7 +10,7 @@ $userid = $_SESSION['profile']['profileID'];
 
 <script src="/js/gatheringlist.js"></script>
 
-<div class="container-fluid my-5 mb-5">
+<div class="container-fluid my-5 mb-5" style="height: 675px;">
     <!-- Flash Message -->
     <?php
     if (!empty($_SESSION['flash_message'])):
@@ -33,7 +33,8 @@ $userid = $_SESSION['profile']['profileID'];
                 <h2>Gathering List</h2>
             </div>
             <div class="col">
-                <form class="d-flex" id="search" style="width: 750px;" action="/gathering/search" method="POST">
+                <form class="d-flex" id="search" style="width: 800px;" action="/gathering/search" method="POST">
+                    <input type="hidden" name="userid" value="<?= htmlspecialchars($userid) ?>">
                     <input class="form-control me-4" name="searchTerm" type="search" placeholder="Search by theme, date, time, or preference" aria-label="Search" value="<?php echo htmlspecialchars($_POST['searchTerm'] ?? ''); ?>">
                     <button type="submit" class="btn btn-outline-primary">Search</button>
                 </form>

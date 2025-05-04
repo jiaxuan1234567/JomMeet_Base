@@ -14,5 +14,5 @@ while (true) {
     $gatheringController->runGatheringJob();
 
     // run on every 30 seconds
-    sleep(30);
+    sleep(10);
 }
