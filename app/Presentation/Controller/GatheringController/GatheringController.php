@@ -335,10 +335,11 @@ class GatheringController
     //     }
     // }
 
-    public function matchGathering($userid)
+    public function matchGathering()
     {
         try {
-            $gatherings = $this->gatheringModel->matchGathering($userid);
+            $userID = $_POST['userid'] ?? null;
+            $gatherings = $this->gatheringModel->matchGathering($userID);
 
             if (empty($gatherings)) {
             } else {
