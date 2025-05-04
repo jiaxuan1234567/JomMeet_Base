@@ -328,10 +328,12 @@ class GatheringController
     //     }
     // }
 
-    public function matchGathering($userid)
+    public function matchGathering()
     {
         try {
-            $gatherings = $this->gatheringModel->matchGathering($userid);
+            $userID = $_SESSION['profile']['profileID'] ?? null;
+            error_log("User ID: " . $userID);
+            $gatherings = $this->gatheringModel->matchGathering($userID);
 
             if (empty($gatherings)) {
             } else {

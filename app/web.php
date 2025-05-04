@@ -39,7 +39,7 @@ Route::get('/gathering', [HomeController::class, 'gatheringHome']);
 Route::get('/gathering/view/{gatheringId}', [GatheringController::class, 'viewDetail']);
 Route::post('/gathering/search', [GatheringController::class, 'searchGatherings']);
 Route::post('/gathering/join', [GatheringController::class, 'joinGathering']);
-Route::get('/gathering/match/{userid}', [GatheringController::class, 'matchGathering']);
+Route::get('/gathering/match', [GatheringController::class, 'matchGathering']);
 
 // my-gathering routes
 Route::get('/my-gathering/view/{id}', [GatheringController::class, 'viewMyGatheringDetail']);
