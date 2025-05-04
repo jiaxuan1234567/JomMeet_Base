@@ -32,7 +32,6 @@ Route::get('/reflection/view/{id}', [ReflectionController::class, 'viewReflectio
 
 // gathering routes
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);
-Route::get('/gathering2', [GatheringController::class, 'gatheringPager']); // -> experimental
 Route::get('/gathering/view/{gatheringId}', [GatheringController::class, 'viewDetail']);
 Route::post('/gathering/search', [GatheringController::class, 'searchGatherings']);
 Route::post('/gathering/join', [GatheringController::class, 'joinGathering']);

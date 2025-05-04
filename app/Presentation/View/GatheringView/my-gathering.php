@@ -8,17 +8,19 @@ $asset = new FileHelper('asset');
 $status = $_GET['status'] ?? 'all';
 $currentStatus = strtolower($status);
 $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentStatus) {
+    error_log("Gathering ID: " . ($g['id'] ?? 'Unknown') . " | Status: " . ($g['status'] ?? 'Unknown') . " | Is Host: " . ($g['isHost'] ?? 'Unknown'));
+
     switch ($currentStatus) {
         case 'hosted':
-            return $g['isHost'] && $g['status'] !== 'cancelled';
+            return $g['isHost'] && strtolower($g['status']) !== 'cancelled';
         case 'upcoming':
-            return $g['status'] === 'new';
+            return $g['status'] && strtolower($g['status']) === 'new';
         case 'ongoing':
-            return $g['status'] === 'start';
+            return $g['status'] && strtolower($g['status']) === 'start';
         case 'completed':
-            return $g['status'] === 'end';
+            return $g['status']  && strtolower($g['status']) === 'end';
         case 'cancelled':
-            return $g['isHost'] && $g['status'] === 'cancelled';
+            return $g['isHost'] && strtolower($g['status']) === 'cancelled';
         case 'all':
         default:
             return true;
@@ -260,6 +262,7 @@ $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentSta
           </div>
           <div class="d-flex gap-2">
             <a href="/my-gathering/view/${g.id}" class="btn btn-sm w-100 px-3 fw-bold text-white" style="background-color: #569FFF; border:none; border-radius:20px;">View Details</a>
+                ${renderActions(g)}
           </div>
         </div>
       </div>
@@ -286,6 +289,45 @@ $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentSta
         };
 
     });
+
+    function renderActions(g) {
+        if (!g.action || !g.action.length) return '';
+        const actions = g.action.map(label => {
+            switch (label.toLowerCase()) {
+                case 'send reminder':
+                    return `<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>`;
+                case 'edit gathering':
+                    return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
+                case 'cancel gathering':
+                    return `<li><form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
+                                <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
+                            </form></li>`;
+                case 'reply reminder':
+                    return `<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>`;
+                case 'leave gathering':
+                    return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
+                                <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
+                            </form></li>`;
+                case 'gathering feedback':
+                    return `<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>`;
+                case 'location feedback':
+                    return `<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>`;
+                default:
+                    return '';
+            }
+        }).join('');
+
+        return `
+            <div class="dropdown rounded border-0">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
+                    Action
+                </button>
+                <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
+                    ${actions}
+                </ul>
+            </div>
+        `;
+    }
 </script>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>
