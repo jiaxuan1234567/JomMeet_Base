@@ -841,7 +841,8 @@ class GatheringModel
             $locationId,
             $desc
         );
-        
+    }
+
     public function getReminders($gatheringId, $profileId)
     {
         $gathering = $this->gatheringDAO->getGatheringById($gatheringId);

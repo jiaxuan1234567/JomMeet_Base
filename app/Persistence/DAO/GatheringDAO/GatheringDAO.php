@@ -753,6 +753,7 @@ class GatheringDAO
             ':lid'  => $locationId,
             ':desc' => $desc
         ]);
+    }
 
     public function getGatheringWithHostInfoByGatheringId($gatheringId)
     {
