@@ -39,8 +39,7 @@ $userid = $_SESSION['profile']['profileID'];
                 </form>
             </div>
             <div class="col">
-                <a data-post="/gathering/match" class="btn btn-light border border-secondary d-flex align-items-center gap-2" style="width:100px;">
-                    <input type="hidden" name="userid" value="<?= htmlspecialchars($userid) ?>">
+                <a href="/gathering/match" class="btn btn-light border border-secondary d-flex align-items-center gap-2" style="width:100px;">
                     <img src="<?= $asset->getFilePath('match') ?>" alt="Icon" style="width: 20px; height: 20px;">
                     <span>Match</span>
                 </a>

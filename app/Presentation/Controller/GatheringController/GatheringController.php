@@ -338,7 +338,8 @@ class GatheringController
     public function matchGathering()
     {
         try {
-            $userID = $_POST['userid'] ?? null;
+            $userID = $_SESSION['profile']['profileID'] ?? null;
+            error_log("User ID: " . $userID);
             $gatherings = $this->gatheringModel->matchGathering($userID);
 
             if (empty($gatherings)) {
