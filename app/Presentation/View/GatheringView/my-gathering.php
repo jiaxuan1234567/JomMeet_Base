@@ -8,19 +8,18 @@ $asset = new FileHelper('asset');
 $status = $_GET['status'] ?? 'all';
 $currentStatus = strtolower($status);
 $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentStatus) {
-    error_log("Gathering ID: " . ($g['id'] ?? 'Unknown') . " | Status: " . ($g['status'] ?? 'Unknown') . " | Is Host: " . ($g['isHost'] ?? 'Unknown'));
 
     switch ($currentStatus) {
         case 'hosted':
-            return $g['isHost'] && strtolower($g['status']) !== 'cancelled';
+            return $g['isHost'] !== 'cancelled';
         case 'upcoming':
-            return $g['status'] && strtolower($g['status']) === 'new';
+            return $g['status'] === 'new';
         case 'ongoing':
-            return $g['status'] && strtolower($g['status']) === 'start';
+            return $g['status'] === 'start';
         case 'completed':
-            return $g['status']  && strtolower($g['status']) === 'end';
+            return $g['status']  === 'end';
         case 'cancelled':
-            return $g['isHost'] && strtolower($g['status']) === 'cancelled';
+            return $g['isHost']  === 'cancelled';
         case 'all':
         default:
             return true;
@@ -224,26 +223,8 @@ $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentSta
                 const venue = g.venue || 'Unknown Venue'; // Fallback for missing venue
                 const pax = g.pax || 0; // Fallback for missing pax
                 const maxPax = g.maxPax || 0; // Fallback for missing maxPax
-                const preference = g.preference.toLowerCase() || 'default'; // Fallback for missing preference
-
-                console.log(preference);
-                const preferenceImageMap = <?= json_encode([
-                                                'dinner' => $asset->getFilePath('dinner'),
-                                                'chill' => $asset->getFilePath('chill'),
-                                                'natural' => $asset->getFilePath('natural'),
-                                                'shopping' => $asset->getFilePath('shopping'),
-                                                'workout' => $asset->getFilePath('workout'),
-                                                'entertainment' => $asset->getFilePath('entertainment'),
-                                                'music' => $asset->getFilePath('music'),
-                                                'movie' => $asset->getFilePath('movie'),
-                                                'food' => $asset->getFilePath('food'),
-                                                'sports' => $asset->getFilePath('sports'),
-                                                'study' => $asset->getFilePath('study'),
-                                                'default' => $asset->getFilePath('default-image'),
-                                            ]) ?>;
                 // Map preference to specific image paths
-                const cover = preferenceImageMap[preference] || preferenceImageMap['default'];
-                console.log(cover);
+                const cover = g.cover;
                 html += `
 <div class="col-6 mb-0 mt-4 pb-0">
   <div class="card border-0 rounded">
@@ -262,7 +243,7 @@ $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentSta
           </div>
           <div class="d-flex gap-2">
             <a href="/my-gathering/view/${g.id}" class="btn btn-sm w-100 px-3 fw-bold text-white" style="background-color: #569FFF; border:none; border-radius:20px;">View Details</a>
-                ${renderActions(g)}
+                ${buildActionMenu(g)}
           </div>
         </div>
       </div>

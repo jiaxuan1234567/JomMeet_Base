@@ -332,17 +332,17 @@ class GatheringModel
         // Ensure all required keys are set with default values
         return array_map(function ($g) use ($profileId) {
             return [
-                'id' => $g['gatheringID'] ?? null,
-                'isHost' => isset($g['hostProfileID']) && $g['hostProfileID'] == $profileId,
-                'status' => $g['status'] ?? 'unknown',
+                'isHost'    => (bool)$g['isHost'],
+                'isJoined'  => (bool)$g['isJoined'],
+                'status'    => strtolower($g['status']),
                 'theme' => $g['theme'] ?? 'No Theme',
-                'date' => $g['date'] ?? null,
-                'startTime' => $g['startTime'] ?? null,
-                'endTime' => $g['endTime'] ?? null,
+                'date'      => date('d F Y', strtotime($g['date'])),
+                'startTime' => date('g:i A',   strtotime($g['startTime'])),
+                'endTime'   => date('g:i A',   strtotime($g['endTime'])),
                 'venue' => $g['venue'] ?? 'Unknown Venue',
-                'pax' => $g['currentParticipant'] ?? 0,
-                'maxPax' => $g['maxParticipant'] ?? 0,
-                'cover' => $g['image'] ?? 'default-image.png',
+                'pax'       => (int)$g['currentParticipant'],
+                'maxPax'    => (int)$g['maxParticipant'],
+                'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
                 'preference' => $g['preference'] ?? 'No Preference',
             ];
         }, $gatherings);
