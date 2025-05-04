@@ -715,7 +715,8 @@ class GatheringDAO
         $sql = "
       SELECT 
         f.feedbackDesc,
-        f.date
+        f.date,
+        f.profileID          
       FROM feedback f
       WHERE f.gatheringID = :gid
         AND f.feedbackType = 'gathering'

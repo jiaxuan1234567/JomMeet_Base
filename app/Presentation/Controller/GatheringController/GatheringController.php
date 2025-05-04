@@ -145,6 +145,41 @@ class GatheringController
         exit;
     }
 
+    // // AJAX GET: my gathering with status
+    // public function ajaxGetMyGathering($status)
+    // {
+    //     $userID = $_SESSION['userID'] ?? null;
+    //     if (!$userID) {
+    //         http_response_code(401);
+    //         echo json_encode(['error' => 'Unauthorized']);
+    //         return;
+    //     }
+
+    //     $allGatherings = $this->gatheringModel->getMyGatheringsWithTab($userID); // ← Your full list
+    //     $status = strtolower($status);
+
+    //     $filtered = array_filter($allGatherings, function ($g) use ($status) {
+    //         switch ($status) {
+    //             case 'hosted':
+    //                 return $g['isHost'] && $g['status'] !== 'cancelled';
+    //             case 'upcoming':
+    //                 return $g['status'] === 'new';
+    //             case 'ongoing':
+    //                 return $g['status'] === 'start';
+    //             case 'completed':
+    //                 return $g['status'] === 'end';
+    //             case 'cancelled':
+    //                 return $g['isHost'] && $g['status'] === 'cancelled';
+    //             case 'all':
+    //             default:
+    //                 return true;
+    //         }
+    //     });
+
+    //     header('Content-Type: application/json');
+    //     echo json_encode(array_values($filtered));
+    // }
+
     // GET: gathering-detail
     public function viewDetail($gatheringId)
     {

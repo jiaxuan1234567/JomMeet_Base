@@ -258,6 +258,13 @@ $asset = new FileHelper('asset');
             $tabContent.removeClass('show active');
             $(`#${status}`).addClass('show active');
             history.replaceState(null, '', status === 'all' ? '/my-gathering' : '#' + status);
+
+            // // New: Fetch latest data via AJAX
+            // $.get(`/api/my-gathering/${status}`, function(gatherings) {
+            //     console.log('success', status, gatherings);
+            //     const $container = $(`#${status} .row`);
+            //     renderGatheringList($container, gatherings);
+            // });
         });
 
         const initialTab = window.location.hash.slice(1) || 'all';
