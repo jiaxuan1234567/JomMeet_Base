@@ -67,6 +67,7 @@ $('#triggerDatePicker').on('click', function () {
 
 // ====== Handle Validation Message ======
 function showValidationError(fieldId, message) {
+    //clearValidationError(fieldId);
     const $input = $(`#${fieldId}`);
     $input.addClass('is-invalid');
     $(`#error-${fieldId}`).text(message + '*').show();
@@ -94,25 +95,25 @@ function storeInitialValues(fields) {
     });
 }
 
-function isFormFilled(fields) {
-    // return fields.every(id => {
-    //     const currentVal = $(`#${id}`).val()?.trim() || '';
-    //     const initialVal = initialValues[id]?.trim() || '';
-    //     return currentVal !== '' && currentVal !== initialVal;
-    // });
-    return fields.every(id => {
-        const val = $(`#${id}`).val();
-        return val !== null && val.trim() !== '';
-    });
-}
+// function isFormFilled(fields) {
+//     // return fields.every(id => {
+//     //     const currentVal = $(`#${id}`).val()?.trim() || '';
+//     //     const initialVal = initialValues[id]?.trim() || '';
+//     //     return currentVal !== '' && currentVal !== initialVal;
+//     // });
+//     return fields.every(id => {
+//         const val = $(`#${id}`).val();
+//         return val !== null && val.trim() !== '';
+//     });
+// }
 
 // ====== Submit Button ======
 const $submitBtn = $('#createBtn');
 
-function toggleSubmitButton(fields) {
-    const hasError = fields.some(id => $(`#${id}`).hasClass('is-invalid'));
-    $('#createBtn').prop('disabled', hasError || !isFormFilled(fields));
-}
+// function toggleSubmitButton(fields) {
+//     const hasError = fields.some(id => $(`#${id}`).hasClass('is-invalid'));
+//     $('#createBtn').prop('disabled', hasError || !isFormFilled(fields));
+// }
 
 function setupSubmitButton(fields) {
     $('#createGatheringFormEl').on('submit', function () {

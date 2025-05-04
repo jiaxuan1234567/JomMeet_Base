@@ -117,6 +117,9 @@ $asset = new FileHelper('asset');
                             <span class="fw-bold d-flex align-items-center">to</span>
 
                             <div class="flex-grow-1 position-relative">
+                                <small id="nextDayNote" class="text-black position-absolute end-0 top-100" style="display: none;">
+                                    (next day)
+                                </small>
                                 <input type="time"
                                     id="endTime"
                                     name="endTime"
@@ -168,7 +171,7 @@ $asset = new FileHelper('asset');
                     <button type="reset" class="btn border-black rounded-1 px-4 py-2 fw-semibold" id="createResetBtn">
                         Reset
                     </button>
-                    <button type="submit" class="btn btn-primary py-2 px-4 button-blue-color border-0" id="createBtn">Create</button>
+                    <button type="submit" class="btn btn-primary py-2 px-4 button-blue-color border-0" id="createBtn" disabled>Create</button>
                 </div>
 
             </form>

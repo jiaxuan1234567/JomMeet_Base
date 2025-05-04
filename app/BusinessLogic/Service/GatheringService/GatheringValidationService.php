@@ -3,6 +3,7 @@
 namespace BusinessLogic\Service\GatheringService;
 
 use DateTime;
+use Exception;
 
 class GatheringValidationService
 {

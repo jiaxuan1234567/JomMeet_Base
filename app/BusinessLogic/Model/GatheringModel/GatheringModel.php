@@ -6,6 +6,7 @@ use Persistence\DAO\GatheringDAO\GatheringDAO;
 use Persistence\DAO\GatheringDAO\LocationDAO;
 use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
 use BusinessLogic\Service\GatheringService\GatheringValidationService;
+use BusinessLogic\Service\GatheringService\GatheringHelperService;
 use Exception;
 use FileHelper;
 use DateTime;
@@ -611,8 +612,6 @@ class GatheringModel
         }
     }
 
-
-
     // validate Gathering Fields
     public function validateGatheringFields($data, $fields, $editingId = null)
     {
@@ -626,6 +625,61 @@ class GatheringModel
 
         // 2) call pure helper
         return $this->validatorService->validate($data, $validTags, $locRow, $joined, $fields, $editingId);
+    }
+
+    /*
+    [
+        'field' => 'fieldId || time',
+        'touched' => 'fieldId',
+        'value' => [
+            'locationName' => 'name',
+            'locationId' => 'id'
+        ]
+        'value' => [
+            'inputDate' => date,
+            'startTime' => startDT,
+            'endTime' => endDT
+        ]
+        'value' => 'data'
+    ]
+    */
+    public function validateGathering($data)
+    {
+        $touched = $data['touched'];
+        $response = ['valid' => true, 'errors' => []];
+        $gatheringHelper = new GatheringHelperService();
+
+        try {
+            switch ($touched) {
+                case 'inputDate':
+                case 'startTime':
+                case 'endTime':
+                    $joined = $this->gatheringDAO->getJoinedGatheringByUserId($_SESSION['profile']['profileID'] ?? 0);
+                    $response = $gatheringHelper->validateDateTime($data, $joined);
+                    break;
+                case 'locationName':
+                case 'locationId':
+                    $validLoc = $this->locationDAO->getLocationById($data['value']['locationId'] ?? '');
+                    $response = $gatheringHelper->validateLocation($data, $validLoc);
+                    break;
+                case 'gatheringTag':
+                    $validTags = $this->getPreference();
+                    $response = $gatheringHelper->validateGatheringTag($data, $validTags);
+                    break;
+                case 'inputTheme':
+                    $response = $gatheringHelper->validateTheme($data);
+                    break;
+                case 'inputPax':
+                    $min = $this->getPaxLimit()['minPax'];
+                    $max = $this->getPaxLimit()['maxPax'];
+                    $response = $gatheringHelper->validatePax($data, $min, $max);
+                    break;
+            }
+        } catch (Exception $e) {
+            $response['valid'] = false;
+            $response['errors'] = $e->getMessage();
+        }
+        return $response;
     }
 
     // Status Service (run job)
