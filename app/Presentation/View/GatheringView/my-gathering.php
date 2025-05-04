@@ -161,7 +161,7 @@ $asset = new FileHelper('asset');
                                 <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
                             </form></li>`;
                     case 'reply reminder':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>`;
+                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/reminder/view/${g.id}">Reply Reminder</a></li>`;
                     case 'leave gathering':
                         return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
                                 <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
