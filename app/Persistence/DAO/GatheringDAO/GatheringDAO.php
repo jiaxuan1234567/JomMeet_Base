@@ -250,27 +250,27 @@ class GatheringDAO
     // }
 
     public function hasTimeConflict($profileId, $startTime)
-{
-    $formatted = $startTime->format('Y-m-d H:i:s');
-    error_log("[hasTimeConflict] Checking time conflict for profile $profileId at $formatted");
+    {
+        $formatted = $startTime->format('Y-m-d H:i:s');
+        error_log("[hasTimeConflict] Checking time conflict for profile $profileId at $formatted");
 
-    $stmt = $this->db->prepare("
+        $stmt = $this->db->prepare("
         SELECT g.* FROM gathering g
         JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
         WHERE pg.profileID = :pid
         AND g.status = 'NEW'
         AND CONCAT(g.date, ' ', g.startTime) = :start
     ");
-    $stmt->execute([
-        ':pid' => $profileId,
-        ':start' => $formatted
-    ]);
-    $conflict = $stmt->rowCount() > 0;
+        $stmt->execute([
+            ':pid' => $profileId,
+            ':start' => $formatted
+        ]);
+        $conflict = $stmt->rowCount() > 0;
 
-    error_log("[hasTimeConflict] Conflict found: " . ($conflict ? "YES" : "NO"));
+        error_log("[hasTimeConflict] Conflict found: " . ($conflict ? "YES" : "NO"));
 
-    return $conflict;
-}
+        return $conflict;
+    }
 
 
     // my-gathering
@@ -573,6 +573,43 @@ class GatheringDAO
         } catch (PDOException $e) {
             error_log("[GatheringDAO] Error fetching preferences: " . $e->getMessage());
             return [];
+        }
+    }
+
+    public function getGatheringWithHostInfoByGatheringId($gatheringId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT g.*, p.phone, p.nickname
+                FROM gathering g
+                JOIN profile p ON g.hostProfileID = p.profileID
+                WHERE g.gatheringID = :gatheringId
+            ");
+            $stmt->bindParam(':gatheringId', $gatheringId, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching gathering info: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function getGatheringWithAllParticipantInfoByGatheringId($gatheringId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT g.*, p.phone, p.nickname
+                FROM gathering g
+                JOIN profilegathering pg ON g.gatheringID = pg.gatheringID
+                JOIN profile p ON pg.profileID = p.profileID
+                WHERE g.gatheringID = :gatheringId
+            ");
+            $stmt->bindParam(':gatheringId', $gatheringId, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching gathering info: " . $e->getMessage());
+            return null;
         }
     }
 }

@@ -7,6 +7,7 @@ use Persistence\DAO\GatheringDAO\LocationDAO;
 use Persistence\DAO\GatheringDAO\ReminderDAO;
 use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
 use BusinessLogic\Service\GatheringService\GatheringValidationService;
+use BusinessLogic\Service\GatheringService\NotificationService;
 use Exception;
 use FileHelper;
 use DateTime;
@@ -19,6 +20,7 @@ class GatheringModel
     private $reminderDAO;
     private $chkStatusService;
     private $validatorService;
+    private $notificationService;
     private $fileHelper;
 
     public function __construct()
@@ -28,6 +30,7 @@ class GatheringModel
         $this->reminderDAO = new ReminderDAO();
         $this->chkStatusService = new CheckGatheringStatusService();
         $this->validatorService = new GatheringValidationService();
+        $this->notificationService = new NotificationService();
         $this->fileHelper = new FileHelper('gathering');
     }
 
@@ -267,9 +270,21 @@ class GatheringModel
     public function addUserToGathering($userID, $gatheringID)
     {
         $result = $this->gatheringDAO->addUserToGathering($userID, $gatheringID);
+        $gathering = $this->gatheringDAO->getGatheringWithAllParticipantInfoByGatheringId($gatheringID);
 
         if ($result) {
             error_log("User $userID successfully joined gathering $gatheringID.");
+            
+            foreach($gathering as $g) {
+                $this->notificationService->sendInfobipWhatsAppTemplate(
+                    $g['phone'],
+                    $g['nickname'],
+                    $gathering,
+                    "user_joined"
+                );
+                break; // Only send to the first participant for testing purposes
+            }
+
         } else {
             error_log("User $userID failed to join gathering $gatheringID.");
         }
@@ -405,7 +420,27 @@ class GatheringModel
     public function updateGathering($data, $profileId, $gatheringId)
     {
         try {
-            return $this->gatheringDAO->updateGathering($data, $profileId, $gatheringId);
+            $result = $this->gatheringDAO->updateGathering($data, $profileId, $gatheringId);
+            $gathering = $this->gatheringDAO->getGatheringWithAllParticipantInfoByGatheringId($gatheringId);
+
+            if ($result) {
+                error_log("Gathering $gatheringId updated successfully.");
+
+                // Notify participants about the update
+                foreach ($gathering as $g) {
+                    $this->notificationService->sendInfobipWhatsAppTemplate(
+                        $g['phone'],
+                        $g['nickname'],
+                        $gathering,
+                        "gathering_updated"
+                    );
+                    break; // Only send to the first participant for testing purposes
+                }
+            } else {
+                error_log("Failed to update gathering $gatheringId.");
+            }
+
+            return $result;
         } catch (Exception $e) {
             error_log("[GatheringModel] Error updating gathering: " . $e->getMessage());
             return false;
@@ -446,6 +481,16 @@ class GatheringModel
 
             $_SESSION['flash_message'] = "Gathering has been cancelled successfully.";
             $_SESSION['flash_type'] = "success";
+
+            foreach ($result as $p) {
+                $this->notificationService->sendInfobipWhatsAppTemplate(
+                    $p['phone'],
+                    $p['profile']['nickname'],
+                    $gathering,
+                    "gathering_cancelled"
+                );
+                break; // Only send to the first participant for testing purposes
+            }
         } else {
             $_SESSION['flash_message'] = "Something went wrong. Please try again.";
             $_SESSION['flash_type'] = "error";
@@ -459,7 +504,7 @@ class GatheringModel
     {
         try {
             // Validate Gathering is Valid
-            $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
+            $gathering = $this->gatheringDAO->getGatheringWithHostInfoByGatheringId($gatheringId);
             if (!$gathering) {
                 return false;
             }
@@ -473,10 +518,17 @@ class GatheringModel
             // Leave
             $result = $this->gatheringDAO->leaveGathering($profileId, $gatheringId);
 
-
             if ($result) {
                 $_SESSION['flash_type'] = 'success';
                 $_SESSION['flash_message'] = 'You have successfully left the gathering.';
+
+                $this->notificationService->sendInfobipWhatsAppTemplate(
+                    $gathering['phone'],
+                    $gathering['nickname'],
+                    $gathering,
+                    "user_left"
+                );
+
             } else {
                 $_SESSION['flash_type'] = 'error';
                 $_SESSION['flash_message'] = 'Something went wrong.';
