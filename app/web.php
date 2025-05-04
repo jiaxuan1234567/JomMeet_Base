@@ -17,7 +17,7 @@ Route::get('/logout', [HomeController::class, 'logoutHome']);
 
 // profile routes
 Route::get('/profile', [ProfileController::class, 'validateLogin']);
-Route::get('/profile', [ProfileController::class, 'viewProfile']);
+// Route::get('/profile', [ProfileController::class, 'viewProfile']);
 Route::get('/profile/edit', [ProfileController::class, 'editProfile']);
 Route::post('/profile/edit', [ProfileController::class, 'saveProfile']);
 

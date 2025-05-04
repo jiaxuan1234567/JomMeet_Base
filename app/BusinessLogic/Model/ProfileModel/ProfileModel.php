@@ -200,7 +200,7 @@ class ProfileModel
             $_SESSION['profileErrors'] = $errors;
             $_SESSION['old'] = [
                 'nickname'    => $nickname,
-                'about_me'    => $aboutMe,
+                'aboutme'    => $aboutMe,
                 'mbti'        => $mbti,
                 'hobbies'     => $hobbies,
                 'preferences' => $preferences,
@@ -212,7 +212,7 @@ class ProfileModel
         // 3) No errors → hand off to DAO to insert into the database
         $data = [
             'nickname'    => trim($nickname),
-            'about_me'    => trim($aboutMe),
+            'aboutme'    => trim($aboutMe),
             'mbti'        => $mbti,
             'hobbies'     => $hobbies,
             'preferences' => $preferences,

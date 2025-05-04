@@ -919,7 +919,7 @@ $(function () {
     e.preventDefault();
     if ($save.prop('disabled')) return;
 
-    if (confirm('Are you sure you want to update your profile?')) {
+    if (confirm('Confirm to update your profile details?')) {
       $form.off('submit').submit();
     } else {
       alert('Profile update canceled.');

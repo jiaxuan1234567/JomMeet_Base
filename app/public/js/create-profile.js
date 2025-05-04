@@ -82,15 +82,20 @@ $(function () {
       $hiddenH.val($hBtns.filter('.active').map((_, b) => b.dataset.value).get().join(','));
       $hiddenP.val($pBtns.filter('.active').map((_, b) => b.dataset.value).get().join(','));
   
+      var action = '/profile/validate',
+      query  = $form.serialize();
+
       $.ajax({
-        url: '/profile/validate',
-        type: 'POST',
-        data: $form.serialize(),
+        url:      action,
+        type:     'POST',
+        data:     query,
         dataType: 'json'
-      }).done(function (res) {
-        console.log('Validation:', res);
-      }).fail(function (xhr, status, err) {
-        console.error('Validation error:', status, err);
+      })
+      .done(function (res) {
+        console.log(action + '?' + query + ':', res);
+      })
+      .fail(function (xhr, status, err) {
+        console.error(action + '?' + query + ' failed:', status, err);
       });
     }
   

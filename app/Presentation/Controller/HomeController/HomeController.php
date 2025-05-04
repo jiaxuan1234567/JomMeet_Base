@@ -30,6 +30,7 @@ class HomeController
         // $profile = (new HomeModel())->getProfileDetails();
         $userId = (int) ($_SESSION['profile_id'] ?? 0);
         $profile = (new HomeModel())->getUserProfileById($userId);
+        $_SESSION['profile'] = $profile;
         // include $this->fileHelper->getFilePath('Profile');
 
         include $this->fileHelper->getFilePath('Profile');

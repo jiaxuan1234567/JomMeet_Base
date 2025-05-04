@@ -94,6 +94,16 @@ class ProfileController
 
     public function submitProfile()
     {
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $_SESSION['profile'] = [
+            'phone'    => '0166824561',
+            'password' => 't1321'
+        ];
+
         $nickname   = trim($_POST['nickname']);
         $aboutMe    = trim($_POST['aboutme']);
         $mbti       = $_POST['mbti'];
@@ -104,10 +114,21 @@ $preferences = $_POST['preferences']
         ? explode(',', $_POST['preferences'])
         : [];
 
-        $this->profileModel->submitProfile($nickname, $aboutMe, $mbti, $hobbies, $preferences);
+        $newId = $this->profileModel->submitProfile(
+            $nickname,
+            $aboutMe,
+            $mbti,
+            $hobbies,
+            $preferences
+        );
 
-        header('Location: /profile');
-        exit;
+        if ($newId !== false) {
+            $_SESSION['profile_id'] = $newId;
+            header('Location: /profile'); 
+            exit;
+        }
+
+        throw new Exception('Failed to create profile.');
     }
 
     public function editProfile()

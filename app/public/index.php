@@ -8,9 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if ($uri !== '/login' && $uri !== '/login/process' && $uri !== '/profile/create' && empty($_SESSION['profile_id'])) {
+if ($uri !== '/login' && $uri !== '/login/process' && $uri !== '/profile/create'  && $uri !== '/profile/validate' && empty($_SESSION['profile_id'])) {
     header('Location: /login');
     exit;
 }
-
 Route::dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
