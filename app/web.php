@@ -36,7 +36,6 @@ Route::get('/reflection/view/{id}', [ReflectionController::class, 'viewReflectio
 
 // gathering routes
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);
-Route::get('/gathering2', [GatheringController::class, 'gatheringPager']); // -> experimental
 Route::get('/gathering/view/{gatheringId}', [GatheringController::class, 'viewDetail']);
 Route::post('/gathering/search', [GatheringController::class, 'searchGatherings']);
 Route::post('/gathering/join', [GatheringController::class, 'joinGathering']);
@@ -49,8 +48,6 @@ Route::post('/my-gathering/create', [GatheringController::class, 'createGatherin
 Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSelectLocation']);
 Route::post('/my-gathering/leave/{gatheringId}', [GatheringController::class, 'leaveGathering']);
 Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGathering']);
-Route::get('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'viewEdit']);
-Route::post('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'editSubmit']);
 
 // Gathering feedback
 // show the anonymous gathering‐feedback page
@@ -60,6 +57,8 @@ Route::post('/my-gathering/gatheringFeedback', [GatheringController::class, 'sub
 // Location feedback
 Route::get('/my-gathering/locationFeedback', [GatheringController::class, 'showLocationFeedback']);
 Route::post('/my-gathering/locationFeedback', [GatheringController::class, 'locationFeedback']);
+Route::get('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'viewEdit']);
+Route::post('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'editSubmit']);
 
 //AJAX
 Route::get('/api/savedLocations', [GatheringController::class, 'apiSavedLocations']);
