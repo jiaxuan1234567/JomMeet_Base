@@ -4,7 +4,6 @@ namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
 use Persistence\DAO\GatheringDAO\LocationDAO;
-use Persistence\DAO\GatheringDAO\ReminderDAO;
 use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
 use BusinessLogic\Service\GatheringService\GatheringValidationService;
 use BusinessLogic\Service\GatheringService\NotificationService;
@@ -17,7 +16,6 @@ class GatheringModel
 {
     private $gatheringDAO;
     private $locationDAO;
-    private $reminderDAO;
     private $chkStatusService;
     private $validatorService;
     private $notificationService;
@@ -27,7 +25,6 @@ class GatheringModel
     {
         $this->gatheringDAO = new GatheringDAO();
         $this->locationDAO = new LocationDAO();
-        $this->reminderDAO = new ReminderDAO();
         $this->chkStatusService = new CheckGatheringStatusService();
         $this->validatorService = new GatheringValidationService();
         $this->notificationService = new NotificationService();
@@ -274,8 +271,8 @@ class GatheringModel
 
         if ($result) {
             error_log("User $userID successfully joined gathering $gatheringID.");
-            
-            foreach($gathering as $g) {
+
+            foreach ($gathering as $g) {
                 $this->notificationService->sendInfobipWhatsAppTemplate(
                     $g['phone'],
                     $g['nickname'],
@@ -284,7 +281,6 @@ class GatheringModel
                 );
                 break; // Only send to the first participant for testing purposes
             }
-
         } else {
             error_log("User $userID failed to join gathering $gatheringID.");
         }
@@ -528,7 +524,6 @@ class GatheringModel
                     $gathering,
                     "user_left"
                 );
-
             } else {
                 $_SESSION['flash_type'] = 'error';
                 $_SESSION['flash_message'] = 'Something went wrong.';
@@ -739,11 +734,22 @@ class GatheringModel
         }
 
         if ($gathering['hostProfileID'] == $profileId) {
-            $reminders = $this->reminderDAO->getRemindersByHost($gatheringId);
+            $reminders = $this->gatheringDAO->getRemindersByHost($gatheringId);
         } else {
-            $reminders = $this->reminderDAO->getRemindersByParticipant($gatheringId, $profileId);
+            $reminders = $this->gatheringDAO->getRemindersByParticipant($gatheringId, $profileId);
         }
 
         return $reminders;
+    }
+
+    public function createReminder($data)
+    {
+        try {
+            $reminderId = $this->gatheringDAO->createReminder($data);
+            return $reminderId;
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error creating reminder: " . $e->getMessage());
+            return false;
+        }
     }
 }

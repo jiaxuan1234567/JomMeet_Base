@@ -422,6 +422,7 @@ class GatheringController
 
         foreach ($reminders as &$reminder) {
             $reminder['timeAgo'] = $this->formatTimeAgo($reminder['createdAt']);
+            $reminder['role'] = $gathering['hostProfileID'] == $reminder['profileID'] ? 'Host' : 'Participant';
         }
 
         include $this->fileHelper->getFilePath('GatheringReminder');
@@ -455,11 +456,11 @@ class GatheringController
         ];
 
         try {
-            $newId = $this->gatheringModel->createGathering($data);
-            $_SESSION['flash_message'] = 'Gathering has been created successfully!';
+            $newId = $this->gatheringModel->createReminder($data);
+            $_SESSION['flash_message'] = 'Reminder has been created successfully!';
             $_SESSION['flash_type'] = 'success';
-
-            header("Location: /my-gathering#hosted");
+            
+            header("Location: /my-gathering/reminder/view/" . $data['gatheringId']);
             exit;
         } catch (Exception $e) {
             http_response_code(500);

@@ -4,16 +4,29 @@ require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
 <div class="container-fluid" style="min-height: 70vh;">
+    <?php
+        if (!empty($_SESSION['flash_message'])):
+        ?>
+            <div id="flashMessage"
+                class="flash-message"
+                data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
+                data-msg="<?= $_SESSION['flash_message'] ?>">
+            </div>
+            <?php
+            unset($_SESSION['flash_message']);
+            unset($_SESSION['flash_type']);
+        ?>
+    <?php endif; ?>
     <div class="row header-reminder mt-3">
-        <div class="col-sm-1 text-center">
-            <a href="/my-gathering" class="btn btn-primary px-4">Back</a>
+        <div class="col-sm-1 text-center pt-1">
+            <a href="/my-gathering" class="bi bi-arrow-left text-black h3 mt-5"></a>
         </div>
         <div class="col-sm-10">
             <div class="fw-bold text-center" style="font-size: 30px;">
                 <?php echo htmlspecialchars($gathering['theme']); ?> Reminder
             </div>
         </div>
-        <div class="col-sm-1 text-center">
+        <div class="col-sm-1 text-center pt-1">
             <a href="#" class="btn btn-primary px-4" data-bs-toggle="collapse" data-bs-target="#createReminderForm">Post</a>
         </div>
     </div>
@@ -49,7 +62,7 @@ require_once __DIR__ . '/../HomeView/header.php';
 
                         <div class="card-header row bg-blue-color">
                             <div class="role text-sm-start col-6">
-                                <?php echo htmlspecialchars($reminder['profileID']); ?> Host / Participant
+                                <?php echo htmlspecialchars($reminder['role']); ?>
                             </div>
                             <div class="time text-sm-end col-6 text-muted">
                                 <?php echo htmlspecialchars($reminder['timeAgo']); ?>

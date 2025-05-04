@@ -49,7 +49,7 @@ Route::get('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'vie
 Route::post('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'editSubmit']);
 // reminder
 Route::get('/my-gathering/reminder/view/{id}', [GatheringController::class, 'viewGatheringReminder']);
-Route::get('/my-gathering/reminder/create', [GatheringController::class, 'createGatheringReminder']);
+Route::post('/my-gathering/reminder/create', [GatheringController::class, 'createGatheringReminder']);
 
 //AJAX
 Route::get('/api/savedLocations', [GatheringController::class, 'apiSavedLocations']);
