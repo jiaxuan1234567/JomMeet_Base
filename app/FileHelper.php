@@ -42,6 +42,9 @@ class FileHelper
         $gatheringPaths = [
             'MyGatheringList' => "/Presentation/View/GatheringView/my-gathering.php",
             'MyGatheringDetails' => "/Presentation/View/GatheringView/my-gathering-details.php",
+            'LocationFeedback' => "/Presentation/View/GatheringView/location-feedback.php",
+            'GatheringFeedback' => "/Presentation/View/GatheringView/gathering-feedback.php",
+
             'CreateGathering' => "/Presentation/View/GatheringView/create-gathering.php",
             'SelectLocation' => "/Presentation/View/GatheringView/select-location.php",
             'JoinGathering' => "/Presentation/View/GatheringView/join-gathering.php",

@@ -217,11 +217,14 @@ class GatheringModel
     public function getMyGatherings($profileId)
     {
         try {
+            $this->gatheringDAO->updateGatheringStatuses();
             $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
             return array_map(function (array $g) {
                 return [
                     'id'        => (int)$g['gatheringID'],
-                    'cover'     => $g['image'],
+                    'locationID'  => (int)$g['locationID'],
+                    // 'cover'     => $g['image'],
+                    'cover' => $g['image'] ?: 'bubble.png',
                     'theme'     => $g['theme'],
                     'date'      => date('d F Y', strtotime($g['date'])),
                     'startTime' => date('g:i A',   strtotime($g['startTime'])),
@@ -437,5 +440,46 @@ class GatheringModel
 
         // 2) call pure helper
         return $this->validatorService->validate($post, $locRow, $joined);
+    }
+
+    // Location Feedback
+    public function getLocationFeedback($locationId)
+    {
+        return $this->gatheringDAO
+            ->getLocationFeedbackByLocation($locationId);
+    }
+
+    /**
+     * Save new feedback if the user hasn’t already posted one.
+     */
+    public function saveLocationFeedback($profileId, $gatheringId, $locationId, $desc)
+    {
+        return $this->gatheringDAO
+            ->insertLocationFeedback($profileId, $gatheringId, $locationId, $desc);
+    }
+
+    // fetch all gathering feedback (anonymous)
+    public function getGatheringFeedback(int $gatheringId): array
+    {
+        return $this->gatheringDAO
+            ->getGatheringFeedbackByGathering($gatheringId);
+    }
+
+    // insert a new gathering feedback record
+    public function addGatheringFeedback(int $profileId, int $gatheringId, string $desc): bool
+    {
+        // load the gathering row so we know its locationID
+        $g = $this->gatheringDAO->getGatheringById($gatheringId);
+        if (!$g) {
+            throw new Exception("Gathering #{$gatheringId} not found");
+        }
+
+        $locationId = (int)$g['locationID'];
+        return $this->gatheringDAO->insertGatheringFeedback(
+            $profileId,
+            $gatheringId,
+            $locationId,
+            $desc
+        );
     }
 }
