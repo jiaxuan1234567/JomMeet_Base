@@ -29,6 +29,9 @@ class ProfileDAO
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Base profile info from the first row
+            if (empty($rows)) {
+                return false;
+            }
             $base = $rows[0];
             $profile = [
                 'profileID'     => (int)$base['profileID'],
@@ -156,7 +159,6 @@ class ProfileDAO
 
             $this->db->commit();
             return $profileId;
-
         } catch (PDOException $e) {
             $this->db->rollBack();
             error_log("Error in insertProfile: " . $e->getMessage());

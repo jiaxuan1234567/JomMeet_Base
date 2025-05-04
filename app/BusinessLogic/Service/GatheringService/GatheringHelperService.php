@@ -15,7 +15,7 @@ class GatheringHelperService
         $dateStr      = $value['inputDate'] ?? '';
         $startTimeStr = $value['startTime'] ?? '';
         $endTimeStr   = $value['endTime'] ?? '';
-        $response = ['valid' => true, 'errors' => [], 'errFields' => []];
+
         if (!empty($editingId)) {
             $joinedGatherings = array_values(array_filter($joinedGatherings, function ($g) use ($editingId) {
                 return $g['gatheringID'] != $editingId;
@@ -26,16 +26,15 @@ class GatheringHelperService
             $date = $dateStr ? new DateTime($dateStr) : null;
             $startDT = $startTimeStr ? new DateTime($startTimeStr) : null;
             $endDT   = $endTimeStr   ? new DateTime($endTimeStr)   : null;
-
-            // if ($startDT && $endDT && $endDT < $startDT) {
-            //     $endDT->modify('+1 day');
-            // }
         } catch (Exception $e) {
-            return $this->formatResponse([
+            return [
                 'valid' => false,
-                'errors' => ['Invalid datetime format'],
-                'errFields' => [$touched]
-            ], $field, $touched);
+                'field' => $field,
+                'touched' => $touched,
+                'errors' => [
+                    $touched => 'Invalid datetime format'
+                ]
+            ];
         }
 
         $today = new DateTime('today');
@@ -45,333 +44,403 @@ class GatheringHelperService
         // Constraint: start time must be >= now + 3 hours
         if ($field === 'inputDateStartTime' || $field === 'inputDateEndTime') {
             if ($date < $threeHoursLater) {
-                $response['valid'] = false;
-                $response['errors'] = ['Start time must be at least 3 hours from now.'];
-                $response['errFields'] = ($field === 'inputDateStartTime') ? ['startTime'] : ['endTime'];
+                return [
+                    'valid' => false,
+                    'field' => $field,
+                    'touched' => $touched,
+                    'errors' => [
+                        $field === 'inputDateStartTime' ? 'startTime' : 'endTime' => 'Start time must be at least 3 hours from now.'
+                    ]
+                ];
             }
-        } else if ($startDT && $startDT < $threeHoursLater) {
-            $response['valid'] = false;
-            $response['errors'] = ['Start time must be at least 3 hours from now.'];
-            $response['errFields'] = ['startTime'];
+        } elseif ($startDT && $startDT < $threeHoursLater) {
+            return [
+                'valid' => false,
+                'field' => $field,
+                'touched' => $touched,
+                'errors' => [
+                    'startTime' => 'Start time must be at least 3 hours from now.'
+                ]
+            ];
         }
 
-        // 1. If field is "time" (start + end both fulfilled) and NOT triggered by "time"
+        // Validate start vs end
         if ($field === 'time') {
             if ($startDT && $endDT) {
                 if ($startDT > $endDT) {
-                    $response['valid'] = false;
-                    $response['errors'] = ['Start time must be earlier than end time.'];
-                    $response['errFields'] = [$touched];
-                } else if ($startDT == $endDT) {
-                    $response['valid'] = false;
-                    $response['errors'] = ['Invalid time options.', ''];
-                    $response['errFields'] = ['startTime', 'endTime'];
+                    return [
+                        'valid' => false,
+                        'field' => $field,
+                        'touched' => $touched,
+                        'errors' => [
+                            $touched => 'Start time must be earlier than end time.'
+                        ]
+                    ];
+                } elseif ($startDT == $endDT) {
+                    return [
+                        'valid' => false,
+                        'field' => $field,
+                        'touched' => $touched,
+                        'errors' => [
+                            'startTime' => 'Start time and end time cannot be same.',
+                            'endTime' => 'Start time and end time cannot be same.'
+                        ]
+                    ];
                 }
-            }
 
-            foreach ($joinedGatherings as $gathering) {
-                $joinedStart = new DateTime("{$gathering['date']} {$gathering['startTime']}");
-                $joinedEnd   = new DateTime("{$gathering['date']} {$gathering['endTime']}");
-
-                // if ($joinedEnd < $joinedStart) {
-                //     $joinedEnd->modify('+1 day');
-                // }
-
-                if ($startDT && $endDT && $startDT < $joinedEnd && $endDT > $joinedStart) {
-                    $response['valid'] = false;
-                    $response['errors'] = ['Selected time overlaps with an existing gathering.'];
-                    $response['errFields'] = [$touched];
-                    break;
-                }
-            }
-        }
-
-        // 2. If current field is the touched one
-        if ($field === $touched) {
-            if ($field === 'inputDate' && $date && $date < $today) {
-                $response['valid'] = false;
-                $response['errors'] = ['Date must be today or later.'];
-                $response['errFields'] = [$touched];
-            }
-
-            if ($field === 'startTime' || $field === 'endTime') {
-                $targetDT = $field === 'startTime' ? $startDT : $endDT;
-
-                foreach ($joinedGatherings as $gathering) {
-                    $joinedStart = new DateTime("{$gathering['date']} {$gathering['startTime']}");
-                    $joinedEnd   = new DateTime("{$gathering['date']} {$gathering['endTime']}");
-
-                    // if ($joinedEnd < $joinedStart) {
-                    //     $joinedEnd->modify('+1 day');
-                    // }
-
-                    if ($targetDT && $targetDT > $joinedStart && $targetDT < $joinedEnd) {
-                        $response['valid'] = false;
-                        $response['errors'] = [ucfirst($field) . ' overlaps with an existing gathering.'];
-                        $response['errFields'] = [$touched];
-                        break;
+                foreach ($joinedGatherings as $g) {
+                    $joinedStart = new DateTime("{$g['date']} {$g['startTime']}");
+                    $joinedEnd   = new DateTime("{$g['date']} {$g['endTime']}");
+                    if ($startDT < $joinedEnd && $endDT > $joinedStart) {
+                        return [
+                            'valid' => false,
+                            'field' => $field,
+                            'touched' => $touched,
+                            'errors' => [
+                                $touched => 'Selected time overlaps with an existing gathering.'
+                            ]
+                        ];
                     }
                 }
             }
         }
 
-        return $this->formatResponse($response, $field, $touched);
-    }
+        // Validate single field overlaps
+        if ($field === $touched) {
+            if ($field === 'inputDate' && $date && $date < $today) {
+                return [
+                    'valid' => false,
+                    'field' => $field,
+                    'touched' => $touched,
+                    'errors' => [
+                        $touched => 'Date must be today or later.'
+                    ]
+                ];
+            }
 
-    public function validateLocation($data, $validLoc)
-    {
-        $field    = $data['field'] ?? '';
-        $touched  = $data['touched'] ?? '';
-        $value    = $data['value'] ?? [];
-        $id      = $value['locationId'] ?? '';
-        $name = $value['locationName'] ?? '';
-        $response = ['valid' => true, 'errors' => []];
+            if ($field === 'startTime' || $field === 'endTime') {
+                $targetDT = $field === 'startTime' ? $startDT : $endDT;
 
-        if ($id === '' || $name === '') {
-            $response['valid'] = false;
-            $response['errors'] = 'Please select a valid location.';
-        } elseif (!$validLoc || strcasecmp($validLoc['locationName'], $name) !== 0) {
-            $response['valid'] = false;
-            $response['errors'] = 'Selected location is invalid.';
+                foreach ($joinedGatherings as $g) {
+                    $joinedStart = new DateTime("{$g['date']} {$g['startTime']}");
+                    $joinedEnd   = new DateTime("{$g['date']} {$g['endTime']}");
+                    if ($targetDT && $targetDT > $joinedStart && $targetDT < $joinedEnd) {
+                        return [
+                            'valid' => false,
+                            'field' => $field,
+                            'touched' => $touched,
+                            'errors' => [
+                                $touched => ucfirst($field) . ' overlaps with an existing gathering.'
+                            ]
+                        ];
+                    }
+                }
+            }
         }
-        return $this->formatResponse($response, $field, $touched);
-    }
 
-    public function validateGatheringTag($data, $validTags)
-    {
-        $field    = $data['field'] ?? '';
-        $touched  = $data['touched'] ?? '';
-        $tag = $data['value'] ?? '';
-        $response = ['valid' => true, 'errors' => []];
-
-        if ($tag === '') {
-            $response['valid'] = false;
-            $response['errors'] = 'Preference is required.';
-        } elseif (!in_array(strtoupper($tag), $validTags, true)) {
-            $response['valid'] = false;
-            $response['errors'] = 'Invalid preference selected.';
-        }
-        return $this->formatResponse($response, $field, $touched);
-    }
-
-    public function validateTheme($data)
-    {
-        $field    = $data['field'] ?? '';
-        $touched  = $data['touched'] ?? '';
-        $theme = $data['value'] ?? '';
-        $response = ['valid' => true, 'errors' => []];
-
-        if ($theme === '') {
-            $response['valid'] = false;
-            $response['errors'] = 'Theme is required.';
-        } elseif (strlen($theme) > 100) {
-            $response['valid'] = false;
-            $response['errors'] = 'Theme cannot exceed 100 characters.';
-        } elseif (!preg_match('/[A-Za-z]/', $theme)) {
-            $response['valid'] = false;
-            $response['errors'] = 'Theme must contain at least one letter.';
-        }
-        return $this->formatResponse($response, $field, $touched);
-    }
-
-    public function validatePax($data, $min, $max)
-    {
-        $field    = $data['field'] ?? '';
-        $touched  = $data['touched'] ?? '';
-        $pax = $data['value'] ?? '';
-        $response = ['valid' => true, 'errors' => []];
-
-        if ($pax < $min || $pax > $max) {
-            $response['valid'] = false;
-            $response['errors'] = 'Pax must be between ' . $min . ' and ' . $max . '.';
-        }
-        return $this->formatResponse($response, $field, $touched);
-    }
-
-    private function formatResponse($raw, $field, $touched)
-    {
-        $normalized = [
-            'valid' => $raw['valid'] ?? true,
+        return [
+            'valid' => true,
             'field' => $field,
             'touched' => $touched,
             'errors' => []
         ];
-
-        if (!$normalized['valid']) {
-            $errors = $raw['errors'] ?? [];
-            $errFields = $raw['errFields'] ?? [];
-
-            if (!is_array($errors)) {
-                $errors = [$errors]; // catch single string error
-            }
-
-            foreach ($errFields as $i => $f) {
-                $normalized['errors'][$f] = $errors[$i] ?? '';
-            }
-
-            // fallback: if no specific errFields, attach to touched field
-            if (empty($errFields) && !empty($errors)) {
-                $normalized['errors'][$touched] = $errors[0];
-            }
-        }
-
-        return $normalized;
     }
 
-    // function buildGatheringDatetime($date, $startTime, $endTime)
-    // {
-    //     $start = new DateTime("$date $startTime");
-    //     $end = new DateTime("$date $endTime");
+    public function validateLocation($data, $validLoc)
+    {
+        $field = $data['field'] ?? '';
+        $touched = $data['touched'] ?? '';
+        $value = $data['value'] ?? [];
+        $id = $value['locationId'] ?? '';
+        $name = $value['locationName'] ?? '';
 
-    //     // If end time is earlier than start time, assume it's the next day
-    //     if ($end < $start) {
-    //         $end->modify('+1 day');
+        $error = '';
+        if ($id === '' || $name === '') {
+            $error = 'Please select a valid location.';
+        } elseif (!$validLoc || strcasecmp($validLoc['locationName'], $name) !== 0) {
+            $error = 'Selected location is invalid.';
+        }
+
+        return [
+            'valid' => $error === '',
+            'field' => $field,
+            'touched' => $touched,
+            'errors' => $error ? [$touched => $error] : []
+        ];
+    }
+
+    public function validateGatheringTag($data, $validTags)
+    {
+        $field = $data['field'] ?? '';
+        $touched = $data['touched'] ?? '';
+        $tag = $data['value'] ?? '';
+        $error = '';
+
+        if ($tag === '') {
+            $error = 'Preference is required.';
+        } elseif (!in_array(strtoupper($tag), $validTags, true)) {
+            $error = 'Invalid preference selected.';
+        }
+
+        return [
+            'valid' => $error === '',
+            'field' => $field,
+            'touched' => $touched,
+            'errors' => $error ? [$touched => $error] : []
+        ];
+    }
+
+    public function validateTheme($data)
+    {
+        $field = $data['field'] ?? '';
+        $touched = $data['touched'] ?? '';
+        $theme = $data['value'] ?? '';
+        $error = '';
+
+        if ($theme === '') {
+            $error = 'Theme is required.';
+        } elseif (strlen($theme) > 100) {
+            $error = 'Theme cannot exceed 100 characters.';
+        } elseif (!preg_match('/[A-Za-z]/', $theme)) {
+            $error = 'Theme must contain at least one letter.';
+        }
+
+        return [
+            'valid' => $error === '',
+            'field' => $field,
+            'touched' => $touched,
+            'errors' => $error ? [$touched => $error] : []
+        ];
+    }
+
+    public function validatePax($data, $min, $max)
+    {
+        $field = $data['field'] ?? '';
+        $touched = $data['touched'] ?? '';
+        $pax = $data['value'] ?? '';
+
+        $error = ($pax < $min || $pax > $max)
+            ? 'Pax must be between ' . $min . ' and ' . $max . '.'
+            : '';
+
+        return [
+            'valid' => $error === '',
+            'field' => $field,
+            'touched' => $touched,
+            'errors' => $error ? [$touched => $error] : []
+        ];
+    }
+
+
+    // public function validateDateTime($data, $joinedGatherings, $editingId = null)
+    // {
+    //     $field    = $data['field'] ?? '';
+    //     $touched  = $data['touched'] ?? '';
+    //     $value    = $data['value'] ?? [];
+    //     $dateStr      = $value['inputDate'] ?? '';
+    //     $startTimeStr = $value['startTime'] ?? '';
+    //     $endTimeStr   = $value['endTime'] ?? '';
+    //     $response = ['valid' => true, 'errors' => [], 'errFields' => []];
+    //     if (!empty($editingId)) {
+    //         $joinedGatherings = array_values(array_filter($joinedGatherings, function ($g) use ($editingId) {
+    //             return $g['gatheringID'] != $editingId;
+    //         }));
     //     }
 
-    //     return [
-    //         'startDatetime' => $start->format('Y-m-d H:i'),
-    //         'endDatetime'   => $end->format('Y-m-d H:i')
-    //     ];
+    //     try {
+    //         $date = $dateStr ? new DateTime($dateStr) : null;
+    //         $startDT = $startTimeStr ? new DateTime($startTimeStr) : null;
+    //         $endDT   = $endTimeStr   ? new DateTime($endTimeStr)   : null;
+
+    //         // if ($startDT && $endDT && $endDT < $startDT) {
+    //         //     $endDT->modify('+1 day');
+    //         // }
+    //     } catch (Exception $e) {
+    //         return $this->formatResponse([
+    //             'valid' => false,
+    //             'errors' => ['Invalid datetime format'],
+    //             'errFields' => [$touched]
+    //         ], $field, $touched);
+    //     }
+
+    //     $today = new DateTime('today');
+    //     $now = new DateTime();
+    //     $threeHoursLater = (clone $now)->modify('+3 hours');
+
+    //     // Constraint: start time must be >= now + 3 hours
+    //     if ($field === 'inputDateStartTime' || $field === 'inputDateEndTime') {
+    //         if ($date < $threeHoursLater) {
+    //             $response['valid'] = false;
+    //             $response['errors'] = ['Start time must be at least 3 hours from now.'];
+    //             $response['errFields'] = ($field === 'inputDateStartTime') ? ['startTime'] : ['endTime'];
+    //         }
+    //     } else if ($startDT && $startDT < $threeHoursLater) {
+    //         $response['valid'] = false;
+    //         $response['errors'] = ['Start time must be at least 3 hours from now.'];
+    //         $response['errFields'] = ['startTime'];
+    //     }
+
+    //     // 1. If field is "time" (start + end both fulfilled) and NOT triggered by "time"
+    //     if ($field === 'time') {
+    //         if ($startDT && $endDT) {
+    //             if ($startDT > $endDT) {
+    //                 $response['valid'] = false;
+    //                 $response['errors'] = ['Start time must be earlier than end time.'];
+    //                 $response['errFields'] = [$touched];
+    //             } else if ($startDT == $endDT) {
+    //                 $response['valid'] = false;
+    //                 $error = ($touched === 'startTime') ? ['Invalid time options.', ''] : ['', 'Invalid time options.'];
+    //                 $response['errors'] = [$error];
+    //                 $response['errFields'] = ['startTime', 'endTime'];
+    //             }
+    //         }
+
+    //         foreach ($joinedGatherings as $gathering) {
+    //             $joinedStart = new DateTime("{$gathering['date']} {$gathering['startTime']}");
+    //             $joinedEnd   = new DateTime("{$gathering['date']} {$gathering['endTime']}");
+
+    //             // if ($joinedEnd < $joinedStart) {
+    //             //     $joinedEnd->modify('+1 day');
+    //             // }
+
+    //             if ($startDT && $endDT && $startDT < $joinedEnd && $endDT > $joinedStart) {
+    //                 $response['valid'] = false;
+    //                 $response['errors'] = ['Selected time overlaps with an existing gathering.'];
+    //                 $response['errFields'] = [$touched];
+    //                 break;
+    //             }
+    //         }
+    //     }
+
+    //     // 2. If current field is the touched one
+    //     if ($field === $touched) {
+    //         if ($field === 'inputDate' && $date && $date < $today) {
+    //             $response['valid'] = false;
+    //             $response['errors'] = ['Date must be today or later.'];
+    //             $response['errFields'] = [$touched];
+    //         }
+
+    //         if ($field === 'startTime' || $field === 'endTime') {
+    //             $targetDT = $field === 'startTime' ? $startDT : $endDT;
+
+    //             foreach ($joinedGatherings as $gathering) {
+    //                 $joinedStart = new DateTime("{$gathering['date']} {$gathering['startTime']}");
+    //                 $joinedEnd   = new DateTime("{$gathering['date']} {$gathering['endTime']}");
+
+    //                 // if ($joinedEnd < $joinedStart) {
+    //                 //     $joinedEnd->modify('+1 day');
+    //                 // }
+
+    //                 if ($targetDT && $targetDT > $joinedStart && $targetDT < $joinedEnd) {
+    //                     $response['valid'] = false;
+    //                     $response['errors'] = [ucfirst($field) . ' overlaps with an existing gathering.'];
+    //                     $response['errFields'] = [$touched];
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return $this->formatResponse($response, $field, $touched);
     // }
 
-    // private function shouldValidate(string $field, array $only): bool
+    // public function validateLocation($data, $validLoc)
     // {
-    //     return empty($only) || in_array($field, $only, true);
+    //     $field    = $data['field'] ?? '';
+    //     $touched  = $data['touched'] ?? '';
+    //     $value    = $data['value'] ?? [];
+    //     $id      = $value['locationId'] ?? '';
+    //     $name = $value['locationName'] ?? '';
+    //     $response = ['valid' => true, 'errors' => []];
+
+    //     if ($id === '' || $name === '') {
+    //         $response['valid'] = false;
+    //         $response['errors'] = 'Please select a valid location.';
+    //     } elseif (!$validLoc || strcasecmp($validLoc['locationName'], $name) !== 0) {
+    //         $response['valid'] = false;
+    //         $response['errors'] = 'Selected location is invalid.';
+    //     }
+    //     return $this->formatResponse($response, $field, $touched);
     // }
 
-    // private function validateTag(string $tag, array $validTags, array $e): array
+    // public function validateGatheringTag($data, $validTags)
     // {
+    //     $field    = $data['field'] ?? '';
+    //     $touched  = $data['touched'] ?? '';
+    //     $tag = $data['value'] ?? '';
+    //     $response = ['valid' => true, 'errors' => []];
+
     //     if ($tag === '') {
-    //         $e['gatheringTag'] = 'Preference is required.';
+    //         $response['valid'] = false;
+    //         $response['errors'] = 'Preference is required.';
     //     } elseif (!in_array(strtoupper($tag), $validTags, true)) {
-    //         $e['gatheringTag'] = 'Invalid preference selected.';
+    //         $response['valid'] = false;
+    //         $response['errors'] = 'Invalid preference selected.';
     //     }
-    //     return $e;
+    //     return $this->formatResponse($response, $field, $touched);
     // }
 
-    // private function validateTheme(string $theme, array $e): array
+    // public function validateTheme($data)
     // {
+    //     $field    = $data['field'] ?? '';
+    //     $touched  = $data['touched'] ?? '';
+    //     $theme = $data['value'] ?? '';
+    //     $response = ['valid' => true, 'errors' => []];
+
     //     if ($theme === '') {
-    //         $e['inputTheme'] = 'Theme is required.';
+    //         $response['valid'] = false;
+    //         $response['errors'] = 'Theme is required.';
     //     } elseif (strlen($theme) > 100) {
-    //         $e['inputTheme'] = 'Theme cannot exceed 100 characters.';
+    //         $response['valid'] = false;
+    //         $response['errors'] = 'Theme cannot exceed 100 characters.';
     //     } elseif (!preg_match('/[A-Za-z]/', $theme)) {
-    //         $e['inputTheme'] = 'Theme must contain at least one letter.';
+    //         $response['valid'] = false;
+    //         $response['errors'] = 'Theme must contain at least one letter.';
     //     }
-    //     return $e;
+    //     return $this->formatResponse($response, $field, $touched);
     // }
 
-    // private function validatePax(int $pax, array $e): array
+    // public function validatePax($data, $min, $max)
     // {
-    //     if ($pax < 3 || $pax > 8) {
-    //         $e['inputPax'] = 'Pax must be between 3 and 8.';
+    //     $field    = $data['field'] ?? '';
+    //     $touched  = $data['touched'] ?? '';
+    //     $pax = $data['value'] ?? '';
+    //     $response = ['valid' => true, 'errors' => []];
+
+    //     if ($pax < $min || $pax > $max) {
+    //         $response['valid'] = false;
+    //         $response['errors'] = 'Pax must be between ' . $min . ' and ' . $max . '.';
     //     }
-    //     return $e;
+    //     return $this->formatResponse($response, $field, $touched);
     // }
 
-    // // private function validateLocation(string $id, string $name, ?array $row, array $e): array
-    // // {
-    // //     if ($id === '' || $name === '') {
-    // //         $e['inputLocation'] = 'Please select a valid location.';
-    // //     } elseif (!$row || strcasecmp($row['locationName'], $name) !== 0) {
-    // //         $e['inputLocation'] = 'Selected location is invalid.';
-    // //     }
-    // //     return $e;
-    // // }
-
-    // private function validateDate(string $date, array $e): array
+    // private function formatResponse($raw, $field, $touched)
     // {
-    //     if ($date === '') {
-    //         $e['inputDate'] = 'Date is required.';
-    //     } else {
-    //         $d = DateTime::createFromFormat('Y-m-d', $date);
-    //         if (!$d) {
-    //             $e['inputDate'] = 'Invalid date format.';
-    //         } elseif ($d < new DateTime('today')) {
-    //             $e['inputDate'] = 'Date cannot be in the past.';
-    //         }
-    //     }
-    //     return $e;
-    // }
+    //     $normalized = [
+    //         'valid' => $raw['valid'] ?? true,
+    //         'field' => $field,
+    //         'touched' => $touched,
+    //         'errors' => []
+    //     ];
 
-    // private function validateTime(string $start, string $end, array $e): array
-    // {
-    //     if ($start === '') {
-    //         $e['startTime'] = 'Start time is required.';
-    //     }
-    //     if ($end === '') {
-    //         $e['endTime'] = 'End time is required.';
-    //     }
-    //     return $e;
-    // }
+    //     if (!$normalized['valid']) {
+    //         $errors = $raw['errors'] ?? [];
+    //         $errFields = $raw['errFields'] ?? [];
 
-    // // private function validateDateTime(string $date, string $start, string $end, array $e): array
-    // // {
-    // //     $startDT = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
-    // //     $endDT   = DateTime::createFromFormat('Y-m-d H:i', "$date $end");
-
-    // //     if (!$startDT || !$endDT) {
-    // //         $e['endTime'] = 'Invalid time format.';
-    // //     } elseif ($startDT >= $endDT) {
-    // //         $e['endTime'] = 'End time must be after start time.';
-    // //     } else {
-    // //         $minStart = (new DateTime())->modify('+3 hours');
-    // //         if ($startDT < $minStart) {
-    // //             $e['startTime'] = 'Start time must be at least 3 hours from now.';
-    // //         }
-    // //     }
-    // //     return $e;
-    // // }
-
-    // private function validateStartTimeBuffer(string $date, string $start, array $e): array
-    // {
-    //     $startDT = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
-    //     if (!$startDT) return $e;
-
-    //     $minStart = (new DateTime())->modify('+3 hours');
-    //     if ($startDT < $minStart) {
-    //         $e['startTime'] = 'Start time must be at least 3 hours from now.';
-    //     }
-    //     return $e;
-    // }
-
-    // private function validateOverlap(string $date, string $start, array $joined, array $e, ?int $editingId = null): array
-    // {
-    //     if ($date === '' || $start === '' || !$joined) {
-    //         return $e;
-    //     }
-
-    //     $newStart = DateTime::createFromFormat('Y-m-d H:i', "$date $start");
-    //     if (!$newStart) {
-    //         return $e;
-    //     }
-
-    //     foreach ($joined as $g) {
-    //         if ($editingId && $g['gatheringID'] == $editingId) {
-    //             continue;
+    //         if (!is_array($errors)) {
+    //             $errors = [$errors]; // catch single string error
     //         }
 
-    //         if (in_array(strtoupper($g['status']), ['END', 'CANCELLED'], true)) {
-    //             continue;
+    //         foreach ($errFields as $i => $f) {
+    //             $normalized['errors'][$f] = $errors[$i] ?? '';
     //         }
-    //         $jStart = DateTime::createFromFormat(
-    //             'Y-m-d H:i:s',
-    //             "{$g['date']} {$g['startTime']}"
-    //         );
-    //         $jEnd = DateTime::createFromFormat(
-    //             'Y-m-d H:i:s',
-    //             "{$g['date']} {$g['endTime']}"
-    //         );
-    //         if ($jStart && $jEnd && $newStart >= $jStart && $newStart < $jEnd) {
-    //             $e['startTime'] = sprintf(
-    //                 "You have another gathering from %s to %s.",
-    //                 $jStart->format('d M Y g:i A'),
-    //                 $jEnd->format('d M Y g:i A')
-    //             );
-    //             break;
+
+    //         // fallback: if no specific errFields, attach to touched field
+    //         if (empty($errFields) && !empty($errors)) {
+    //             $normalized['errors'][$touched] = $errors[0];
     //         }
     //     }
 
-    //     return $e;
+    //     return $normalized;
     // }
 }

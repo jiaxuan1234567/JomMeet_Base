@@ -8,7 +8,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if (($uri !== '/login' || $uri !== '/login/process' || $uri !== '/profile/create') && empty($_SESSION['profile']['profileID'])) {
+
+if ($uri == '/profile/create') {
+} else if ($uri !== '/login' && $uri !== '/login/process' && empty($_SESSION['profile']['profileID'])) {
     header('Location: /login');
     exit;
 }

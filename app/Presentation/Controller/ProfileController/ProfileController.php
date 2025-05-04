@@ -58,12 +58,17 @@ class ProfileController
 
         $status = $this->profileModel->validateLogin($phoneNumber, $password);
 
-        if ($status) {
+        if ($status == "valid") {
             error_log("login success");
             header("Location: /");
+            exit;
+        } else if ($status == "newAcc") {
+            header("Location: /profile/create");
+            exit;
         } else {
             error_log("login failed");
             header("Location: /login");
+            exit;
         }
     }
 
@@ -97,12 +102,12 @@ class ProfileController
         $nickname   = trim($_POST['nickname']);
         $aboutMe    = trim($_POST['aboutme']);
         $mbti       = $_POST['mbti'];
-        $hobbies     = $_POST['hobbies'] 
-        ? explode(',', $_POST['hobbies']) 
-        : [];
-$preferences = $_POST['preferences']
-        ? explode(',', $_POST['preferences'])
-        : [];
+        $hobbies     = $_POST['hobbies']
+            ? explode(',', $_POST['hobbies'])
+            : [];
+        $preferences = $_POST['preferences']
+            ? explode(',', $_POST['preferences'])
+            : [];
 
         $this->profileModel->submitProfile($nickname, $aboutMe, $mbti, $hobbies, $preferences);
 
@@ -125,12 +130,12 @@ $preferences = $_POST['preferences']
         $nickname   = trim($_POST['nickname']);
         $aboutMe    = trim($_POST['aboutme']);
         $mbti       = $_POST['mbti'];
-        $hobbies     = $_POST['hobbies'] 
-        ? explode(',', $_POST['hobbies']) 
-        : [];
-$preferences = $_POST['preferences']
-        ? explode(',', $_POST['preferences'])
-        : [];
+        $hobbies     = $_POST['hobbies']
+            ? explode(',', $_POST['hobbies'])
+            : [];
+        $preferences = $_POST['preferences']
+            ? explode(',', $_POST['preferences'])
+            : [];
 
         $this->profileModel->saveProfile($userId, $nickname, $aboutMe, $mbti, $hobbies, $preferences);
 
@@ -197,18 +202,21 @@ $preferences = $_POST['preferences']
         $aboutMe     = trim($_POST['aboutme']     ?? '');
         $mbti        = $_POST['mbti']             ?? '';
         $hobbies     = !empty($_POST['hobbies'])
-                       ? explode(',', $_POST['hobbies'])
-                       : [];
+            ? explode(',', $_POST['hobbies'])
+            : [];
         $preferences = !empty($_POST['preferences'])
-                       ? explode(',', $_POST['preferences'])
-                       : [];
+            ? explode(',', $_POST['preferences'])
+            : [];
 
         $result = $this->profileModel->validateProfileData(
-            $nickname, $aboutMe, $mbti, $hobbies, $preferences
+            $nickname,
+            $aboutMe,
+            $mbti,
+            $hobbies,
+            $preferences
         );
 
         echo json_encode($result);
         exit;
     }
-
 }

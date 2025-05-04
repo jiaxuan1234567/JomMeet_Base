@@ -73,7 +73,8 @@ class ProfileModel
         ];
     }
 
-    public function getAllPreferences() {
+    public function getAllPreferences()
+    {
         return [
             'Entertainment',
             'Sports',
@@ -94,14 +95,17 @@ class ProfileModel
         $profile = $this->profileDAO->getUserByPhoneNumber($phoneNumber);
 
         //if (!$profile || !password_verify($password, $profile['password'])) {
-        if (!$profile || !($password == $profile['password'])) {
+        if (!$profile) {
             //$_SESSION['login_error'] = 'Invalid username or password.';
-            return false;
+            return "newAcc";
+        } else if (!($password == $profile['password'])) {
+            return "invalid";
         } else {
             $_SESSION['profile'] = $profile;
             $_SESSION['profile_id'] = $profile['profileID'];
-            return true;
+            return "valid";
         }
+
 
         // $profiles = $this->getAllProfiles();
         // // Validate phone number and password
@@ -230,7 +234,7 @@ class ProfileModel
         array  $hobbies,
         array  $preferences
     ) {
-        
+
         //Validation
         $nickLen = mb_strlen($nickname);
         if ($nickLen === 0) {
