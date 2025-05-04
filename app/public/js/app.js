@@ -76,7 +76,7 @@ $(function () {
 });
 
 // Storage Clear
-(function () {
+$(function () {
     const allowedPaths = [
         '/my-gathering/create',
         '/my-gathering/create/location'
@@ -88,7 +88,7 @@ $(function () {
         const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation', 'locationId'];
         fields.forEach(id => sessionStorage.removeItem(id));
     }
-})();
+});
 
 
 // ============================================================================
@@ -136,7 +136,7 @@ $(() => {
             e.stopImmediatePropagation();
         }
     });
-    
+
 
 
     // Initiate GET request

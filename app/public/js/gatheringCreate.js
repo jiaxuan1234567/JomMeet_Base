@@ -56,6 +56,7 @@ $(() => {
             success: function (response) {
                 const errors = response.errors || {};
 
+                console.log(errors);
                 touched.forEach(fieldId => {
                     if (errors[fieldId]) {
                         showValidationError(fieldId, errors[fieldId]);

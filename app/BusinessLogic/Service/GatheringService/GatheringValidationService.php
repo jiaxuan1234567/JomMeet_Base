@@ -51,7 +51,7 @@ class GatheringValidationService
         }
 
         // 7. Time buffer
-        if (empty($errors['inputDate']) && empty($errors['startTime']) && $start !== '') {
+        if (empty($errors['inputDate']) && empty($errors['startTime']) && $date !== '' && $start !== '') {
             $errors = $this->validateStartTimeBuffer($date, $start, $errors);
         }
 
@@ -143,7 +143,7 @@ class GatheringValidationService
         $endDT   = DateTime::createFromFormat('Y-m-d H:i', "$date $end");
 
         if (!$startDT || !$endDT) {
-            $e['startTime'] = 'Invalid time format.';
+            $e['endTime'] = 'Invalid time format.';
         } elseif ($startDT >= $endDT) {
             $e['endTime'] = 'End time must be after start time.';
         } else {
