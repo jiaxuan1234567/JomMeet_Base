@@ -13,31 +13,63 @@ $savedHobbies = $_SESSION['profile']['hobbies'] ?? [];
 $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 ?>
 
-<div class="container-fluid my-3">
+<style>
+  /* Profile PHP responsive grid via CSS */
+  #hobbiesList,
+  #preferencesList {
+    padding-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 1199px) {
+
+    #hobbiesList,
+    #preferencesList {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
+
+  @media (max-width: 991px) {
+
+    #hobbiesList,
+    #preferencesList {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media (max-width: 767px) {
+
+    #hobbiesList,
+    #preferencesList {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+
+<div class="container-fluid my-4">
   <!-- Header with “Profile” title and edit button -->
-  <div class="d-flex align-items-center mb-1">
-    <div class="ms-3 mt-2">
-      <a href="/profile">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#333333" class="bi bi-arrow-left" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
-        </svg>
-      </a>
-    </div>
-    <h2 class="fw-bold flex-grow-1 text-center">Profile</h2>
+  <div class="d-flex align-items-center justify-content-between mb-2 px-3">
+    <a href="/profile" class="text-decoration-none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#333333" class="bi bi-arrow-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+      </svg>
+    </a>
+    <h2 class="fw-bold flex-grow-1 text-center me-4">Profile</h2>
   </div>
 </div>
-<div>
-  <hr class="border-2 border-top border-dark mb-3">
-</div>
+
+<hr class="border-2 border-top border-dark mb-3">
 
 <!-- Phone Number -->
 <div class="row mb-4">
-  <div class="col-md-9 offset-md-1">
+  <div class="col-12 col-md-9 offset-md-1">
     <label for="phone" class="form-label fw-bold fs-5">Phone Number</label>
     <input
       type="text"
       id="phone"
-      class="form-control border roundedv w-75"
+      class="form-control border rounded w-75"
       style="background-color: #e8e8e8; border-color: #0077CC;"
       value="<?php echo htmlspecialchars($profile['phone'] ?? '') ?>"
       readonly>
@@ -47,7 +79,7 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 <form id="editProfileForm" action="/profile/edit" method="POST">
   <!-- Nickname and MBTI -->
   <div class="row justify-content-center g-3 mb-4">
-    <div class="col-md-9">
+    <div class="col-12 col-md-9">
       <label for="nickname" class="form-label fw-bold fs-5">Nickname</label>
 
       <input type="text" id="nickname" name="nickname" class="form-control w-75" maxlength="30" value="<?php echo htmlspecialchars($profile['nickname'] ?? '') ?>" />
@@ -55,7 +87,7 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
     </div>
 
 
-    <div class="col-md-1">
+    <div class="col-12 col-md-1">
       <label for="mbti" class="form-label fw-bold fs-5">MBTI</label>
       <select class="form-select" name="mbti" required>
         <option value="" disabled <?= $selectedMBTI === '' ? 'selected' : '' ?>>Select</option>
@@ -72,7 +104,7 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 
   <!-- About Me -->
   <div class="row mb-4">
-    <div class="col-md-10 offset-md-1">
+    <div class="col-12 col-md-10 offset-md-1">
       <label class="form-label fw-bold fs-5">About Me</label>
       <textarea id="aboutme" name="aboutme" class="form-control" rows="4" maxlength="270" style="resize: none;" required><?php echo htmlspecialchars($profile['aboutme']) ?></textarea>
       <div id="aboutCount" class="d-block text-end fs-6" style="color:#0C0C0D; opacity:40%;">0/255 characters</div>
@@ -81,9 +113,9 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 
   <!-- Hobbies -->
   <div class="row mb-4">
-    <div class="col-md-10 offset-md-1" style="display: grid;">
+    <div class="col-12 col-md-10 offset-md-1" style="display: grid;">
       <h6 class="fw-bold fs-5">Hobbies</h6>
-      <div class="border rounded p-3 mb-4" id="hobbiesList" style="display: grid;grid-template-columns: repeat(8, 1fr); gap: 1.5rem; background-color: #ffffff;">
+      <div class="border rounded p-3 mb-4" id="hobbiesList" style="background-color: #ffffff;">
         <?php foreach ($hobbyOptions as $hobby):
           $isActive = in_array($hobby, $savedHobbies, true);
           $btnClass = $isActive
@@ -104,9 +136,9 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 
   <!-- Preferences -->
   <div class="row mb-4">
-    <div class="col-md-10 offset-md-1" style="display: grid;">
+    <div class="col-12 col-md-10 offset-md-1" style="display: grid;">
       <h6 class="fw-bold fs-5">Preference Gathering</h6>
-      <div class="border rounded p-3 mb-4" id="preferencesList" style="display: grid;grid-template-columns: repeat(8, 1fr); gap: 1.5rem; background-color: #ffffff;">
+      <div class="border rounded p-3 mb-4" id="preferencesList" style="background-color: #ffffff;">
 
         <?php foreach ($preferenceOptions as $pref):
           $active = in_array($pref, $savedPrefs, true);
@@ -126,23 +158,23 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
     </div>
   </div>
 
-  <input type="hidden" name="hobbies"     id="hiddenHobbies">
+  <input type="hidden" name="hobbies" id="hiddenHobbies">
   <input type="hidden" name="preferences" id="hiddenPrefs">
 
   <!-- Form Buttons -->
-  <div class="col-12 d-flex justify-content-center gap-3 mt-4 mb-5">
-    <button type="button" id="cancelBtn" class="btn py-2 px-4" style="border-color: #000000; color:#000000; background-color:#ffffff; width: 7%;">Cancel</button>
-    <button type="submit" id="saveBtn" class="btn btn-primary py-2 px-4" style="width: 7%;">Save</button>
+  <div class="col-12 d-flex justify-content-center flex-wrap gap-3 mt-4 mb-5">
+    <button type="button" id="cancelBtn" class="btn py-2 px-4" style="border-color: #000000; color:#000000; background-color:#ffffff; min-width: 100px;">Cancel</button>
+    <button type="submit" id="saveBtn" class="btn btn-primary py-2 px-4" style="min-width: 100px;">Save</button>
   </div>
 
 </form>
 
 <script>
   window.profileInit = {
-    nickname:    <?= json_encode($profile['nickname']   ?? '') ?>,
-    aboutme:     <?= json_encode($profile['aboutme']    ?? '') ?>,
-    mbti:        <?= json_encode($selectedMBTI          ?? '') ?>,
-    hobbies:     <?= json_encode($savedHobbies) ?>,
+    nickname: <?= json_encode($profile['nickname']   ?? '') ?>,
+    aboutme: <?= json_encode($profile['aboutme']    ?? '') ?>,
+    mbti: <?= json_encode($selectedMBTI          ?? '') ?>,
+    hobbies: <?= json_encode($savedHobbies) ?>,
     preferences: <?= json_encode($savedPrefs) ?>
   };
 </script>

@@ -73,7 +73,8 @@ class ProfileModel
         ];
     }
 
-    public function getAllPreferences() {
+    public function getAllPreferences()
+    {
         return [
             'Entertainment',
             'Sports',
@@ -93,15 +94,17 @@ class ProfileModel
 
         $profile = $this->profileDAO->getUserByPhoneNumber($phoneNumber);
 
-        //if (!$profile || !password_verify($password, $profile['password'])) {
-        if (!$profile || !($password == $profile['password'])) {
+        if (!$profile) {
             //$_SESSION['login_error'] = 'Invalid username or password.';
-            return false;
+            return "newAcc";
+        } else if (!($password == $profile['password'])){
+            return "invalid";
         } else {
             $_SESSION['profile'] = $profile;
             $_SESSION['profile_id'] = $profile['profileID'];
-            return true;
+            return "valid";
         }
+
 
         // $profiles = $this->getAllProfiles();
         // // Validate phone number and password
@@ -195,19 +198,19 @@ class ProfileModel
             $errors['preferences'] = 'Select at least one preference.';
         }
 
-        // 2) If any errors, store them and the old input, then redirect back
-        if (!empty($errors)) {
-            $_SESSION['profileErrors'] = $errors;
-            $_SESSION['old'] = [
-                'nickname'    => $nickname,
-                'aboutme'    => $aboutMe,
-                'mbti'        => $mbti,
-                'hobbies'     => $hobbies,
-                'preferences' => $preferences,
-            ];
-            header('Location: /profile/create');
-            exit;
-        }
+        // // 2) If any errors, store them and the old input, then redirect back
+        // if (!empty($errors)) {
+        //     $_SESSION['profileErrors'] = $errors;
+        //     $_SESSION['old'] = [
+        //         'nickname'    => $nickname,
+        //         'aboutme'    => $aboutMe,
+        //         'mbti'        => $mbti,
+        //         'hobbies'     => $hobbies,
+        //         'preferences' => $preferences,
+        //     ];
+        //     header('Location: /profile/create');
+        //     exit;
+        // }
 
         // 3) No errors → hand off to DAO to insert into the database
         $data = [
@@ -230,7 +233,7 @@ class ProfileModel
         array  $hobbies,
         array  $preferences
     ) {
-        
+
         //Validation
         $nickLen = mb_strlen($nickname);
         if ($nickLen === 0) {

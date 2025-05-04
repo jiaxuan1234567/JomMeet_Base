@@ -20,7 +20,7 @@ class ProfileDAO
     {
         try {
             $sql = "SELECT p.*, ph.hobby, pp.preference 
-            FROM `profile` p
+            FROM profile p
             LEFT JOIN profile_hobby ph ON p.profileID = ph.profileID
             LEFT JOIN profile_preference pp ON p.profileID = pp.profileID
             WHERE p.phone = :phone";
@@ -29,6 +29,9 @@ class ProfileDAO
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Base profile info from the first row
+            if (empty($rows)) {
+                return false;
+            }
             $base = $rows[0];
             $profile = [
                 'profileID'     => (int)$base['profileID'],
@@ -156,7 +159,6 @@ class ProfileDAO
 
             $this->db->commit();
             return $profileId;
-
         } catch (PDOException $e) {
             $this->db->rollBack();
             error_log("Error in insertProfile: " . $e->getMessage());
