@@ -12,7 +12,7 @@ require_once __DIR__ . '/../HomeView/header.php';
             <i class="bi bi-arrow-left h3 m-0"></i>
         </button>
         <!-- title -->
-        <h2 class="h5 fw-bold mb-0">Gathering Details</h2>
+        <h2 class="h5 fw-bold mb-0">My Gathering Details</h2>
     </div>
 </div>
 
