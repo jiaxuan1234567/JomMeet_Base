@@ -10,7 +10,7 @@ $userid = $_SESSION['profile']['profileID'];
 
 <script src="/js/gatheringlist.js"></script>
 
-<div class="container-fluid my-5 mb-5" style="height: 675px;">
+<div class="container-fluid my-5 mb-5">
     <!-- Flash Message -->
     <?php
     if (!empty($_SESSION['flash_message'])):
@@ -33,14 +33,13 @@ $userid = $_SESSION['profile']['profileID'];
                 <h2>Gathering List</h2>
             </div>
             <div class="col">
-                <form class="d-flex" id="search" style="width: 800px;" action="/gathering/search" method="POST">
-                    <input type="hidden" name="userid" value="<?= htmlspecialchars($userid) ?>">
+                <form class="d-flex" id="search" style="width: 750px;" action="/gathering/search" method="POST">
                     <input class="form-control me-4" name="searchTerm" type="search" placeholder="Search by theme, date, time, or preference" aria-label="Search" value="<?php echo htmlspecialchars($_POST['searchTerm'] ?? ''); ?>">
                     <button type="submit" class="btn btn-outline-primary">Search</button>
                 </form>
             </div>
             <div class="col">
-                <a href="/gathering/match/<?= $userid ?>" class="btn btn-light border border-secondary d-flex align-items-center gap-2" style="width:100px;">
+                <a href="/gathering/match" class="btn btn-light border border-secondary d-flex align-items-center gap-2" style="width:100px;">
                     <img src="<?= $asset->getFilePath('match') ?>" alt="Icon" style="width: 20px; height: 20px;">
                     <span>Match</span>
                 </a>
@@ -60,7 +59,7 @@ $userid = $_SESSION['profile']['profileID'];
                 <?php foreach ($gatherings as $gathering): ?>
                     <div class="col-md-6">
                         <div class="d-flex border rounded shadow-sm p-2 bg-white">
-                            <img src="<?= $asset->getFilePath(strtolower($gathering['preference'])) ?>" alt="Dinner" class="rounded" style="width: 120px; height: auto; object-fit: cover;">
+                            <img src="<?= $asset->getFilePath('dinner') ?>" alt="Dinner" class="rounded" style="width: 120px; height: auto; object-fit: cover;">
                             <div class="ms-3 d-flex flex-column justify-content-between flex-grow-1">
                                 <div>
                                     <strong><?php echo htmlspecialchars($gathering['theme']); ?></strong><br>

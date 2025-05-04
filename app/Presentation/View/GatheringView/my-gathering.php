@@ -3,33 +3,49 @@ $_title = 'My Gathering';
 
 require_once __DIR__ . '/../HomeView/header.php';
 $asset = new FileHelper('asset');
+
+// Determine active status and filter gatherings in PHP
+// $status = $_GET['status'] ?? 'all';
+// $currentStatus = strtolower($status);
+// $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentStatus) {
+//     switch ($currentStatus) {
+//         case 'hosted':
+//             return $g['isHost'] && $g['status'] !== 'cancelled';
+//         case 'upcoming':
+//             return $g['status'] === 'new';
+//         case 'ongoing':
+//             return $g['status'] === 'start';
+//         case 'completed':
+//             return $g['status'] === 'end';
+//         case 'cancelled':
+//             return $g['isHost'] && $g['status'] === 'cancelled';
+//         case 'all':
+//         default:
+//             return true;
+//     }
+// });
 ?>
 
 <div class="container-fluid my-5 mb-5">
-    <?php
-    if (!empty($_SESSION['flash_message'])):
-    ?>
+    <?php if (!empty($_SESSION['flash_message'])): ?>
         <div id="flashMessage"
             class="flash-message"
             data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
             data-msg="<?= $_SESSION['flash_message'] ?>">
         </div>
-        <?php
-        unset($_SESSION['flash_message']);
-        unset($_SESSION['flash_type']);
-        ?>
+        <?php unset($_SESSION['flash_message'], $_SESSION['flash_type']); ?>
     <?php endif; ?>
 
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
         <h2 class="fw-bold">My Gathering</h2>
-        <a href="/my-gathering/create" class="btn btn-outline-dark d-flex align-items-center py-1 px-2 rounded ">
-            <span class="d-inline-block bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;">
-                <i class="bi bi-plus" style="font-size: 1.25rem;"></i>
-            </span>
+        <a href="/my-gathering/create" class="btn btn-outline-dark d-flex align-items-center py-1 px-2 rounded">
+            <span class="d-inline-block bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;"><i class="bi bi-plus" style="font-size: 1.25rem;"></i></span>
             <span class="fw-bold me-1">Create</span>
         </a>
     </div>
+
+    <!-- Tabs -->
     <div class="container">
         <ul class="nav justify-content-center nav-pills nav-justified mb-4 fw-semibold" id="gatheringTabs" role="tablist">
             <?php
@@ -46,6 +62,8 @@ $asset = new FileHelper('asset');
                 </li>
             <?php endforeach; ?>
         </ul>
+
+        <!-- jx ul deleted -->
 
         <!-- Tab Contents -->
         <div class="tab-content" id="gatheringTabsContent">
@@ -82,10 +100,53 @@ $asset = new FileHelper('asset');
             </div>
         </div>
 
-    </div>
-    <div style="height: 300px;"></div>
-</div>
+        <!-- jx -->
+        <!-- Cancel Gathering Modal -->
+        <!-- <div class="modal fade" id="cancelGatheringModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+            <div class="modal-dialog custom-modal-dialog">
+                <div class="modal-content custom-modal-content">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title modal-title-custom" id="cancelModalLabel">JomMeet</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body modal-body-custom">
+                        Confirm to cancel the gathering?
+                    </div>
+                    <div class="modal-footer justify-content-end border-0">
+                        <form method="POST" action="/my-gathering/cancel" id="cancelGatheringForm" class="d-flex gap-3">
+                            <input type="hidden" name="gatheringID" id="modalCancelGatheringID">
+                            <button type="button" class="btn btn-outline-primary custom-cancel-btn" data-bs-dismiss="modal">No</button>
+                            <button type="submit" class="btn custom-leave-btn text-white" style="background-color: #FF5C56;">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div> -->
 
+        <!-- Leave Gathering Modal -->
+        <!-- <div class="modal fade" id="leaveGatheringModal" tabindex="-1" aria-labelledby="leaveModalLabel" aria-hidden="true">
+            <div class="modal-dialog custom-modal-dialog">
+                <div class="modal-content custom-modal-content">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title modal-title-custom" id="leaveModalLabel">JomMeet</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body modal-body-custom">
+                        Confirm to leave the gathering?
+                    </div>
+                    <div class="modal-footer justify-content-end border-0">
+                        <form method="POST" action="/my-gathering/leave" id="leaveGatheringForm" class="d-flex gap-3">
+                            <input type="hidden" name="gatheringID" id="modalLeaveGatheringID">
+                            <button type="button" class="btn btn-outline-primary custom-cancel-btn" data-bs-dismiss="modal">No</button>
+                            <button type="submit" class="btn custom-leave-btn text-white" style="background-color: #FF5C56;">Leave</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <!-- jx -->
+    </div>
+</div>
 <script>
     $(function() {
         const allGatherings = <?= json_encode($myGatherings) ?>;
@@ -157,19 +218,21 @@ $asset = new FileHelper('asset');
                     case 'edit gathering':
                         return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
                     case 'cancel gathering':
+                        // return `<li><button type="submit" class="dropdown-item fw-bold" onclick="confirmCancelGathering(${g.id})">Cancel Gathering</button></li>`;
                         return `<li><form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
                                 <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
                             </form></li>`;
                     case 'reply reminder':
                         return `<li><a class="dropdown-item fw-bold" href="/my-gathering/reminder/view/${g.id}">Reply Reminder</a></li>`;
                     case 'leave gathering':
+                        // return `<li><button type = "button" class = "dropdown-item fw-bold text-danger" onclick = "confirmLeaveGathering(${g.id})" > Leave Gathering </button> </li>`;
                         return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
                                 <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
                             </form></li>`;
                     case 'gathering feedback':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>`;
+                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/gatheringFeedback?gatheringID=${g.id}">Gathering Feedback</a></li>`;
                     case 'location feedback':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>`;
+                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/locationFeedback?gatheringID=${g.id}&locationID=${g.locationID}">Location Feedback</a></li>`;
                     default:
                         return '';
                 }
@@ -195,15 +258,69 @@ $asset = new FileHelper('asset');
             $tabContent.removeClass('show active');
             $(`#${status}`).addClass('show active');
             history.replaceState(null, '', status === 'all' ? '/my-gathering' : '#' + status);
+
+            // // New: Fetch latest data via AJAX
+            // $.get(`/api/my-gathering/${status}`, function(gatherings) {
+            //     console.log('success', status, gatherings);
+            //     const $container = $(`#${status} .row`);
+            //     renderGatheringList($container, gatherings);
+            // });
         });
 
         const initialTab = window.location.hash.slice(1) || 'all';
         setActiveTab(initialTab);
         $tabContent.removeClass('show active');
         $(`#${initialTab}`).addClass('show active');
+
+        // // Jiaxuan
+        // window.confirmCancelGathering = function(id) {
+        //     $('#cancelGatheringForm').attr('action', `/my-gathering/cancel/${id}`);
+        //     $('#cancelGatheringModal').modal('show');
+        // };
+        // window.confirmLeaveGathering = function(id) {
+        //     $('#leaveGatheringForm').attr('action', `/my-gathering/leave/${id}`);
+        //     $('#leaveGatheringModal').modal('show');
+        // };
     });
+
+    function renderActions(g) {
+        if (!g.action || !g.action.length) return '';
+        const actions = g.action.map(label => {
+            switch (label.toLowerCase()) {
+                case 'send reminder':
+                    return `<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>`;
+                case 'edit gathering':
+                    return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
+                case 'cancel gathering':
+                    return `<li><form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
+                                <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
+                            </form></li>`;
+                case 'reply reminder':
+                    return `<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>`;
+                case 'leave gathering':
+                    return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
+                                <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
+                            </form></li>`;
+                case 'gathering feedback':
+                    return `<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>`;
+                case 'location feedback':
+                    return `<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>`;
+                default:
+                    return '';
+            }
+        }).join('');
+
+        return `
+            <div class="dropdown rounded border-0">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
+                    Action
+                </button>
+                <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
+                    ${actions}
+                </ul>
+            </div>
+        `;
+    }
 </script>
-
-
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

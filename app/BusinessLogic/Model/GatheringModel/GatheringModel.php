@@ -7,6 +7,7 @@ use Persistence\DAO\GatheringDAO\LocationDAO;
 use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
 use BusinessLogic\Service\GatheringService\GatheringValidationService;
 use BusinessLogic\Service\GatheringService\NotificationService;
+use BusinessLogic\Service\GatheringService\GatheringHelperService;
 use Exception;
 use FileHelper;
 use DateTime;
@@ -61,6 +62,7 @@ class GatheringModel
     {
         return [
             'minPax' => ($gathering['currentParticipant'] > 3) ? ($gathering['currentParticipant']) : 3,
+            'currentPax' => $gathering['maxParticipant'],
             'maxPax' => 8
         ];
     }
@@ -342,6 +344,9 @@ class GatheringModel
     public function getMyGatheringsWithTab($profileId)
     {
         try {
+            // jx
+            $this->gatheringDAO->updateGatheringStatuses();
+            // jx
             $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
             $grouped = [
                 'all'       => [],
@@ -360,6 +365,7 @@ class GatheringModel
                 $gathering = [
                     'id'        => (int)$g['gatheringID'],
                     'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
+                    'locationID'  => (int)$g['locationID'],
                     'theme'     => $g['theme'],
                     'date'      => date('d F Y', strtotime($g['date'])),
                     'startTime' => date('g:i A', strtotime($g['startTime'])),
@@ -661,8 +667,6 @@ class GatheringModel
         }
     }
 
-
-
     // validate Gathering Fields
     public function validateGatheringFields($data, $fields, $editingId = null)
     {
@@ -676,6 +680,80 @@ class GatheringModel
 
         // 2) call pure helper
         return $this->validatorService->validate($data, $validTags, $locRow, $joined, $fields, $editingId);
+    }
+
+    /*
+    [
+        'field' => 'fieldId || time',
+        'touched' => 'fieldId',
+        'value' => [
+            'locationName' => 'name',
+            'locationId' => 'id'
+        ],
+        'value' => [
+            'inputDate' => date,
+            'startTime' => startDT,
+            'endTime' => endDT
+        ]
+        'value' => 'data'
+    ]
+    
+    [
+    'valid' => true || false,
+    'field' => 'field',
+    'touched' => fieldId',
+    'errors' => [
+        'f1' => 'e1',
+        'f2' => 'e2',
+        'f3' => ''
+    ]
+    ]
+    */
+    public function validateGathering($data, $editingId = null)
+    {
+        $touched = $data['touched'];
+        $response = ['valid' => true, 'errors' => []];
+        $gatheringHelper = new GatheringHelperService();
+
+        try {
+            switch ($touched) {
+                case 'inputDate':
+                case 'startTime':
+                case 'endTime':
+                    $joined = $this->gatheringDAO->getJoinedGatheringByUserId($_SESSION['profile']['profileID'] ?? 0);
+                    $response = $gatheringHelper->validateDateTime($data, $joined, $editingId);
+                    break;
+                case 'locationName':
+                case 'locationId':
+                case 'inputLocation':
+                    $validLoc = $this->locationDAO->getLocationById($data['value']['locationId'] ?? '');
+                    $response = $gatheringHelper->validateLocation($data, $validLoc);
+                    break;
+                case 'gatheringTag':
+                    $validTags = $this->getPreference();
+                    $response = $gatheringHelper->validateGatheringTag($data, $validTags);
+                    break;
+                case 'inputTheme':
+                    $response = $gatheringHelper->validateTheme($data);
+                    break;
+                case 'inputPax':
+                    if (empty($editingId)) {
+                        $min = $this->getPaxLimit()['minPax'];
+                        $max = $this->getPaxLimit()['maxPax'];
+                    } else {
+                        $paxLimit = $this->getEditPaxLimit($this->gatheringDAO->getGatheringById($editingId));
+                        $min = $paxLimit['minPax'];
+                        $max = $paxLimit['maxPax'];
+                    }
+
+                    $response = $gatheringHelper->validatePax($data, $min, $max);
+                    break;
+            }
+        } catch (Exception $e) {
+            $response['valid'] = false;
+            $response['errors'] = $e->getMessage();
+        }
+        return $response;
     }
 
     // Status Service (run job)
@@ -724,6 +802,46 @@ class GatheringModel
         return [];
     }
 
+    // Location Feedback
+    public function getLocationFeedback($locationId)
+    {
+        return $this->gatheringDAO
+            ->getLocationFeedbackByLocation($locationId);
+    }
+
+    /**
+     * Save new feedback if the user hasn’t already posted one.
+     */
+    public function saveLocationFeedback($profileId, $gatheringId, $locationId, $desc)
+    {
+        return $this->gatheringDAO
+            ->insertLocationFeedback($profileId, $gatheringId, $locationId, $desc);
+    }
+
+    // fetch all gathering feedback (anonymous)
+    public function getGatheringFeedback(int $gatheringId): array
+    {
+        return $this->gatheringDAO
+            ->getGatheringFeedbackByGathering($gatheringId);
+    }
+
+    // insert a new gathering feedback record
+    public function addGatheringFeedback(int $profileId, int $gatheringId, string $desc): bool
+    {
+        // load the gathering row so we know its locationID
+        $g = $this->gatheringDAO->getGatheringById($gatheringId);
+        if (!$g) {
+            throw new Exception("Gathering #{$gatheringId} not found");
+        }
+
+        $locationId = (int)$g['locationID'];
+        return $this->gatheringDAO->insertGatheringFeedback(
+            $profileId,
+            $gatheringId,
+            $locationId,
+            $desc
+        );
+        
     public function getReminders($gatheringId, $profileId)
     {
         $gathering = $this->gatheringDAO->getGatheringById($gatheringId);

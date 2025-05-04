@@ -16,10 +16,10 @@ class ReflectionDAO
         $this->db = Database::getConnection();
     }
 
-    public function getAllReflections()
+    public function getAllReflections($profileId)
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM self_reflect");
+            $stmt = $this->db->prepare("SELECT * FROM self_reflect WHERE profileID = $profileId");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {

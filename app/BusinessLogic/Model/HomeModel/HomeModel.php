@@ -18,7 +18,7 @@ class HomeModel
 
     public function getAllReflections()
     {
-        $profileId = $_SESSION['profile_id'];
+        $profileId = $_SESSION['profile']['profileID'];
         return (new ReflectionModel())->getAllReflections($profileId);
     }
 
@@ -34,10 +34,10 @@ class HomeModel
         return (new GatheringModel())->getMyGatheringsWithTab($hostProfileId);
     }
 
-    // public function getAllProfiles()
-    // {
-    //     return (new ProfileModel())->getAllProfiles();
-    // }
+    public function getUserProfileById($userId)
+    {
+        return (new ProfileModel())->getUserByProfileID($userId);
+    }   
 
     public function logout()
     {

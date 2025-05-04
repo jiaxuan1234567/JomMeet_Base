@@ -15,18 +15,39 @@ $('.tag-option').on('click', function () {
     $('#tagSelectionModal').modal('hide');
 });
 
-$('#gatheringTag').on('input change', function () {
-    const value = $(this).val();
-    const $selectedOption = $(`.tag-option[data-value="${value}"]`);
+// $('#gatheringTag').on('input change', function () {
+//     const value = $(this).val();
+//     const $selectedOption = $(`.tag-option[data-value="${value}"]`);
 
-    if ($selectedOption.length) {
-        const label = $selectedOption.data('label');
-        const image = $selectedOption.data('image');
+//     if ($selectedOption.length) {
+//         const label = $selectedOption.data('label');
+//         const image = $selectedOption.data('image');
 
-        $('#selectedTagLabel').text(label);
-        $('#selectedTagImage').attr('src', image);
-    }
-});
+//         $('#selectedTagLabel').text(label);
+//         $('#selectedTagImage').attr('src', image);
+//     }
+// });
+// Gathering tag
+// function updateSelectedTagUI(value) {
+//     const $selectedOption = $(`.tag-option[data-value="${value}"]`);
+//     if ($selectedOption.length) {
+//         const label = $selectedOption.data('label');
+//         const image = $selectedOption.data('image');
+
+//         $('#selectedTagLabel').text(label);
+//         $('#selectedTagImage').attr('src', image);
+//     }
+// }
+
+// $('#gatheringTag').on('input change', function () {
+//     const value = $(this).val();
+//     updateSelectedTagUI(value);
+// });
+
+// const initialTagValue = $('#gatheringTag').val();
+// if (initialTagValue) {
+//     updateSelectedTagUI(initialTagValue);
+// }
 
 // ====== Pax Button Adjustment ======
 const $increase = $('#increasePax');
@@ -66,92 +87,93 @@ $('#triggerDatePicker').on('click', function () {
 });
 
 // ====== Handle Validation Message ======
-function showValidationError(fieldId, message) {
-    const $input = $(`#${fieldId}`);
-    $input.addClass('is-invalid');
-    $(`#error-${fieldId}`).text(message + '*').show();
-}
+// function showValidationError(fieldId, message) {
+//     //clearValidationError(fieldId);
+//     const $input = $(`#${fieldId}`);
+//     $input.addClass('is-invalid');
+//     $(`#error-${fieldId}`).text(message + '*').show();
+// }
 
-function clearValidationError(fieldId) {
-    const $input = $(`#${fieldId}`);
-    $input.removeClass('is-invalid');
-    $(`#error-${fieldId}`).text('').hide();
-}
+// function clearValidationError(fieldId) {
+//     const $input = $(`#${fieldId}`);
+//     $input.removeClass('is-invalid');
+//     $(`#error-${fieldId}`).text('').hide();
+// }
 
-function clearAllValidationErrors(fields) {
-    fields.forEach(fieldId => clearValidationError(fieldId));
-}
+// function clearAllValidationErrors(fields) {
+//     fields.forEach(fieldId => clearValidationError(fieldId));
+// }
 
-let initialValues = {};
+// let initialValues = {};
 
-function storeInitialValues(fields) {
-    initialValues = {};
-    fields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            initialValues[id] = el.value;
-        }
-    });
-}
+// function storeInitialValues(fields) {
+//     initialValues = {};
+//     fields.forEach(id => {
+//         const el = document.getElementById(id);
+//         if (el) {
+//             initialValues[id] = el.value;
+//         }
+//     });
+// }
 
-function isFormFilled(fields) {
-    // return fields.every(id => {
-    //     const currentVal = $(`#${id}`).val()?.trim() || '';
-    //     const initialVal = initialValues[id]?.trim() || '';
-    //     return currentVal !== '' && currentVal !== initialVal;
-    // });
-    return fields.every(id => {
-        const val = $(`#${id}`).val();
-        return val !== null && val.trim() !== '';
-    });
-}
+// function isFormFilled(fields) {
+//     // return fields.every(id => {
+//     //     const currentVal = $(`#${id}`).val()?.trim() || '';
+//     //     const initialVal = initialValues[id]?.trim() || '';
+//     //     return currentVal !== '' && currentVal !== initialVal;
+//     // });
+//     return fields.every(id => {
+//         const val = $(`#${id}`).val();
+//         return val !== null && val.trim() !== '';
+//     });
+// }
 
 // ====== Submit Button ======
-const $submitBtn = $('#createBtn');
+//const $submitBtn = $('#createBtn');
 
-function toggleSubmitButton(fields) {
-    const hasError = fields.some(id => $(`#${id}`).hasClass('is-invalid'));
-    $('#createBtn').prop('disabled', hasError || !isFormFilled(fields));
-}
+// function toggleSubmitButton(fields) {
+//     const hasError = fields.some(id => $(`#${id}`).hasClass('is-invalid'));
+//     $('#createBtn').prop('disabled', hasError || !isFormFilled(fields));
+// }
 
-function setupSubmitButton(fields) {
-    $('#createGatheringFormEl').on('submit', function () {
-        fields.forEach(id => sessionStorage.removeItem(id));
-    });
-    // $submitBtn.on('submit', function () {
-    //     fields.forEach(id => sessionStorage.removeItem(id));
-    // });
-}
+// function setupSubmitButton(fields) {
+//     $('#createGatheringFormEl').on('submit', function () {
+//         fields.forEach(id => sessionStorage.removeItem(id));
+//     });
+//     // $submitBtn.on('submit', function () {
+//     //     fields.forEach(id => sessionStorage.removeItem(id));
+//     // });
+// }
 
 
 // ====== Reset Button ======
-function setupResetButton(fields) {
-    // const initialValues = {};
+// function setupResetButton(fields) {
+//     // const initialValues = {};
 
-    // // Save initial field values
-    // fields.forEach(id => {
-    //     const el = document.getElementById(id);
-    //     if (el) {
-    //         initialValues[id] = el.value;
-    //     }
-    // });
+//     // // Save initial field values
+//     // fields.forEach(id => {
+//     //     const el = document.getElementById(id);
+//     //     if (el) {
+//     //         initialValues[id] = el.value;
+//     //     }
+//     // });
 
-    $('#createResetBtn').on('click', function (e) {
-        e.preventDefault();
+//     $('#createResetBtn').on('click', function (e) {
+//         e.preventDefault();
 
-        fields.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.value = initialValues[id]?.trim() || '';
-                sessionStorage.removeItem(id);
-            }
-        });
+//         fields.forEach(id => {
+//             const el = document.getElementById(id);
+//             if (el) {
+//                 el.value = initialValues[id]?.trim() || '';
+//                 sessionStorage.removeItem(id);
+//             }
+//         });
 
-        if (initialValues['inputPax']) updateButtons?.();
-        toggleSubmitButton?.(fields);
-        clearAllValidationErrors?.(fields);
-    });
-}
+//         if (initialValues['inputPax']) updateButtons?.();
+//         toggleSubmitButton?.(fields);
+//         clearAllValidationErrors?.(fields);
+//     });
+// }
 
 // ====== AJAX Field Validation with Native Popup ======
 // function validateFields(fieldIds, allFields, touched, urlEndpoint) {
