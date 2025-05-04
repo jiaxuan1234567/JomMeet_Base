@@ -66,6 +66,7 @@ Route::post('/my-gathering/reminder/create', [GatheringController::class, 'creat
 //AJAX
 Route::get('/api/savedLocations', [GatheringController::class, 'apiSavedLocations']);
 Route::get('/api/search-location', [GatheringController::class, 'ajaxSearchLocation']);
+Route::get('/api/location-feedback', [GatheringController::class, 'ajaxGetLocationFeedback']);
 
 
 // AJAX Validation

@@ -245,6 +245,23 @@ class GatheringController
         echo json_encode($results);
     }
 
+    public function ajaxGetLocationFeedback()
+{
+    header('Content-Type: application/json');
+
+    $locationId = $_GET['locationId'] ?? null;
+
+    if (!$locationId) {
+        echo json_encode([]);
+        return;
+    }
+    
+    $feedbacks = $this->gatheringModel->getLocationFeedback($locationId);
+
+    echo json_encode($feedbacks);
+}
+
+
     // -- Join Gathering --
     public function joinGathering()
     {
@@ -528,7 +545,7 @@ class GatheringController
     // ============================================================================
     // Reminder PART
     // ============================================================================
-    
+
     public function viewGatheringReminder($gatheringId)
     {
         $profileId = $_SESSION['profile']['profileID'];
