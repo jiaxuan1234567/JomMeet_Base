@@ -1,31 +1,6 @@
 <?php
 $_title = 'Reminder';
 require_once __DIR__ . '/../HomeView/header.php';
-
-// dummy data
-$reminders = [
-    [
-        "reminderID" => 1,
-        "gatheringID" => 1,
-        "profileID" => 1,   // need to check if the user is host or not
-        "description" => "Where should we meet?",
-        "createdAt" => "6:00pm",
-    ],
-    [
-        "reminderID" => 2,
-        "gatheringID" => 1,
-        "profileID" => 2,
-        "description" => "I think main entrance is the best",
-        "createdAt" => "6:00pm",
-    ],
-    [
-        "reminderID" => 3,
-        "gatheringID" => 1,
-        "profileID" => 3,
-        "description" => "I'm three member",
-        "createdAt" => "6:00pm",
-    ],
-];
 ?>
 
 <div class="container-fluid" style="min-height: 70vh;">
@@ -35,8 +10,7 @@ $reminders = [
         </div>
         <div class="col-sm-10">
             <div class="fw-bold text-center" style="font-size: 30px;">
-                <?php echo htmlspecialchars($reminders[0]['gatheringID']); ?> {Gathering Name} Reminder
-                <!-- Past gathering ID from gathering list -->
+                <?php echo htmlspecialchars($gathering['theme']); ?> Reminder
             </div>
         </div>
         <div class="col-sm-1 text-center">
@@ -57,15 +31,15 @@ $reminders = [
                                 <?php echo htmlspecialchars($reminder['profileID']); ?> Host / Participant
                             </div>
                             <div class="time text-sm-end col-6 text-muted">
-                                <?php echo htmlspecialchars($reminder['createdAt']); ?>
+                                <?php echo htmlspecialchars($reminder['timeAgo']); ?>
                             </div>
                         </div>
 
                         <div class="card-body">
-                            <h5 class="card-title"><?php echo htmlspecialchars($reminder['profileID']); ?> Username</h5>
+                            <h5 class="card-title"><?php echo htmlspecialchars($reminder['nickname']); ?></h5>
                             <p class="card-text"><?php echo htmlspecialchars($reminder['description']); ?></p>
                         </div>
-                        
+
                     </div>
                 </div>
             <?php endforeach; ?>

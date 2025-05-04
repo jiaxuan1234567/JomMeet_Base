@@ -404,4 +404,44 @@ class GatheringController
             echo $e->getMessage();
         }
     }
+
+    public function viewGatheringReminder($gatheringId)
+    {
+        $profileId = $_SESSION['profile']['profileID'];
+
+        $gathering = $this->gatheringModel->getUserGatheringById($profileId, $gatheringId);
+
+        if (!$gathering) {
+            $_SESSION['flash_message'] = "You are not authorized to view this gathering reminder.";
+            $_SESSION['flash_type'] = "error";
+            header('Location: /my-gathering');
+            exit;
+        }
+
+        $reminders = $this->gatheringModel->getReminders($gatheringId, $profileId);
+
+        foreach ($reminders as &$reminder) {
+            $reminder['timeAgo'] = $this->formatTimeAgo($reminder['createdAt']);
+        }
+
+        include $this->fileHelper->getFilePath('GatheringReminder');
+    }
+
+    private function formatTimeAgo($datetime)
+    {
+        $timestamp = strtotime($datetime);
+        $diff = time() - $timestamp;
+
+        if ($diff < 60) {
+            return "just now";
+        } elseif ($diff < 3600) {
+            return floor($diff / 60) . " minute(s) ago";
+        } elseif ($diff < 86400) {
+            return floor($diff / 3600) . " hour(s) ago";
+        } elseif ($diff < 172800) {
+            return "yesterday";
+        } else {
+            return date("d M Y, H:i", $timestamp);
+        }
+    }
 }

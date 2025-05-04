@@ -4,6 +4,7 @@ namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
 use Persistence\DAO\GatheringDAO\LocationDAO;
+use Persistence\DAO\GatheringDAO\ReminderDAO;
 use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
 use BusinessLogic\Service\GatheringService\GatheringValidationService;
 use Exception;
@@ -15,6 +16,7 @@ class GatheringModel
 {
     private $gatheringDAO;
     private $locationDAO;
+    private $reminderDAO;
     private $chkStatusService;
     private $validatorService;
     private $fileHelper;
@@ -23,6 +25,7 @@ class GatheringModel
     {
         $this->gatheringDAO = new GatheringDAO();
         $this->locationDAO = new LocationDAO();
+        $this->reminderDAO = new ReminderDAO();
         $this->chkStatusService = new CheckGatheringStatusService();
         $this->validatorService = new GatheringValidationService();
         $this->fileHelper = new FileHelper('gathering');
@@ -672,5 +675,23 @@ class GatheringModel
         }
 
         return [];
+    }
+
+    public function getReminders($gatheringId, $profileId)
+    {
+        $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
+
+        if (!$gathering) {
+            error_log("[getReminders] Gathering ID $gatheringId not found.");
+            return false;
+        }
+
+        if ($gathering['hostProfileID'] == $profileId) {
+            $reminders = $this->reminderDAO->getRemindersByHost($gatheringId);
+        } else {
+            $reminders = $this->reminderDAO->getRemindersByParticipant($gatheringId, $profileId);
+        }
+
+        return $reminders;
     }
 }

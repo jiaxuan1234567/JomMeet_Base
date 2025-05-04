@@ -153,7 +153,7 @@ $asset = new FileHelper('asset');
             const actions = g.action.map(label => {
                 switch (label.toLowerCase()) {
                     case 'send reminder':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>`;
+                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/reminder/view/${g.id}">Send Reminder</a></li>`;
                     case 'edit gathering':
                         return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
                     case 'cancel gathering':
