@@ -87,6 +87,7 @@ $(function () {
     if (!allowedPaths.includes(currentPath)) {
         const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation', 'locationId'];
         fields.forEach(id => sessionStorage.removeItem(id));
+        //sessionStorage.removeItem('locationId');
         sessionStorage.removeItem('__field_states__');
     }
 });

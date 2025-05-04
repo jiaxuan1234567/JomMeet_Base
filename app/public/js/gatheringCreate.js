@@ -1,57 +1,38 @@
 $(() => {
-    const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
-    $('#nextDayNote').hide();
-
     // reload clear saved data
-    const hasSessionData = fields.some(id => sessionStorage.getItem(id) !== null);
+    const hasSessionData = sessionStorage.getItem('__field_states__') !== null;
     if (performance.getEntriesByType("navigation")[0]?.type === "reload" && hasSessionData) {
-        //fields.forEach(id => sessionStorage.removeItem(id));
-        //sessionStorage.removeItem('__validation_state__');
+        sessionStorage.removeItem('__field_states__');
         location.reload();
     }
+
+    $('#nextDayNote').hide();
+
+    const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
+    const fieldStates = {};
+    fields.forEach(f => {
+        fieldStates[f] = {
+            valid: false,
+            error: [],
+            value: ''
+        };
+    });
 
     // defined variables
     const timeFields = ['inputDate', 'startTime', 'endTime'];
     const locationFields = ['inputLocation', 'locationId'];
-
-    // // validation state define and restore
-    // const validationState = {};
-    // const savedValidation = sessionStorage.getItem('__validation_state__');
-    // if (savedValidation) {
-    //     const parsed = JSON.parse(savedValidation);
-    //     fields.forEach(f => {
-    //         validationState[f] = parsed[f] === true;
-    //     });
-    // } else {
-    //     fields.forEach(f => validationState[f] = false);
-    // }
-
-    // // errorMsg state
-    // const errorMessages = {};
-    // const savedErrors = sessionStorage.getItem('__error_messages__');
-    // if (savedErrors) {
-    //     const parsed = JSON.parse(savedErrors);
-    //     Object.entries(parsed).forEach(([fieldId, messages]) => {
-    //         errorMessages[fieldId] = messages;
-    //         showValidationError(fieldId, messages); // ⛔ Re-show errors
-    //     });
-    // }
-
-    const fieldStates = {};
-    fields.forEach(f => {
-        fieldStates[f] = { valid: false, error: [] };
-    });
 
     const savedFieldStates = sessionStorage.getItem('__field_states__');
     if (savedFieldStates) {
         const parsed = JSON.parse(savedFieldStates);
         Object.entries(parsed).forEach(([fieldId, state]) => {
             fieldStates[fieldId] = state;
-            renderValidation(fieldId); // Restore UI
+            $(`#${fieldId}`).val(state.value);
+            renderValidation(fieldId);
         });
     }
 
-    storeInitialValues(fields);
+    //storeInitialValues(fields);
     updateButtons();
 
     // Submit Button
@@ -62,30 +43,33 @@ $(() => {
 
 
     fields.forEach(fieldId => {
-        const val = sessionStorage.getItem(fieldId);
-        if (val !== null) {
-            $(`#${fieldId}`).val(val).trigger('input');
-            //touched.add(fieldId);
-        }
+        // const val = sessionStorage.getItem(fieldId);
+        // if (val !== null) {
+        //     $(`#${fieldId}`).val(val).trigger('input');
+        //     //touched.add(fieldId);
+        // }
 
         $(`#${fieldId}`).on('input change', function () {
             const data = $(this).val();
-            sessionStorage.setItem(fieldId, data);
+
+            fieldStates[fieldId].value = data;
+            //sessionStorage.setItem(fieldId, data);
 
             if (timeFields.includes(fieldId)) {
                 validateField(fieldId, datetimeDataHandler(fieldId));
             } else if (locationFields.includes(fieldId)) {
                 validateField(fieldId, locationDataHandler());
             } else {
-                validateField(fieldId, dataHandler(data));
+                validateField(fieldId, dataHandler(fieldId, data));
             }
             toggleSubmitButton();
         });
     });
     const id = sessionStorage.getItem('locationId');
-    if (id) {
-        validateField('inputLocation', locationDataHandler());
+    if (id && fieldStates['inputLocation']?.value) {
+        $('#inputLocation').val(fieldStates['inputLocation'].value);
         $('#locationId').val(id);
+        validateField('inputLocation', locationDataHandler());
     }
     if ($('#inputDate').val()) {
         validateField('inputDate', datetimeDataHandler('inputDate'));
@@ -101,9 +85,8 @@ $(() => {
         fields.forEach(id => {
             const el = document.getElementById(id);
             if (el) {
-                el.value = initialValues[id]?.trim() || ''; // initial value concern
-                //sessionStorage.removeItem(id);
-                fieldStates[id] = { valid: false, error: [] };
+                el.value = initialValues[id]?.trim() || '';
+                fieldStates[id] = { valid: false, error: [], value: '' };
                 renderValidation(id);
             }
         });
@@ -114,23 +97,52 @@ $(() => {
     });
 
     function validateField(fieldId, data) {
-        console.log(data);
+        //console.log(data);
         $.ajax({
             url: '/api/validate-gathering',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function (response) {
-                fieldStates[fieldId] = {
-                    valid: response.valid,
-                    error: response.valid ? [] : response.errors
-                };
+                console.log('Response: ', response);
+                const isValid = response['valid'] === true;
+                const errors = isValid ? [] : (Array.isArray(response['errors']) ? response['errors'] : [response['errors']]);
+
+                if (data.field === 'time') {
+                    const sharedError = isValid ? [] : (Array.isArray(errors) ? [...new Set(errors)] : [errors]);
+
+                    // Apply the same error to both fields first
+                    ['startTime', 'endTime'].forEach(field => {
+                        fieldStates[field].valid = isValid;
+                        fieldStates[field].error = sharedError;
+                    });
+
+                    // If both fields have the same error(s), clear one to avoid duplicate UI
+                    if (
+                        JSON.stringify(fieldStates['startTime'].error) === JSON.stringify(fieldStates['endTime'].error)
+                        && fieldStates['startTime'].error.length > 0
+                    ) {
+                        fieldStates['endTime'].error = [];
+                    }
+
+                    ['startTime', 'endTime'].forEach(renderValidation);
+                } else {
+                    // update only the touched field
+                    const touched = data.touched;
+                    fieldStates[touched].valid = isValid;
+                    fieldStates[touched].error = errors;
+                    renderValidation(touched);
+                }
+
                 sessionStorage.setItem('__field_states__', JSON.stringify(fieldStates));
-                renderValidation(fieldId);
                 toggleSubmitButton();
+                console.log('State: ', fieldStates);
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX error: ', xhr.responseText);
+                console.log(error);
             }
         });
-        console.log(fieldStates);
     }
 
     function renderValidation(fieldId) {
@@ -141,7 +153,7 @@ $(() => {
         const hasError = !state.valid && Array.isArray(state.error) && state.error.length > 0;
 
         if (hasError) {
-            const uniqueErrors = [...new Set(state.error)]; // ✅ remove duplicates
+            const uniqueErrors = [...new Set(state.error)];
             const msg = uniqueErrors.join('<br>');
             $input.addClass('is-invalid');
             $error.html(`${msg}*`).show();
@@ -155,12 +167,6 @@ $(() => {
         const allValid = Object.values(fieldStates).every(state => state.valid);
         $('#createBtn').prop('disabled', !allValid);
     }
-
-    // function updateValidationState(fieldId, isValid) {
-    //     validationState[fieldId] = isValid;
-    //     sessionStorage.setItem('__validation_state__', JSON.stringify(validationState));
-    //     toggleSubmitButton();
-    // }
 
     function locationDataHandler() {
         const inputLocation = $('#inputLocation');

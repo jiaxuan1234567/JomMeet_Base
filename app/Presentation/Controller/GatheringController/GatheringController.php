@@ -142,6 +142,7 @@ class GatheringController
         $data = json_decode($json, true);
         $response = $this->gatheringModel->validateGathering($data);
         echo json_encode($response);
+        exit;
     }
 
     // AJAX Validation: EDIT Gathering Fields
