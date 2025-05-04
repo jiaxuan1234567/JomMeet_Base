@@ -5,6 +5,8 @@ namespace Persistence\DAO\GatheringDAO;
 use PDO;
 use PDOException;
 use Database;
+use \DateTime;
+
 
 class GatheringDAO
 {
@@ -250,30 +252,31 @@ class GatheringDAO
     // }
 
     public function hasTimeConflict($profileId, $startTime)
-{
-    $formatted = $startTime->format('Y-m-d H:i:s');
-    error_log("[hasTimeConflict] Checking time conflict for profile $profileId at $formatted");
+    {
+        $formatted = $startTime->format('Y-m-d H:i:s');
+        error_log("[hasTimeConflict] Checking time conflict for profile $profileId at $formatted");
 
-    $stmt = $this->db->prepare("
+        $stmt = $this->db->prepare("
         SELECT g.* FROM gathering g
         JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
         WHERE pg.profileID = :pid
         AND g.status = 'NEW'
         AND CONCAT(g.date, ' ', g.startTime) = :start
     ");
-    $stmt->execute([
-        ':pid' => $profileId,
-        ':start' => $formatted
-    ]);
-    $conflict = $stmt->rowCount() > 0;
+        $stmt->execute([
+            ':pid' => $profileId,
+            ':start' => $formatted
+        ]);
+        $conflict = $stmt->rowCount() > 0;
 
-    error_log("[hasTimeConflict] Conflict found: " . ($conflict ? "YES" : "NO"));
+        error_log("[hasTimeConflict] Conflict found: " . ($conflict ? "YES" : "NO"));
 
-    return $conflict;
-}
+        return $conflict;
+    }
 
 
     // my-gathering
+
     public function getUserAllGatherings($profileId)
     {
         try {
@@ -370,6 +373,33 @@ class GatheringDAO
     }
 
     // Check if user-related gathering only
+    // -----------------------------------------------------------------------------------------------
+    // Auto update gathering status
+    public function updateGatheringStatuses()
+    {
+        try {
+            $now = new \DateTime();
+            $nowFormatted = $now->format('Y-m-d H:i:s');
+
+            $sql = "UPDATE gathering
+                SET status = CASE
+                    WHEN CONCAT(date, ' ', startTime) > :now THEN 'NEW'
+                    WHEN CONCAT(date, ' ', startTime) <= :now AND CONCAT(date, ' ', endTime) >= :now THEN 'START'
+                    WHEN CONCAT(date, ' ', endTime) < :now THEN 'END'
+                    ELSE status
+                END
+                WHERE status != 'CANCELLED'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':now' => $nowFormatted]);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] updateGatheringStatuses: " . $e->getMessage());
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    // Get User-related gathering only
     public function isProfileInvolved($gatheringId, $profileId)
     {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM profilegathering WHERE gatheringID = :gid AND profileID = :pid");
@@ -574,5 +604,153 @@ class GatheringDAO
             error_log("[GatheringDAO] Error fetching preferences: " . $e->getMessage());
             return [];
         }
+    }
+    //     public function insertLocationFeedback(array $data)
+    // {
+    //     try {
+    //         $sql = "INSERT INTO feedback
+    //           (profileID, gatheringID, locationID, feedbackDesc, feedbackType, date)
+    //          VALUES
+    //           (:pid, :gid, :lid, :desc, :type, :date)";
+    //         $stmt = $this->db->prepare($sql);
+    //         return $stmt->execute([
+    //             ':pid'  => $data['profileID'],
+    //             ':gid'  => $data['gatheringID'],
+    //             ':lid'  => $data['locationID'],
+    //             ':desc' => $data['feedbackDesc'],
+    //             ':type' => $data['feedbackType'],
+    //             ':date' => $data['date'],
+    //         ]);
+    //     } catch (PDOException $e) {
+    //         error_log("Error inserting location feedback: " . $e->getMessage());
+    //         return false;
+    //     }
+    // }
+
+    // // Location Feedback
+    // public function fetchLocationFeedbacks($gatheringId, $locationId)
+    // {
+    //     try {
+    //         $stmt = $this->db->prepare("
+    //           SELECT f.*, p.name, p.avatar
+    //             FROM feedback f
+    //             JOIN profile p ON f.profileID = p.profileID
+    //            WHERE f.gatheringID = :gid
+    //              AND f.locationID  = :lid
+    //            ORDER BY f.date DESC
+    //         ");
+    //         $stmt->execute([
+    //           ':gid' => $gatheringId,
+    //           ':lid' => $locationId
+    //         ]);
+    //         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //     } catch (PDOException $e) {
+    //         error_log("Error fetching location feedbacks: " . $e->getMessage());
+    //         return [];
+    //     }
+    // }
+
+    /**
+     * Fetch all location feedback for a gathering’s location,
+     * including the poster’s name and avatar.
+     */
+    public function getLocationFeedbackByLocation($locationId)
+    {
+        $sql = "
+      SELECT 
+        f.feedbackDesc,
+        f.date,
+        p.profileID,
+        p.nickname    AS name,
+        NULL          AS avatar
+      FROM feedback f
+      JOIN profile p 
+        ON p.profileID = f.profileID
+      WHERE f.locationID = :loc
+        AND f.feedbackType = 'LOCATION'
+      ORDER BY f.date ASC
+    ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':loc' => $locationId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    /**
+     * Insert a new location feedback, but only if the user
+     * hasn’t already left feedback for that gathering.
+     */
+    public function insertLocationFeedback($profileId, $gatheringId, $locationId, $desc)
+    {
+        // Only one LOCATION per user-gathering
+        $check = $this->db->prepare("
+      SELECT COUNT(*) FROM feedback
+       WHERE profileID   = :pid
+         AND gatheringID = :gid
+         AND feedbackType= 'LOCATION'
+    ");
+        $check->execute([':pid' => $profileId, ':gid' => $gatheringId]);
+        if ($check->fetchColumn() > 0) return false;
+
+        // insert
+        $ins = $this->db->prepare("
+      INSERT INTO feedback
+        (profileID, gatheringID, locationID, feedbackDesc, feedbackType, date)
+      VALUES
+        (:pid, :gid, :lid, :desc, 'LOCATION', NOW())
+    ");
+        return $ins->execute([
+            ':pid'  => $profileId,
+            ':gid'  => $gatheringId,
+            ':lid'  => $locationId,
+            ':desc' => $desc
+        ]);
+    }
+
+
+
+    // 1) retrieve all gathering feedback entries
+    public function getGatheringFeedbackByGathering(int $gatheringId): array
+    {
+        $sql = "
+      SELECT 
+        f.feedbackDesc,
+        f.date
+      FROM feedback f
+      WHERE f.gatheringID = :gid
+        AND f.feedbackType = 'gathering'
+      ORDER BY f.date ASC
+    ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':gid' => $gatheringId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // 2) insert a new gathering feedback
+    public function insertGatheringFeedback($profileId, $gatheringId, $locationId, $desc)
+    {
+        // Only one GATHERING per user-gathering
+        $check = $this->db->prepare("
+      SELECT COUNT(*) FROM feedback
+       WHERE profileID   = :pid
+         AND gatheringID = :gid
+         AND feedbackType= 'GATHERING'
+    ");
+        $check->execute([':pid' => $profileId, ':gid' => $gatheringId]);
+        if ($check->fetchColumn() > 0) return false;
+
+        // insert
+        $ins = $this->db->prepare("
+      INSERT INTO feedback
+        (profileID, gatheringID, locationID, feedbackDesc, feedbackType, date)
+      VALUES
+        (:pid, :gid, :lid, :desc, 'GATHERING', NOW())
+    ");
+        return $ins->execute([
+            ':pid'  => $profileId,
+            ':gid'  => $gatheringId,
+            ':lid'  => $locationId,
+            ':desc' => $desc
+        ]);
     }
 }
