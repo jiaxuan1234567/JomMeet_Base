@@ -216,20 +216,38 @@ $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentSta
             let html = '';
             list.forEach(g => {
                 const theme = g.theme || 'No Theme'; // Fallback for missing theme
-                const date = g.date || 'N/A';       // Fallback for missing date
+                const date = g.date || 'N/A'; // Fallback for missing date
                 const startTime = g.startTime || 'N/A'; // Fallback for missing start time
-                const endTime = g.endTime || 'N/A';     // Fallback for missing end time
+                const endTime = g.endTime || 'N/A'; // Fallback for missing end time
                 const venue = g.venue || 'Unknown Venue'; // Fallback for missing venue
-                const pax = g.pax || 0;             // Fallback for missing pax
-                const maxPax = g.maxPax || 0;       // Fallback for missing maxPax
-                const cover = g.cover || 'default-image.png'; // Fallback for missing cover image
+                const pax = g.pax || 0; // Fallback for missing pax
+                const maxPax = g.maxPax || 0; // Fallback for missing maxPax
+                const preference = g.preference.toLowerCase() || 'default'; // Fallback for missing preference
 
+                console.log(preference);
+                const preferenceImageMap = <?= json_encode([
+                                                'dinner' => $asset->getFilePath('dinner'),
+                                                'chill' => $asset->getFilePath('chill'),
+                                                'natural' => $asset->getFilePath('natural'),
+                                                'shopping' => $asset->getFilePath('shopping'),
+                                                'workout' => $asset->getFilePath('workout'),
+                                                'entertainment' => $asset->getFilePath('entertainment'),
+                                                'music' => $asset->getFilePath('music'),
+                                                'movie' => $asset->getFilePath('movie'),
+                                                'food' => $asset->getFilePath('food'),
+                                                'sports' => $asset->getFilePath('sports'),
+                                                'study' => $asset->getFilePath('study'),
+                                                'default' => $asset->getFilePath('default-image'),
+                                            ]) ?>;
+                // Map preference to specific image paths
+                const cover = preferenceImageMap[preference] || preferenceImageMap['default'];
+                console.log(cover);
                 html += `
 <div class="col-6 mb-0 mt-4 pb-0">
   <div class="card border-0 rounded">
     <div class="row g-0 align-items-center">
       <div class="col-4 text-center p-2">
-        <img src="/asset/${cover}" class="img-fluid" style="max-height:100px" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1161/1161388.png'">
+        <img src="${cover}" class="img-fluid" style="max-height:100px" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1161/1161388.png'">
       </div>
       <div class="col-8">
         <div class="card-body py-2 px-3">
@@ -242,7 +260,6 @@ $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentSta
           </div>
           <div class="d-flex gap-2">
             <a href="/my-gathering/view/${g.id}" class="btn btn-sm w-100 px-3 fw-bold text-white" style="background-color: #569FFF; border:none; border-radius:20px;">View Details</a>
-            ${buildActionMenu(g)}
           </div>
         </div>
       </div>

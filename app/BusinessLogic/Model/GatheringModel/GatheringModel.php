@@ -343,6 +343,7 @@ class GatheringModel
                 'pax' => $g['currentParticipant'] ?? 0,
                 'maxPax' => $g['maxParticipant'] ?? 0,
                 'cover' => $g['image'] ?? 'default-image.png',
+                'preference' => $g['preference'] ?? 'No Preference',
             ];
         }, $gatherings);
     }
