@@ -49,22 +49,26 @@ require_once __DIR__ . '/../HomeView/header.php';
     <div class="ms-5 p-2 mb-4 border border-primary rounded"
         style="background-color: #deecff; border-color:#0077CC !important; margin-right: 60px;">
         <h6 class="fw-bold mb-2">Hobbies</h6>
-        <?php foreach ($profile['hobbies'] as $hobby): ?>
-            <button class="btn btn-outline-primary btn-sm me-2 mb-2" style="color:#000000; border-color:#000000; background-color:#FFFFFF;">
-                <?php echo htmlspecialchars($hobby) ?>
-            </button>
-        <?php endforeach; ?>
+        <div class="border rounded p-3" id="hobbiesList" style="display: grid;grid-template-columns: repeat(8, 1fr); gap: 1.5rem;">
+            <?php foreach ($profile['hobbies'] as $hobby): ?>
+                <button class="btn btn-outline-primary btn-sm" style="color:#000000; border-color:#000000; background-color:#FFFFFF;">
+                    <?php echo htmlspecialchars($hobby) ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
     </div>
 
     <!-- Preference Gathering -->
-    <div class="ms-5 p-2 mb-4 border border-primary rounded"
+    <div class="ms-5 p-2 mb-5 border border-primary rounded"
         style="background-color: #deecff; border-color:#0077CC !important; margin-right: 60px;">
         <h6 class="fw-bold mb-2">Preference Gathering</h6>
-        <?php foreach ($profile['preferences'] as $preference): ?>
-            <button class="btn btn-outline-primary btn-sm me-2 mb-2" style="color:#000000; border-color:#000000; background-color:#FFFFFF;">
-                <?php echo htmlspecialchars($preference) ?>
-            </button>
-        <?php endforeach; ?>
+        <div class="border rounded p-3" id="preferencesList" style="display: grid;grid-template-columns: repeat(8, 1fr); gap: 1.5rem;">
+            <?php foreach ($profile['preferences'] as $preference): ?>
+                <button class="btn btn-outline-primary btn-sm" style="color:#000000; border-color:#000000; background-color:#FFFFFF;">
+                    <?php echo htmlspecialchars($preference) ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 

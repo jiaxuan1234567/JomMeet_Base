@@ -34,10 +34,10 @@ class HomeModel
         return (new GatheringModel())->getMyGatheringsWithTab($hostProfileId);
     }
 
-    // public function getAllProfiles()
-    // {
-    //     return (new ProfileModel())->getAllProfiles();
-    // }
+    public function getUserProfileById($userId)
+    {
+        return (new ProfileModel())->getUserByProfileID($userId);
+    }   
 
     public function logout()
     {
