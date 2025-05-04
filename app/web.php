@@ -37,6 +37,8 @@ Route::post('/my-gathering/create', [GatheringController::class, 'createGatherin
 Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSelectLocation']);
 // before you dispatch
 Route::post('/my-gathering/create/location', [GatheringController::class, 'selectLocationSubmit']);
+// reminder
+Route::get('/my-gathering/reminder', [GatheringController::class, 'viewGatheringReminder']);
 
 //AJAX
 Route::get('/api/check-gathering-status', [GatheringController::class, 'checkGatheringStatus']);

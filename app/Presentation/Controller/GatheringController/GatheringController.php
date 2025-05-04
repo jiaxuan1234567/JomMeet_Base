@@ -248,4 +248,10 @@ class GatheringController
         header('Content-Type: application/json');
         echo json_encode(['updated' => $updated]);
     }
+
+    public function viewGatheringReminder()
+    {
+        $redirectUrl = $_GET['redirect'] ?? '/my-gathering/reminder';
+        require_once $this->fileHelper->getFilePath('GatheringReminder');
+    }
 }

@@ -95,7 +95,7 @@ $myGatherings = [
                                                             Action
                                                         </button>
                                                         <ul class="dropdown-menu">
-                                                            <li><a class="dropdown-item" href="#">Send Reminder</a></li>
+                                                            <li><a class="dropdown-item" href="/my-gathering/reminder">Send Reminder</a></li>
                                                             <li><a class="dropdown-item" href="#">Edit Gathering</a></li>
                                                             <li><a class="dropdown-item" href="#">Cancel Gathering</a></li>
                                                         </ul>
