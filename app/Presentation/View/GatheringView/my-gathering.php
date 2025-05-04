@@ -26,7 +26,7 @@ $asset = new FileHelper('asset');
 // });
 ?>
 
-<div class="container-fluid my-5 mb-5">
+<div class="container-fluid my-5 mb-5" style="min-height: 70vh;">
     <?php if (!empty($_SESSION['flash_message'])): ?>
         <div id="flashMessage"
             class="flash-message"

@@ -33,7 +33,7 @@
 <body>
     <!-- Header -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light px-4 bg-blue-color">
+        <nav class="navbar navbar-expand-md navbar-light px-4 bg-blue-color">
             <a class="navbar-brand" href="#">
                 <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" alt="Logo" width="40" height="40" />
             </a>
