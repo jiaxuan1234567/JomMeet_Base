@@ -43,8 +43,20 @@ Route::get('/my-gathering/view/{id}', [GatheringController::class, 'viewMyGather
 Route::get('/my-gathering/create', [GatheringController::class, 'viewCreate']);
 Route::post('/my-gathering/create', [GatheringController::class, 'createGathering']);
 Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSelectLocation']);
+Route::get('/my-gathering', [GatheringController::class, 'listGatherings']);
+// before you dispatch
+Route::post('/my-gathering/create/location', [GatheringController::class, 'selectLocationSubmit']);
 Route::post('/my-gathering/leave/{gatheringId}', [GatheringController::class, 'leaveGathering']);
 Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGathering']);
+
+// Gathering feedback
+// show the anonymous gathering‐feedback page
+Route::get('/my-gathering/gatheringFeedback', [GatheringController::class, 'showGatheringFeedback']);
+Route::post('/my-gathering/gatheringFeedback', [GatheringController::class, 'submitGatheringFeedback']);
+
+// Location feedback
+Route::get('/my-gathering/locationFeedback', [GatheringController::class, 'showLocationFeedback']);
+Route::post('/my-gathering/locationFeedback', [GatheringController::class, 'locationFeedback']);
 Route::get('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'viewEdit']);
 Route::post('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'editSubmit']);
 
@@ -60,3 +72,9 @@ Route::post('/api/validate-gathering-edit', [GatheringController::class, 'ajaxVa
 
 // helper route to save location (need delete in future)
 Route::post('/gathering/location/save', [GatheringController::class, 'saveLocation']);
+
+
+
+
+
+
