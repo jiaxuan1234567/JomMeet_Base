@@ -25,7 +25,7 @@ require_once __DIR__ . '/../HomeView/header.php';
             <form method="post" action="/reflection/edit/<?php echo $reflectionSelected['selfreflectID']; ?>" class="form" id="selfReflectionForm">
                     <div class="my-3">
                         <h4 style="font-size: 30px;"><label for="date">Date</label></h4>
-                        <input type="text" class="ps-2 bg-light-subtle border border-black border-2 rounded-3" id="reflectionDate" name="reflectionDate" value="<?php echo $reflectionSelected['date'] ?? '' ?>" style="width:500px;" readonly>
+                        <input type="text" class="ps-2 bg-light-subtle border border-black border-2 rounded-3" id="reflectionDate" name="reflectionDate" value="<?php echo date('Y-m-d H:i', strtotime($reflectionSelected['date'] ?? '')); ?>" style="width:500px;" readonly>
                     </div>
                     
                     <div class="my-3">
