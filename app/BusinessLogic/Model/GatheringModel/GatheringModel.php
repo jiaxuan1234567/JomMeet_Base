@@ -330,7 +330,9 @@ class GatheringModel
     public function getMyGatheringsWithTab($profileId)
     {
         try {
+            // jx
             $this->gatheringDAO->updateGatheringStatuses();
+            // jx
             $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
             $grouped = [
                 'all'       => [],

@@ -24,7 +24,7 @@ textarea.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     if (!hasPostedFeedback && textarea.value.length > 0 && textarea.value.length <= 500) {
-      postBtn.click(); 
+      postBtn.click();
     }
   }
 });
@@ -40,5 +40,5 @@ postBtn.addEventListener('click', (e) => {
 
 function goBack() {
   const status = document.getElementById('gatheringStatus')?.value || '';
-  window.location.href = `/my-gathering?status=completed`;
+  window.location.href = `/my-gathering#completed`;
 }
