@@ -25,7 +25,6 @@ require_once __DIR__ . '/../HomeView/header.php';
         <div class="container border border-2 rounded-3 m-2 align-content-center" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
             <div class="container d-flex align-item-center justify-content-center">
                 <form method="post" action="/reflection/create" class="form" id="selfReflectionForm">
-                    <h1></h1>
                     <div class="my-3">
                         <h4 style="font-size: 30px;"><label for="date"><b>Date</b></label></h4>
                         <input type="text" class="ps-2 bg-light-subtle border border-black border-2 rounded-3" id="reflectionDate" name="reflectionDate" value="<?= date("Y-m-d H:i") ?>" style="width:500px;" readonly>

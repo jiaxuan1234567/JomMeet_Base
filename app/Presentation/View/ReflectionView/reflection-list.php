@@ -14,10 +14,10 @@ require_once __DIR__ . '/../HomeView/header.php';
     <section class="page-header page-header-classic page-header-sm">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-10 order-2 order-md-1 align-self-center p-static my-3">
+                <div class="col-md-10 order-1 order-md-1 align-self-center p-static my-3">
                     <h2 data-title-border>Self-Reflection</h2>
                 </div>
-                <div class="col-md-2 order-1 order-md-2 align-self-center my-3 justify-content-center">
+                <div class="col-md-2 order-2 order-md-2 align-self-center my-3 justify-content-center">
                     <a href="/reflection/create" class="btn btn-outline-dark d-flex align-items-center py-1 px-2 rounded ">
                         <span class="d-inline-block bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;">
                             <i class="bi bi-plus" style="font-size: 1.25rem;"></i>
@@ -33,10 +33,10 @@ require_once __DIR__ . '/../HomeView/header.php';
             <div class="container">
                 <?php if (!empty($reflections)): ?>
                     <?php foreach ($reflections as $reflection): ?>
-                        <div class="row container border border-2 rounded-3 my-3" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
+                        <div class="row m-1 container border border-2 rounded-3 my-3" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
                             <div class="col-md-10">
                                 <a href="/reflection/view/<?= $reflection['selfreflectID'] ?>" class="text-decoration-none text-reset">
-                                    <div class="card my-4 col-sm-3" style="background-color: rgb(86,159,255);">
+                                    <div class="card my-4 col-md-4" style="background-color: rgb(86,159,255);">
                                         <h4 class="card-content font-weight-medium m-2 align-self-center" style="font-size: 20px;"><?php echo htmlspecialchars(date('j F Y g:ia', strtotime($reflection['date']))); ?></h4>
                                     </div>
                                     <div class="mb-3">
