@@ -6,9 +6,33 @@ $(() => {
         location.reload();
     }
 
+    function updateSelectedTagUI(value) {
+        const $selectedOption = $(`.tag-option[data-value="${value}"]`);
+        if ($selectedOption.length) {
+            const label = $selectedOption.data('label');
+            const image = $selectedOption.data('image');
+
+            $('#selectedTagLabel').text(label);
+            $('#selectedTagImage').attr('src', image);
+        }
+    }
+
+    $('#gatheringTag').on('input change', function () {
+        const value = $(this).val();
+        updateSelectedTagUI(value);
+    });
+
+    const initialTagValue = $('#gatheringTag').val();
+    if (initialTagValue) {
+        updateSelectedTagUI(initialTagValue);
+    }
+
     $('#nextDayNote').hide();
 
     const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
+    const initFields = ['inputDate', 'inputPax'];
+    const timeFields = ['inputDate', 'startTime', 'endTime'];
+    const locationFields = ['inputLocation', 'locationId'];
     const fieldStates = {};
     fields.forEach(f => {
         fieldStates[f] = {
@@ -18,10 +42,6 @@ $(() => {
         };
     });
 
-    // defined variables
-    const timeFields = ['inputDate', 'startTime', 'endTime'];
-    const locationFields = ['inputLocation', 'locationId'];
-
     const savedFieldStates = sessionStorage.getItem('__field_states__');
     if (savedFieldStates) {
         const parsed = JSON.parse(savedFieldStates);
@@ -30,9 +50,23 @@ $(() => {
             $(`#${fieldId}`).val(state.value);
             renderValidation(fieldId);
         });
+    } else {
+        initFields.forEach(fieldId => {
+            const currentVal = $(`#${fieldId}`).val();
+            if (currentVal) {
+                fieldStates[fieldId].value = currentVal;
+
+                if (timeFields.includes(fieldId)) {
+                    validateField(fieldId, datetimeDataHandler(fieldId));
+                } else if (locationFields.includes(fieldId)) {
+                    validateField(fieldId, locationDataHandler());
+                } else {
+                    validateField(fieldId, dataHandler(fieldId, currentVal));
+                }
+            }
+        });
     }
 
-    //storeInitialValues(fields);
     updateButtons();
 
     // Submit Button
@@ -43,12 +77,6 @@ $(() => {
 
 
     fields.forEach(fieldId => {
-        // const val = sessionStorage.getItem(fieldId);
-        // if (val !== null) {
-        //     $(`#${fieldId}`).val(val).trigger('input');
-        //     //touched.add(fieldId);
-        // }
-
         $(`#${fieldId}`).on('input change', function () {
             const data = $(this).val();
 
@@ -71,13 +99,6 @@ $(() => {
         $('#locationId').val(id);
         validateField('inputLocation', locationDataHandler());
     }
-    if ($('#inputDate').val()) {
-        validateField('inputDate', datetimeDataHandler('inputDate'));
-    }
-    const inputPax = $('inputPax').val();
-    if (inputPax) {
-        validateField('inputPax', inputPax);
-    }
 
     $('#createResetBtn').on('click', function (e) {
         e.preventDefault();
@@ -97,7 +118,7 @@ $(() => {
     });
 
     function validateField(fieldId, data) {
-        //console.log(data);
+        console.log('Pass data: ', data);
         $.ajax({
             url: '/api/validate-gathering',
             method: 'POST',
@@ -108,24 +129,62 @@ $(() => {
                 const isValid = response['valid'] === true;
                 const errors = isValid ? [] : (Array.isArray(response['errors']) ? response['errors'] : [response['errors']]);
 
-                if (data.field === 'time') {
-                    const sharedError = isValid ? [] : (Array.isArray(errors) ? [...new Set(errors)] : [errors]);
 
-                    // Apply the same error to both fields first
-                    ['startTime', 'endTime'].forEach(field => {
+                if (timeFields.includes(data.touched)) {
+                    const sharedError = isValid ? [] : (Array.isArray(errors) ? [...new Set(errors)] : [errors]);
+                    const errFields = response.errFields || [];
+
+                    // First clear all time fields' errors and validity
+                    timeFields.forEach(field => {
                         fieldStates[field].valid = isValid;
-                        fieldStates[field].error = sharedError;
+                        fieldStates[field].error = [];
                     });
 
-                    // If both fields have the same error(s), clear one to avoid duplicate UI
-                    if (
-                        JSON.stringify(fieldStates['startTime'].error) === JSON.stringify(fieldStates['endTime'].error)
-                        && fieldStates['startTime'].error.length > 0
-                    ) {
-                        fieldStates['endTime'].error = [];
+                    // Then apply error to the listed fields only
+                    if (!isValid && errFields.length) {
+                        errFields.forEach(field => {
+                            fieldStates[field].error = sharedError;
+                            fieldStates[field].valid = false;
+                        });
                     }
+                    errFields.forEach(renderValidation);
 
-                    ['startTime', 'endTime'].forEach(renderValidation);
+                    // const sharedError = isValid ? [] : (Array.isArray(errors) ? [...new Set(errors)] : [errors]);
+                    // const [date, start, end] = timeFields;
+
+                    // fieldStates[data.touched].valid = isValid;
+                    // fieldStates[data.touched].error = sharedError;
+
+                    // if (['time', 'inputDateStartTime', 'inputDateEndTime'].includes(data.field)) {
+                    //     [date, start, end].forEach(field => {
+                    //         fieldStates[field].valid = isValid;
+                    //         fieldStates[field].error = sharedError;
+                    //     });
+
+                    //     // Show shared error in only one time field depending on context
+                    //     if (!isValid) {
+                    //         if (data.field === 'inputDateEndTime') {
+                    //             fieldStates[end].error = sharedError;
+                    //             fieldStates[start].error = [];
+                    //             fieldStates[date].error = [];
+                    //         } else {
+                    //             fieldStates[start].error = sharedError;
+                    //             fieldStates[end].error = [];
+                    //             fieldStates[date].error = [];
+                    //         }
+                    //     }
+
+                    //     // Compare and keep error only on 'inputDate' if all 3 are same
+                    //     const errDate = JSON.stringify(fieldStates[date].error);
+                    //     const errStart = JSON.stringify(fieldStates[start].error);
+                    //     const errEnd = JSON.stringify(fieldStates[end].error);
+
+                    //     if (errDate === errStart && errStart === errEnd && fieldStates[start].error.length > 0) {
+                    //         fieldStates[date].error = [];
+                    //     }
+                    // }
+
+                    // timeFields.forEach(renderValidation);
                 } else {
                     // update only the touched field
                     const touched = data.touched;
@@ -150,13 +209,31 @@ $(() => {
         const $input = $(`#${fieldId}`);
         const $error = $(`#error-${fieldId}`);
 
-        const hasError = !state.valid && Array.isArray(state.error) && state.error.length > 0;
+        // const hasError = !state.valid && Array.isArray(state.error) && state.error.length > 0;
+
+        // if (hasError) {
+        //     const uniqueErrors = [...new Set(state.error)];
+        //     const msg = uniqueErrors.join('<br>');
+        //     $input.addClass('is-invalid');
+        //     $error.html(`${msg}*`).show();
+        // } else {
+        //     $input.removeClass('is-invalid');
+        //     $error.text('').hide();
+        // }
+        const hasError = !state.valid;
 
         if (hasError) {
-            const uniqueErrors = [...new Set(state.error)];
+            const errors = Array.isArray(state.error) ? state.error.filter(e => e.trim() !== '') : [];
+            const uniqueErrors = [...new Set(errors)];
             const msg = uniqueErrors.join('<br>');
+
             $input.addClass('is-invalid');
-            $error.html(`${msg}*`).show();
+
+            if (msg) {
+                $error.html(`${msg}*`).show();
+            } else {
+                $error.text('').hide(); // Hide message but still show border
+            }
         } else {
             $input.removeClass('is-invalid');
             $error.text('').hide();
@@ -188,51 +265,45 @@ $(() => {
         const nextDayNote = $('#nextDayNote');
         let startDatetime = '';
         let endDatetime = '';
-
-        if (date && startTime) {
-            startDatetime = new Date(`${date}T${startTime}`);
-        }
-        if (date && endTime) {
-            console.log(endTime);
-            endDatetime = new Date(`${date}T${endTime}`);
-            // Compare and adjust if needed
-            // if (startDatetime && new Date(endDatetime) < new Date(startDatetime)) {
-            //     const endDateObj = new Date(endDatetime);
-            //     endDateObj.setDate(endDateObj.getDate() + 1); // Add one day
-            //     endDatetime = endDateObj.toISOString().slice(0, 16).replace('T', ' ');
-            // }
-            if (startDatetime) {
-                // const s = new Date(startDatetime);
-                // const e = new Date(endDatetime);
-
-                if (!isNaN(startDatetime.getTime()) && !isNaN(endDatetime.getTime())) {
-                    if (endDatetime < startDatetime) {
-                        endDatetime.setDate(endDatetime.getDate() + 1);
-                        nextDayNote.show(); // 👈 show label
-                    } else {
-                        nextDayNote.hide(); // 👈 hide if not needed
-                    }
-                    //endDatetime = endDatetime.toISOString().slice(0, 16).replace('T', ' ');
-                }
-            }
-        }
-
         const payload = {
-            field: '', // will be assigned below
+            field: '',
             touched: fieldId,
             value: {
-                inputDate: date || '',
-                startTime: startDatetime,
-                endTime: endDatetime
+                inputDate: date,
+                startTime: '',
+                endTime: ''
             }
         };
 
+        if (date && startTime) {
+            startDatetime = new Date(`${date}T${startTime}`);
+            payload.value.inputDate = startDatetime;
+        }
+        if (date && endTime) {
+            endDatetime = new Date(`${date}T${endTime}`);
+            // if (startDatetime) {
+
+            //     if (!isNaN(startDatetime.getTime()) && !isNaN(endDatetime.getTime())) {
+            //         if (endDatetime < startDatetime) {
+            //             endDatetime.setDate(endDatetime.getDate() + 1);
+            //             nextDayNote.show();
+            //         } else {
+            //             nextDayNote.hide();
+            //         }
+            //     }
+            // }
+            payload.value.inputDate = endDatetime;
+        }
+        payload.value.startTime = startDatetime;
+        payload.value.endTime = endDatetime;
+
         // Determine which field(s) were touched and the main field flag
-        // field : inputDate, startTime, endTime, time
-        if (fieldId === 'inputDate') {
-            payload.field = 'inputDate';
-        } else if (startTime && endTime) {
+        if (startTime && endTime) {
             payload.field = 'time';
+        } else if ((date && startTime)) {
+            payload.field = 'inputDateStartTime';
+        } else if ((date && endTime)) {
+            payload.field = 'inputDateEndTime';
         } else {
             payload.field = fieldId;
         }

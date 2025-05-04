@@ -7,7 +7,7 @@ use Exception;
 
 class GatheringHelperService
 {
-    public function validateDateTime($data, $joinedGatherings)
+    public function validateDateTime($data, $joinedGatherings, $editingId = null)
     {
         $field    = $data['field'] ?? '';
         $touched  = $data['touched'] ?? '';
@@ -15,16 +15,21 @@ class GatheringHelperService
         $dateStr      = $value['inputDate'] ?? '';
         $startTimeStr = $value['startTime'] ?? '';
         $endTimeStr   = $value['endTime'] ?? '';
-        $response = ['valid' => true, 'errors' => []];
+        $response = ['valid' => true, 'errors' => [], 'errFields' => []];
+        if (!empty($editingId)) {
+            $joinedGatherings = array_values(array_filter($joinedGatherings, function ($g) use ($editingId) {
+                return $g['gatheringID'] != $editingId;
+            }));
+        }
 
         try {
             $date = $dateStr ? new DateTime($dateStr) : null;
             $startDT = $startTimeStr ? new DateTime($startTimeStr) : null;
             $endDT   = $endTimeStr   ? new DateTime($endTimeStr)   : null;
 
-            if ($startDT && $endDT && $endDT < $startDT) {
-                $endDT->modify('+1 day');
-            }
+            // if ($startDT && $endDT && $endDT < $startDT) {
+            //     $endDT->modify('+1 day');
+            // }
         } catch (Exception $e) {
             return ['valid' => false, 'errors' => ['Invalid datetime format']];
         }
@@ -34,9 +39,16 @@ class GatheringHelperService
         $threeHoursLater = (clone $now)->modify('+3 hours');
 
         // Constraint: start time must be >= now + 3 hours
-        if ($startDT && $startDT < $threeHoursLater) {
+        if ($field === 'inputDateStartTime' || $field === 'inputDateEndTime') {
+            if ($date < $threeHoursLater) {
+                $response['valid'] = false;
+                $response['errors'] = ['Start time must be at least 3 hours from now.'];
+                $response['errFields'] = ($field === 'inputDateStartTime') ? ['startTime'] : ['endTime'];
+            }
+        } else if ($startDT && $startDT < $threeHoursLater) {
             $response['valid'] = false;
-            $response['errors'] = 'Start time must be at least 3 hours from now.';
+            $response['errors'] = ['Start time must be at least 3 hours from now.'];
+            $response['errFields'] = ['startTime'];
         }
 
         // 1. If field is "time" (start + end both fulfilled) and NOT triggered by "time"
@@ -44,10 +56,12 @@ class GatheringHelperService
             if ($startDT && $endDT) {
                 if ($startDT > $endDT) {
                     $response['valid'] = false;
-                    $response['errors'] = 'Start time must be earlier than end time.';
+                    $response['errors'] = ['Start time must be earlier than end time.'];
+                    $response['errFields'] = [$touched];
                 } else if ($startDT == $endDT) {
                     $response['valid'] = false;
-                    $response['errors'] = 'Invalid time options.';
+                    $response['errors'] = ['Invalid time options.', ''];
+                    $response['errFields'] = ['startTime', 'endTime'];
                 }
             }
 
@@ -55,13 +69,14 @@ class GatheringHelperService
                 $joinedStart = new DateTime("{$gathering['date']} {$gathering['startTime']}");
                 $joinedEnd   = new DateTime("{$gathering['date']} {$gathering['endTime']}");
 
-                if ($joinedEnd < $joinedStart) {
-                    $joinedEnd->modify('+1 day');
-                }
+                // if ($joinedEnd < $joinedStart) {
+                //     $joinedEnd->modify('+1 day');
+                // }
 
                 if ($startDT && $endDT && $startDT < $joinedEnd && $endDT > $joinedStart) {
                     $response['valid'] = false;
-                    $response['errors'] = 'Selected time overlaps with an existing gathering.';
+                    $response['errors'] = ['Selected time overlaps with an existing gathering.'];
+                    $response['errFields'] = [$touched];
                     break;
                 }
             }
@@ -71,7 +86,8 @@ class GatheringHelperService
         if ($field === $touched) {
             if ($field === 'inputDate' && $date && $date < $today) {
                 $response['valid'] = false;
-                $response['errors'] = 'Date must be today or later.';
+                $response['errors'] = ['Date must be today or later.'];
+                $response['errFields'] = [$touched];
             }
 
             if ($field === 'startTime' || $field === 'endTime') {
@@ -81,13 +97,14 @@ class GatheringHelperService
                     $joinedStart = new DateTime("{$gathering['date']} {$gathering['startTime']}");
                     $joinedEnd   = new DateTime("{$gathering['date']} {$gathering['endTime']}");
 
-                    if ($joinedEnd < $joinedStart) {
-                        $joinedEnd->modify('+1 day');
-                    }
+                    // if ($joinedEnd < $joinedStart) {
+                    //     $joinedEnd->modify('+1 day');
+                    // }
 
                     if ($targetDT && $targetDT > $joinedStart && $targetDT < $joinedEnd) {
                         $response['valid'] = false;
-                        $response['errors'] = ucfirst($field) . ' overlaps with an existing gathering.';
+                        $response['errors'] = [ucfirst($field) . ' overlaps with an existing gathering.'];
+                        $response['errFields'] = [$touched];
                         break;
                     }
                 }

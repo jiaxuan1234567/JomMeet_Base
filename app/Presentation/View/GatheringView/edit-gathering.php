@@ -93,7 +93,7 @@ $asset = new FileHelper('asset');
                                 id="inputPax"
                                 name="inputPax"
                                 class="form-control gathering-input text-center"
-                                value="<?= $paxLimit['minPax'] ?>"
+                                value="<?= $paxLimit['currentPax'] ?>"
                                 min="<?= $paxLimit['minPax'] ?>" max="<?= $paxLimit['maxPax'] ?>" readonly
                                 style="max-width: 60px;">
 
@@ -166,7 +166,7 @@ $asset = new FileHelper('asset');
                     <button type="reset" class="btn border-black rounded-1 px-4 py-2 fw-semibold" id="createResetBtn">
                         Reset
                     </button>
-                    <button type="submit" class="btn btn-primary py-2 px-4 button-blue-color border-0" id="createBtn">Update</button>
+                    <button type="submit" class="btn btn-primary py-2 px-4 button-blue-color border-0" id="createBtn" disabled>Update</button>
                 </div>
                 <input type="hidden" name="gatheringId" id="gatheringId" value="<?= $gathering['gatheringID'] ?>">
             </form>

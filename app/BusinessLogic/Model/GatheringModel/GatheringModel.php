@@ -59,6 +59,7 @@ class GatheringModel
     {
         return [
             'minPax' => ($gathering['currentParticipant'] > 3) ? ($gathering['currentParticipant']) : 3,
+            'currentPax' => $gathering['maxParticipant'],
             'maxPax' => 8
         ];
     }
@@ -634,6 +635,9 @@ class GatheringModel
         'value' => [
             'locationName' => 'name',
             'locationId' => 'id'
+        ],
+        'errFields' => [
+        'fieldId', 'anotherFieldId'
         ]
         'value' => [
             'inputDate' => date,
@@ -643,7 +647,7 @@ class GatheringModel
         'value' => 'data'
     ]
     */
-    public function validateGathering($data)
+    public function validateGathering($data, $editingId = null)
     {
         $touched = $data['touched'];
         $response = ['valid' => true, 'errors' => []];
@@ -655,7 +659,7 @@ class GatheringModel
                 case 'startTime':
                 case 'endTime':
                     $joined = $this->gatheringDAO->getJoinedGatheringByUserId($_SESSION['profile']['profileID'] ?? 0);
-                    $response = $gatheringHelper->validateDateTime($data, $joined);
+                    $response = $gatheringHelper->validateDateTime($data, $joined, $editingId);
                     break;
                 case 'locationName':
                 case 'locationId':
@@ -670,8 +674,15 @@ class GatheringModel
                     $response = $gatheringHelper->validateTheme($data);
                     break;
                 case 'inputPax':
-                    $min = $this->getPaxLimit()['minPax'];
-                    $max = $this->getPaxLimit()['maxPax'];
+                    if (empty($editingId)) {
+                        $min = $this->getPaxLimit()['minPax'];
+                        $max = $this->getPaxLimit()['maxPax'];
+                    } else {
+                        $paxLimit = $this->getEditPaxLimit($this->gatheringDAO->getGatheringById($editingId));
+                        $min = $paxLimit['minPax'];
+                        $max = $paxLimit['maxPax'];
+                    }
+
                     $response = $gatheringHelper->validatePax($data, $min, $max);
                     break;
             }

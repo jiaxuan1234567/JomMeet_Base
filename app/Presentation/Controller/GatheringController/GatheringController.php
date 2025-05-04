@@ -90,7 +90,7 @@ class GatheringController
         $this->gatheringModel->updateGathering($data, $profileId, $gatheringId);
         $_SESSION['flash_message'] = 'Gathering updated successfully!';
         $_SESSION['flash_type'] = 'success';
-        header("Location: /my-gathering/view/$gatheringId");
+        header("Location: /my-gathering");
         exit;
     }
 
@@ -124,19 +124,6 @@ class GatheringController
     // AJAX Validation: CREATE Gathering Fields
     public function ajaxValidateGathering()
     {
-        // header('Content-Type: application/json');
-        // $json = file_get_contents('php://input');
-        // $post = json_decode($json, true);
-
-        // $fields = $post['touchedFields'] ?? [];
-        // $data = $post;
-
-        // $errors = $this->gatheringModel->validateGatheringFields($data, $fields);
-
-        // echo json_encode(['errors' => $errors]);
-
-
-        //pass json data format
         header('Content-Type: application/json');
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
@@ -151,14 +138,11 @@ class GatheringController
         header('Content-Type: application/json');
         $json = file_get_contents('php://input');
         $post = json_decode($json, true);
-
-        $fields = $post['touchedFields'] ?? [];
-        $gatheringId = $post['gatheringId'] ?? null;
-        $data = $post;
-
-        $errors = $this->gatheringModel->validateGatheringFields($data, $fields, $gatheringId);
-
-        echo json_encode(['errors' => $errors]);
+        $editingId = $post['editingId'] ?? '';
+        $data = $post['data'];
+        $response = $this->gatheringModel->validateGathering($data, $editingId);
+        echo json_encode($response);
+        exit;
     }
 
     // GET: gathering-detail
