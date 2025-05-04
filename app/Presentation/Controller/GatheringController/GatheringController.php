@@ -523,10 +523,12 @@ class GatheringController
         // Redirect back to the GET page
         header("Location: /my-gathering/gatheringFeedback?gatheringID={$gatheringID}");
         exit;
-        
+    }
+
     // ============================================================================
     // Reminder PART
     // ============================================================================
+    
     public function viewGatheringReminder($gatheringId)
     {
         $profileId = $_SESSION['profile']['profileID'];
@@ -581,7 +583,7 @@ class GatheringController
             $newId = $this->gatheringModel->createReminder($data);
             $_SESSION['flash_message'] = 'Reminder has been created successfully!';
             $_SESSION['flash_type'] = 'success';
-            
+
             header("Location: /my-gathering/reminder/view/" . $data['gatheringId']);
             exit;
         } catch (Exception $e) {
