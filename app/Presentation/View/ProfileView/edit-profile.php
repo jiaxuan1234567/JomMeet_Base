@@ -1,12 +1,8 @@
 <?php
 $_title = 'Edit Profile';
 require_once __DIR__ . '/../HomeView/header.php';
-// $userid = $_SESSION['profile_id'] ?? null;
-$profile = $_SESSION['profile'] ?? [];
 
-$errors          = $_SESSION['profileErrors']   ?? [];
-$old             = $_SESSION['oldProfile']      ?? [];
-unset($_SESSION['profileErrors'], $_SESSION['oldProfile']);
+$profile = $_SESSION['profile'] ?? [];
 
 $selectedMBTI = $profile['mbti']    ?? '';
 $savedHobbies = $_SESSION['profile']['hobbies'] ?? [];
@@ -14,7 +10,6 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
 ?>
 
 <style>
-  /* Profile PHP responsive grid via CSS */
   #hobbiesList,
   #preferencesList {
     padding-top: 10px;
@@ -82,10 +77,10 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
     <div class="col-12 col-md-9">
       <label for="nickname" class="form-label fw-bold fs-5">Nickname</label>
 
-      <input type="text" id="nickname" name="nickname" class="form-control w-75" maxlength="30" value="<?php echo htmlspecialchars($profile['nickname'] ?? '') ?>" />
+      <input type="text" id="nickname" name="nickname" class="form-control w-75 <?= isset($errors['nickname'])?'is-invalid':'' ?>" maxlength="30" value="<?php echo htmlspecialchars($profile['nickname'] ?? '') ?>" />
       <div id="nicknameCount" class="d-block text-end fs-6 w-75" style="color:#0C0C0D; opacity:40%;">0/20 characters</div>
+      <div class="invalid-profile text-danger" id="errorNickname"> <?= $errors['nickname'] ?? '' ?></div>
     </div>
-
 
     <div class="col-12 col-md-1">
       <label for="mbti" class="form-label fw-bold fs-5">MBTI</label>

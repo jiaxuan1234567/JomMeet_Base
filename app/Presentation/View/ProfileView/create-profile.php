@@ -29,7 +29,6 @@
     <title>Create Profile</title>
 
     <style>
-        /* Profile PHP responsive grid via CSS */
         #hobbiesList,
         #preferencesList {
             padding-top: 10px;
@@ -62,18 +61,11 @@
             }
         }
     </style>
-
 </head>
 
 <body style="background-color: #f5f5f7;">
     <main>
-        <!-- <?php
-                // $errors          = $_SESSION['profileErrors']   ?? [];
-                // $old             = $_SESSION['oldProfile']      ?? [];
-                // unset($_SESSION['profileErrors'], $_SESSION['oldProfile']);
-                ?> -->
         <div class="container-fluid my-4">
-            <!-- Header with “Profile” title and edit button -->
             <div class="d-flex align-items-center mb-5">
                 <div class="ms-3 mt-2">
                     <a href="/login">
@@ -176,6 +168,7 @@
                 preferences: []
             };
         </script>
+
         <script src="/js/create-profile.js"></script>
     </main>
 

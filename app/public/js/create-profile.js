@@ -1,23 +1,19 @@
-$(function () {
-  // ====== Initial data ======
-  var init = window.profileInit || { nickname: '', aboutme: '', mbti: '', hobbies: [], preferences: [] };
-  var maxNick = 20, maxAbout = 255;
-
+$(document).ready(function () {
   // ====== Cache elements ======
-  var $nick = $('input[name=nickname]'),
-    $nCnt = $nick.siblings('.text-end'),
-    $about = $('textarea[name=aboutme]'),
-    $aCnt = $about.siblings('.text-end'),
-    $mbti = $('select[name=mbti]'),
-    $hBtns = $('#hobbiesList .hobby-btn'),
-    $pBtns = $('#preferencesList .pref-btn'),
-    $hContainer = $('#hobbiesList'),
-    $pContainer = $('#preferencesList'),
-    $create = $('#createBtn'),
-    $reset = $('#resetBtn'),
-    $form = $('#profileForm'),
-    $hiddenH = $('#hiddenHobbies'),
-    $hiddenP = $('#hiddenPrefs');
+  const init = window.profileInit;
+  const maxNick = 20, maxAbout = 255;
+  const $form = $('#profileForm');
+  const $nick = $('input[name=nickname]');
+  const $nCnt = $('#nicknameCount');
+  const $about = $('textarea[name=aboutme]');
+  const $aCnt = $('#aboutCount');
+  const $mbti = $('select[name=mbti]');
+  const $hBtns = $('#hobbiesList .hobby-btn');
+  const $pBtns = $('#preferencesList .pref-btn');
+  const $hiddenH = $('#hiddenHobbies');
+  const $hiddenP = $('#hiddenPrefs');
+  const $create = $('#createBtn');
+  const $reset = $('#resetBtn');
 
   // ====== Initialize hidden fields ======
   $hiddenH.val(init.hobbies.join(','));
@@ -25,11 +21,11 @@ $(function () {
 
   // ====== Style toggle helper ======
   function styleBtn($b, on) {
-    if (on) {
-      $b.addClass('active').css({ backgroundColor: '#569FFF', borderColor: '#569FFF', color: '#000' });
-    } else {
-      $b.removeClass('active').css({ backgroundColor: '#fff', borderColor: '#dee2e6', color: '#000' });
-    }
+    $b.toggleClass('active', on)
+      .css(on
+        ? { backgroundColor: '#569FFF', borderColor: '#569FFF', color: '#000' }
+        : { backgroundColor: '#fff', borderColor: '#dee2e6', color: '#000' }
+      );
   }
 
   // ====== Initialize fields and counters ======
@@ -37,74 +33,102 @@ $(function () {
   $about.val(init.aboutme);
   $mbti.val(init.mbti);
 
+  // counter updaters
   function updNick() {
-    var l = $nick.val().length;
-    $nCnt.text(l + '/' + maxNick + ' characters').css('color', l > maxNick ? '#ff0000' : '');
+    const l = $nick.val().length;
+    $nCnt.text(`${l}/${maxNick} characters`)
+      .css('color', l > maxNick ? '#f00' : '');
     $nick.toggleClass('is-invalid', l === 0 || l > maxNick);
   }
 
   function updAbout() {
-    var l = $about.val().length;
-    $aCnt.text(l + '/' + maxAbout + ' characters').css('color', l > maxAbout ? '#ff0000' : '');
+    const l = $about.val().length;
+    $aCnt.text(`${l}/${maxAbout} characters`)
+      .css('color', l > maxAbout ? '#f00' : '');
     $about.toggleClass('is-invalid', l === 0 || l > maxAbout);
   }
 
-  updNick(); updAbout();
-
   // ====== Init and style buttons ======
-  $hBtns.each(function () { styleBtn($(this), init.hobbies.includes($(this).data('value'))); });
-  $pBtns.each(function () { styleBtn($(this), init.preferences.includes($(this).data('value'))); });
+  $hBtns.each((_, b) => styleBtn($(b), init.hobbies.includes(b.dataset.value)));
+  $pBtns.each((_, b) => styleBtn($(b), init.preferences.includes(b.dataset.value)));
 
   // ====== Validation helpers ======
   function validateHobbies() {
-    $hContainer.toggleClass('border-danger', $hBtns.filter('.active').length === 0);
+    $('#hobbiesList').toggleClass('border-danger',
+      $hBtns.filter('.active').length === 0
+    );
   }
   function validatePrefs() {
-    $pContainer.toggleClass('border-danger', $pBtns.filter('.active').length === 0);
+    $('#preferencesList').toggleClass('border-danger',
+      $pBtns.filter('.active').length === 0
+    );
   }
 
   // ====== Main form validation ======
   function validateForm() {
-    var okN = $nick.val().length > 0 && $nick.val().length <= maxNick,
-      okA = $about.val().length > 0 && $about.val().length <= maxAbout,
-      okM = $mbti.val() !== '',
-      okH = $hBtns.filter('.active').length > 0,
-      okP = $pBtns.filter('.active').length > 0;
-
+    updNick(); updAbout();
     validateHobbies(); validatePrefs();
-    $create.prop('disabled', !(okN && okA && okM && okH && okP));
-  }
-  validateForm();
 
-  // ====== AJAX validation ======
-  function logValidation() {
-    // sync hidden inputs
+    const okN = $nick.val().trim().length > 0 && $nick.val().length <= maxNick;
+    const okA = $about.val().trim().length > 0 && $about.val().length <= maxAbout;
+    const okM = $mbti.val() !== '';
+    const okH = $hBtns.filter('.active').length > 0;
+    const okP = $pBtns.filter('.active').length > 0;
+
+    $create.prop('disabled', !(okN && okA && okM && okH && okP));
+    if ($create.prop('disabled')) {
+      $create.css({ backgroundColor: 'grey', borderColor: 'grey', cursor: 'not-allowed', opacity: 0.7 });
+    } else {
+      $create.css({ backgroundColor: '', borderColor: '', cursor: '', opacity: '' });
+    }
+  }
+
+  // full‐form AJAX validation on every change
+  function validateField(field) {
+    // sync hidden arrays
     $hiddenH.val($hBtns.filter('.active').map((_, b) => b.dataset.value).get().join(','));
     $hiddenP.val($pBtns.filter('.active').map((_, b) => b.dataset.value).get().join(','));
 
-    var action = '/profile/validate',
-      query = $form.serialize();
+    const payload = $form.serialize();
+    console.log('🔍 validating', field, payload);
 
     $.ajax({
-      url: action,
+      url: '/api/validate-profile',
       type: 'POST',
-      data: query,
-      dataType: 'json'
-    })
-      .done(function (res) {
-        console.log(action + '?' + query + ':', res);
-      })
-      .fail(function (xhr, status, err) {
-        console.error(action + '?' + query + ' failed:', status, err);
-      });
+      data: payload,
+      dataType: 'json',
+      success(res) {
+        console.log('✅ /api/validate-profile', res);
+        if (res.success) {
+          // clear all error boxes
+          ['Nickname', 'Aboutme', 'Mbti', 'Hobbies', 'Preferences']
+            .forEach(s => $(`#error${s}`).text(''));
+        } else {
+          // show errors
+          Object.entries(res.errors || {}).forEach(([fld, msg]) => {
+            const label = fld.charAt(0).toUpperCase() + fld.slice(1);
+            $(`#error${label}`).text(msg);
+          });
+        }
+      },
+      error(xhr, status, err) {
+        console.error('❌ Validation failed:', status, err);
+      }
+    });
   }
 
   // ====== Bind events ======
-  $nick.on('input', function () { updNick(); validateForm(); logValidation(); });
-  $about.on('input', function () { updAbout(); validateForm(); logValidation(); });
-  $mbti.on('change', function () { $mbti.toggleClass('is-invalid', $mbti.val() === ''); validateForm(); logValidation(); });
-  $hBtns.on('click', function () { styleBtn($(this), !$(this).hasClass('active')); validateForm(); logValidation(); });
-  $pBtns.on('click', function () { styleBtn($(this), !$(this).hasClass('active')); validateForm(); logValidation(); });
+  $nick.on('input change', () => { validateForm(); validateField('nickname'); });
+  $about.on('input change', () => { validateForm(); validateField('aboutme'); });
+  $mbti.on('change', () => { validateForm(); validateField('mbti'); });
+  $hBtns.on('click', function () {
+    styleBtn($(this), !$(this).hasClass('active'));
+    validateForm(); validateField('hobbies');
+  });
+  $pBtns.on('click', function () {
+    styleBtn($(this), !$(this).hasClass('active'));
+    validateForm(); validateField('preferences');
+  });
 
   // ====== Reset form ======
   $reset.on('click', function () {
@@ -114,20 +138,22 @@ $(function () {
     $hBtns.each(function () { styleBtn($(this), false); });
     $pBtns.each(function () { styleBtn($(this), false); });
     $hContainer.removeClass('border-danger'); $pContainer.removeClass('border-danger');
-    validateForm(); logValidation();
+    validateForm();
   });
 
   // ====== Form submit ======
   $form.on('submit', function (e) {
-    e.preventDefault();
-    if ($create.prop('disabled')) return;
     $hiddenH.val($hBtns.filter('.active').map((_, b) => b.dataset.value).get().join(','));
     $hiddenP.val($pBtns.filter('.active').map((_, b) => b.dataset.value).get().join(','));
+
+    e.preventDefault();
+    if ($create.prop('disabled')) return;
+
     if (confirm('Confirm to submit your profile?')) {
       $form.off('submit').submit();
     }
   });
 
-  // ====== Initial AJAX ======
-  logValidation();
+  // initial run
+  validateForm();
 });
