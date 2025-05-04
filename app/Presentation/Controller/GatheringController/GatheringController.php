@@ -444,4 +444,26 @@ class GatheringController
             return date("d M Y, H:i", $timestamp);
         }
     }
+
+    public function createGatheringReminder()
+    {
+        $data = [
+            'profileId'         => $_SESSION['profile']['profileID'],
+            'gatheringId'       => (int)($_POST['gatheringID'] ?? null),
+            'description'       => $_POST['description'] ?? '',
+            'createdAt'         => date('Y-m-d H:i:s'),
+        ];
+
+        try {
+            $newId = $this->gatheringModel->createGathering($data);
+            $_SESSION['flash_message'] = 'Gathering has been created successfully!';
+            $_SESSION['flash_type'] = 'success';
+
+            header("Location: /my-gathering#hosted");
+            exit;
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo "Error creating gathering: " . htmlspecialchars($e->getMessage());
+        }
+    }
 }

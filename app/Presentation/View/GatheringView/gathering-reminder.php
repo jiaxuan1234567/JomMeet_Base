@@ -14,13 +14,34 @@ require_once __DIR__ . '/../HomeView/header.php';
             </div>
         </div>
         <div class="col-sm-1 text-center">
-            <a href="#" class="btn btn-primary px-4">Post</a>
+            <a href="#" class="btn btn-primary px-4" data-bs-toggle="collapse" data-bs-target="#createReminderForm">Post</a>
         </div>
     </div>
 
     <hr class="hr pb-4" />
 
     <div class="container-fluid reminder-content">
+
+        <div id="createReminderForm" class="collapse">
+            <div class="row justify-content-md-center">
+                <div class="mb-4 card w-50 shadow-sm border-primary">
+                    <div class="card-header bg-light text-primary fw-bold">
+                        New Reminder
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="/my-gathering/reminder/create">
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Reminder Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                            </div>
+                            <input type="hidden" name="gatheringID" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
+                            <button type="submit" class="btn btn-primary">Post Reminder</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <?php if (!empty($reminders)): ?>
             <?php foreach ($reminders as $reminder): ?>
                 <div class="row justify-content-md-center">

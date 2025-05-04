@@ -57,6 +57,7 @@ class FileHelper
             'GatheringDetail' => "/Presentation/View/GatheringView/gathering-detail.php",
             'GatheringList' => "/Presentation/View/GatheringView/gathering-list.php",
             'GatheringReminder' => "/Presentation/View/GatheringView/gathering-reminder.php",
+            // 'CreateGatheringReminder' => "/Presentation/View/GatheringView/create-gathering-reminder.php",
         ]);
 
         $assetPaths = [
