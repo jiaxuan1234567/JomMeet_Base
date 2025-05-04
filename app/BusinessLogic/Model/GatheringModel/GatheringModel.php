@@ -327,65 +327,24 @@ class GatheringModel
     // my-gathering
     public function getMyGatheringsWithTab($profileId)
     {
-        try {
-            $this->gatheringDAO->updateGatheringStatuses();
-            $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
-            $grouped = [
-                'all'       => [],
-                'hosted'    => [],
-                'upcoming'  => [],
-                'ongoing'   => [],
-                'completed' => [],
-                'cancelled' => [],
+        $gatherings = (new GatheringDAO())->getUserAllGatherings($profileId);
+
+        // Ensure all required keys are set with default values
+        return array_map(function ($g) use ($profileId) {
+            return [
+                'id' => $g['gatheringID'] ?? null,
+                'isHost' => isset($g['hostProfileID']) && $g['hostProfileID'] == $profileId,
+                'status' => $g['status'] ?? 'unknown',
+                'theme' => $g['theme'] ?? 'No Theme',
+                'date' => $g['date'] ?? null,
+                'startTime' => $g['startTime'] ?? null,
+                'endTime' => $g['endTime'] ?? null,
+                'venue' => $g['venue'] ?? 'Unknown Venue',
+                'pax' => $g['currentParticipant'] ?? 0,
+                'maxPax' => $g['maxParticipant'] ?? 0,
+                'cover' => $g['image'] ?? 'default-image.png',
             ];
-
-            foreach ($rows as $g) {
-                $status = strtolower($g['status']);
-                $isHost = (bool)$g['isHost'];
-                $isJoined = (bool)$g['isJoined'];
-
-                $gathering = [
-                    'id'        => (int)$g['gatheringID'],
-                    'locationID'  => (int)$g['locationID'],
-                    // 'cover'     => $g['image'],
-                    'cover' => $g['image'] ?: 'bubble.png',
-                    'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
-                    'theme'     => $g['theme'],
-                    'date'      => date('d F Y', strtotime($g['date'])),
-                    'startTime' => date('g:i A', strtotime($g['startTime'])),
-                    'endTime'   => date('g:i A', strtotime($g['endTime'])),
-                    'pax'       => (int)$g['currentParticipant'],
-                    'maxPax'    => (int)$g['maxParticipant'],
-                    'venue'     => $g['venue'],
-                    'status'    => $status,
-                    'isHost'    => $isHost,
-                    'isJoined'  => $isJoined,
-                    'action'    => $this->determineActions($status, $isHost, $isJoined),
-                ];
-
-                $grouped['all'][] = $gathering;
-
-                if ($isHost) {
-                    $grouped['hosted'][] = $gathering;
-                    if ($status === 'cancelled') {
-                        $grouped['cancelled'][] = $gathering;
-                    }
-                }
-
-                if ($status === 'new') {
-                    $grouped['upcoming'][] = $gathering;
-                } elseif ($status === 'start') {
-                    $grouped['ongoing'][] = $gathering;
-                } elseif ($status === 'end') {
-                    $grouped['completed'][] = $gathering;
-                }
-            }
-
-            return $grouped;
-        } catch (Exception $e) {
-            error_log("[GatheringModel] Error in getMyGatheringsByCategory: " . $e->getMessage());
-            return [];
-        }
+        }, $gatherings);
     }
 
     // Create Gathering

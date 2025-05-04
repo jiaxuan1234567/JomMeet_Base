@@ -252,27 +252,27 @@ class GatheringDAO
     // }
 
     public function hasTimeConflict($profileId, $startTime)
-{
-    $formatted = $startTime->format('Y-m-d H:i:s');
-    error_log("[hasTimeConflict] Checking time conflict for profile $profileId at $formatted");
+    {
+        $formatted = $startTime->format('Y-m-d H:i:s');
+        error_log("[hasTimeConflict] Checking time conflict for profile $profileId at $formatted");
 
-    $stmt = $this->db->prepare("
+        $stmt = $this->db->prepare("
         SELECT g.* FROM gathering g
         JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
         WHERE pg.profileID = :pid
         AND g.status = 'NEW'
         AND CONCAT(g.date, ' ', g.startTime) = :start
     ");
-    $stmt->execute([
-        ':pid' => $profileId,
-        ':start' => $formatted
-    ]);
-    $conflict = $stmt->rowCount() > 0;
+        $stmt->execute([
+            ':pid' => $profileId,
+            ':start' => $formatted
+        ]);
+        $conflict = $stmt->rowCount() > 0;
 
-    error_log("[hasTimeConflict] Conflict found: " . ($conflict ? "YES" : "NO"));
+        error_log("[hasTimeConflict] Conflict found: " . ($conflict ? "YES" : "NO"));
 
-    return $conflict;
-}
+        return $conflict;
+    }
 
 
     // my-gathering
@@ -320,11 +320,6 @@ class GatheringDAO
             error_log("[GatheringDAO] updateGatheringStatuses: " . $e->getMessage());
         }
     }
-
-
-
-   
-
 
 
     public function getUserHostedGatherings($profileId)
@@ -642,31 +637,31 @@ class GatheringDAO
      * hasn’t already left feedback for that gathering.
      */
     public function insertLocationFeedback($profileId, $gatheringId, $locationId, $desc)
-{
-    // Only one LOCATION per user-gathering
-    $check = $this->db->prepare("
+    {
+        // Only one LOCATION per user-gathering
+        $check = $this->db->prepare("
       SELECT COUNT(*) FROM feedback
        WHERE profileID   = :pid
          AND gatheringID = :gid
          AND feedbackType= 'LOCATION'
     ");
-    $check->execute([':pid'=>$profileId, ':gid'=>$gatheringId]);
-    if ($check->fetchColumn() > 0) return false;
+        $check->execute([':pid' => $profileId, ':gid' => $gatheringId]);
+        if ($check->fetchColumn() > 0) return false;
 
-    // insert
-    $ins = $this->db->prepare("
+        // insert
+        $ins = $this->db->prepare("
       INSERT INTO feedback
         (profileID, gatheringID, locationID, feedbackDesc, feedbackType, date)
       VALUES
         (:pid, :gid, :lid, :desc, 'LOCATION', NOW())
     ");
-    return $ins->execute([
-        ':pid'  => $profileId,
-        ':gid'  => $gatheringId,
-        ':lid'  => $locationId,
-        ':desc' => $desc
-    ]);
-}
+        return $ins->execute([
+            ':pid'  => $profileId,
+            ':gid'  => $gatheringId,
+            ':lid'  => $locationId,
+            ':desc' => $desc
+        ]);
+    }
 
 
 
@@ -689,29 +684,71 @@ class GatheringDAO
 
     // 2) insert a new gathering feedback
     public function insertGatheringFeedback($profileId, $gatheringId, $locationId, $desc)
-{
-    // Only one GATHERING per user-gathering
-    $check = $this->db->prepare("
+    {
+        // Only one GATHERING per user-gathering
+        $check = $this->db->prepare("
       SELECT COUNT(*) FROM feedback
        WHERE profileID   = :pid
          AND gatheringID = :gid
          AND feedbackType= 'GATHERING'
     ");
-    $check->execute([':pid'=>$profileId, ':gid'=>$gatheringId]);
-    if ($check->fetchColumn() > 0) return false;
+        $check->execute([':pid' => $profileId, ':gid' => $gatheringId]);
+        if ($check->fetchColumn() > 0) return false;
 
-    // insert
-    $ins = $this->db->prepare("
+        // insert
+        $ins = $this->db->prepare("
       INSERT INTO feedback
         (profileID, gatheringID, locationID, feedbackDesc, feedbackType, date)
       VALUES
         (:pid, :gid, :lid, :desc, 'GATHERING', NOW())
     ");
-    return $ins->execute([
-        ':pid'  => $profileId,
-        ':gid'  => $gatheringId,
-        ':lid'  => $locationId,
-        ':desc' => $desc
-    ]);
-}
+        return $ins->execute([
+            ':pid'  => $profileId,
+            ':gid'  => $gatheringId,
+            ':lid'  => $locationId,
+            ':desc' => $desc
+        ]);
+    }
+
+    public function getAllProfileHobby($profileId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT hobby 
+            FROM profile_hobby 
+            WHERE profileID = :profileId
+        ");
+            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Fetch all hobby values into an array
+            $hobbies = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            return $hobbies;
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching hobbies: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAllProfilePreference($profileId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT preference 
+                FROM profile_preference 
+                WHERE profileID = :profileId
+            ");
+            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Fetch all preference values into an array
+            $preferences = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            return $preferences;
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching preferences: " . $e->getMessage());
+            return [];
+        }
+    }
 }

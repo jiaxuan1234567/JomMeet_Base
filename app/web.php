@@ -43,7 +43,6 @@ Route::get('/my-gathering/view/{id}', [GatheringController::class, 'viewMyGather
 Route::get('/my-gathering/create', [GatheringController::class, 'viewCreate']);
 Route::post('/my-gathering/create', [GatheringController::class, 'createGathering']);
 Route::get('/my-gathering/create/location', [GatheringController::class, 'viewSelectLocation']);
-Route::get('/my-gathering', [GatheringController::class, 'listGatherings']);
 // before you dispatch
 Route::post('/my-gathering/create/location', [GatheringController::class, 'selectLocationSubmit']);
 Route::post('/my-gathering/leave/{gatheringId}', [GatheringController::class, 'leaveGathering']);
