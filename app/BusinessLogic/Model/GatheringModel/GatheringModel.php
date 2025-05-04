@@ -636,15 +636,23 @@ class GatheringModel
             'locationName' => 'name',
             'locationId' => 'id'
         ],
-        'errFields' => [
-        'fieldId', 'anotherFieldId'
-        ]
         'value' => [
             'inputDate' => date,
             'startTime' => startDT,
             'endTime' => endDT
         ]
         'value' => 'data'
+    ]
+    
+    [
+    'valid' => true || false,
+    'field' => 'field',
+    'touched' => fieldId',
+    'errors' => [
+        'f1' => 'e1',
+        'f2' => 'e2',
+        'f3' => ''
+    ]
     ]
     */
     public function validateGathering($data, $editingId = null)
@@ -663,6 +671,7 @@ class GatheringModel
                     break;
                 case 'locationName':
                 case 'locationId':
+                case 'inputLocation':
                     $validLoc = $this->locationDAO->getLocationById($data['value']['locationId'] ?? '');
                     $response = $gatheringHelper->validateLocation($data, $validLoc);
                     break;

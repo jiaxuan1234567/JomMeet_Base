@@ -40,6 +40,7 @@ $(() => {
         };
         editFieldStates[f] = {
             valid: true,
+            touched: false,
             error: [],
             value: currentVal
         };
@@ -59,6 +60,7 @@ $(() => {
             const data = $(this).val();
 
             editFieldStates[fieldId].value = data;
+            editFieldStates[fieldId].touched = true;
 
             if (timeFields.includes(fieldId)) {
                 validateField(fieldId, datetimeDataHandler(fieldId));

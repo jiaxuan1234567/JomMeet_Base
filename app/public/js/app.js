@@ -89,6 +89,7 @@ $(function () {
         fields.forEach(id => sessionStorage.removeItem(id));
         //sessionStorage.removeItem('locationId');
         sessionStorage.removeItem('__field_states__');
+        sessionStorage.removeItem('locationId');
     }
 });
 

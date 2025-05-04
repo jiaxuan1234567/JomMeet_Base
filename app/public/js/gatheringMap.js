@@ -96,11 +96,7 @@ function submitLocationForm(loc) {
     // Restore current fieldStates or create fresh
     const fieldStates = JSON.parse(sessionStorage.getItem('__field_states__')) || {};
 
-    fieldStates['inputLocation'] = {
-        value: loc.locationName,
-        valid: false, // will validate after redirect
-        error: []
-    };
+    fieldStates['inputLocation'].value = loc.locationName;
 
     // Optionally store raw ID for post-processing
     sessionStorage.setItem('locationId', loc.locationID);

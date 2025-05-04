@@ -31,7 +31,11 @@ class GatheringHelperService
             //     $endDT->modify('+1 day');
             // }
         } catch (Exception $e) {
-            return ['valid' => false, 'errors' => ['Invalid datetime format']];
+            return $this->formatResponse([
+                'valid' => false,
+                'errors' => ['Invalid datetime format'],
+                'errFields' => [$touched]
+            ], $field, $touched);
         }
 
         $today = new DateTime('today');
@@ -111,7 +115,7 @@ class GatheringHelperService
             }
         }
 
-        return $response;
+        return $this->formatResponse($response, $field, $touched);
     }
 
     public function validateLocation($data, $validLoc)
@@ -130,11 +134,13 @@ class GatheringHelperService
             $response['valid'] = false;
             $response['errors'] = 'Selected location is invalid.';
         }
-        return $response;
+        return $this->formatResponse($response, $field, $touched);
     }
 
     public function validateGatheringTag($data, $validTags)
     {
+        $field    = $data['field'] ?? '';
+        $touched  = $data['touched'] ?? '';
         $tag = $data['value'] ?? '';
         $response = ['valid' => true, 'errors' => []];
 
@@ -145,11 +151,13 @@ class GatheringHelperService
             $response['valid'] = false;
             $response['errors'] = 'Invalid preference selected.';
         }
-        return $response;
+        return $this->formatResponse($response, $field, $touched);
     }
 
     public function validateTheme($data)
     {
+        $field    = $data['field'] ?? '';
+        $touched  = $data['touched'] ?? '';
         $theme = $data['value'] ?? '';
         $response = ['valid' => true, 'errors' => []];
 
@@ -163,11 +171,13 @@ class GatheringHelperService
             $response['valid'] = false;
             $response['errors'] = 'Theme must contain at least one letter.';
         }
-        return $response;
+        return $this->formatResponse($response, $field, $touched);
     }
 
     public function validatePax($data, $min, $max)
     {
+        $field    = $data['field'] ?? '';
+        $touched  = $data['touched'] ?? '';
         $pax = $data['value'] ?? '';
         $response = ['valid' => true, 'errors' => []];
 
@@ -175,7 +185,37 @@ class GatheringHelperService
             $response['valid'] = false;
             $response['errors'] = 'Pax must be between ' . $min . ' and ' . $max . '.';
         }
-        return $response;
+        return $this->formatResponse($response, $field, $touched);
+    }
+
+    private function formatResponse($raw, $field, $touched)
+    {
+        $normalized = [
+            'valid' => $raw['valid'] ?? true,
+            'field' => $field,
+            'touched' => $touched,
+            'errors' => []
+        ];
+
+        if (!$normalized['valid']) {
+            $errors = $raw['errors'] ?? [];
+            $errFields = $raw['errFields'] ?? [];
+
+            if (!is_array($errors)) {
+                $errors = [$errors]; // catch single string error
+            }
+
+            foreach ($errFields as $i => $f) {
+                $normalized['errors'][$f] = $errors[$i] ?? '';
+            }
+
+            // fallback: if no specific errFields, attach to touched field
+            if (empty($errFields) && !empty($errors)) {
+                $normalized['errors'][$touched] = $errors[0];
+            }
+        }
+
+        return $normalized;
     }
 
     // function buildGatheringDatetime($date, $startTime, $endTime)
