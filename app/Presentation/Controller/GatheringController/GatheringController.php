@@ -470,11 +470,12 @@ class GatheringController
             $_SESSION['flash_type']    = "error";
         }
 
-        // Redirect back to the GET page
-        $gatheringFeedbacks = $this->gatheringModel->getLocationFeedback($gatheringId);
+        $locationFeedbacks = $this->gatheringModel->getLocationFeedback($locationId);
+        error_log("Location Feedbacks: " . print_r($locationFeedbacks, true));
         include $this->fileHelper->getFilePath('LocationFeedback');
         exit;
     }
+
 
     // GET: display all gathering feedback + form
     public function showGatheringFeedback()
@@ -492,8 +493,8 @@ class GatheringController
     public function showLocationFeedback()
     {
         $profileId    = $_SESSION['profile']['profileID'];
-        $gatheringId  = (int)($_POST['gatheringID']  ?? 0);
-        $locationId   = (int)($_POST['locationID']   ?? 0);
+        $gatheringId  = (int)($_GET['gatheringID']  ?? 0);
+        $locationId   = (int)($_GET['locationID']   ?? 0);
 
         // Only participants can view
         if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringId)) {
@@ -503,7 +504,9 @@ class GatheringController
             exit;
         }
 
-        $locationFeedbacks = $this->gatheringModel->getLocationFeedback($locationId);
+        $locationFeedbacks = $this->gatheringModel
+            ->getLocationFeedbackByGatheringAndLocation($gatheringId, $locationId);
+
 
         include $this->fileHelper->getFilePath('LocationFeedback');
     }
@@ -530,7 +533,7 @@ class GatheringController
         }
 
         // Redirect back to the GET page
-        $locationFeedbacks = $this->gatheringModel->getGatheringFeedback($gatheringID);
+        $gatheringFeedbacks = $this->gatheringModel->getGatheringFeedback($gatheringID);
         include $this->fileHelper->getFilePath('GatheringFeedback');
         exit;
     }
