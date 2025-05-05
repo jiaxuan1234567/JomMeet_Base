@@ -108,6 +108,16 @@ class GatheringModel
         foreach ($allGatherings as $gathering) {
             $valid = $this->getPublicGatheringById($profileId, $gathering['gatheringID']);
             if ($valid) {
+                // Fetch location details
+                $location = $this->gatheringDAO->getLocationByGatheringId($gathering['gatheringID']);
+                if ($location) {
+                    $valid['location'] = $location['locationID'];
+                    $valid['locationName'] = $location['locationName'];
+                } else {
+                    $valid['location'] = null;
+                    $valid['locationName'] = "Unknown Location";
+                }
+
                 $validGatherings[] = $valid;
             } else {
                 error_log("[getAvailableGatherings] Skipping gathering {$gathering['gatheringID']}: not eligible.");
