@@ -597,7 +597,7 @@ class GatheringModel
                     $this->notificationService->sendInfobipWhatsAppTemplate(
                         $g['phone'],
                         $g['nickname'],
-                        $gathering,
+                        $g,
                         "gathering_updated"
                     );
                     break; // Only send to the first participant for testing purposes

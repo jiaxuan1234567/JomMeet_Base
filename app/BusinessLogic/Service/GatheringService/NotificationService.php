@@ -14,7 +14,7 @@ class NotificationService
 
     public function sendInfobipWhatsAppTemplate($to, $name, $gathering, $action)
     {
-        $to = "60102348059"; // API Restriction
+        $to = "6".$to; // Malaysia number format
         $template = "reservation_reminder";
         $name = $name . ", JomMeet here";
         $text = $gathering['date'] . " " . $gathering['startTime'] . ".";
