@@ -101,7 +101,7 @@ class GatheringHelperService
                             'field' => $field,
                             'touched' => $touched,
                             'errors' => [
-                                $touched => 'Selected time overlaps with an existing gathering.'
+                                $touched => 'You have a gathering start from ' . $joinedStart . ' to ' . $joinedEnd . '.'
                             ]
                         ];
                     }
@@ -134,7 +134,7 @@ class GatheringHelperService
                             'field' => $field,
                             'touched' => $touched,
                             'errors' => [
-                                $touched => ucfirst($field) . ' overlaps with an existing gathering.'
+                                $touched => 'You have a gathering start from ' . $joinedStart . ' to ' . $joinedEnd . '.'
                             ]
                         ];
                     }

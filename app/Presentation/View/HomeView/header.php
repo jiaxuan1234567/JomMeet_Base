@@ -34,9 +34,9 @@
     <!-- Header -->
     <header>
         <nav class="navbar navbar-expand-md navbar-light px-4 bg-blue-color">
-            <a class="navbar-brand" href="#">
+            <span class="navbar-brand">
                 <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" alt="Logo" width="40" height="40" />
-            </a>
+            </span>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li id="homeNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/">Home</a></li>
