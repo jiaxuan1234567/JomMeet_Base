@@ -55,8 +55,8 @@ class GatheringController
     public function viewSelectLocation()
     {
         //empty($_SESSION['allow_select_location'])
-        if ($_SESSION['previous_page'] != '/api/validate-gathering') {
-            $_SESSION['flash_message'] = 'Restricted Page';
+        if ($_SESSION['previous_page'] != '/api/validate-gathering' && $_SESSION['previous_page'] != '/api/savedLocations' && $_SESSION['previous_page'] != '/my-gathering/create') {
+            $_SESSION['flash_message'] = 'Restricted Page' . $_SESSION['previous_page'];
             $_SESSION['flash_type'] = 'error';
             header('Location: /');
             exit;

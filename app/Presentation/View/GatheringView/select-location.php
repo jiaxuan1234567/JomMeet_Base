@@ -56,7 +56,7 @@ require_once __DIR__ . '/../HomeView/header.php';
         </div>
 
         <!-- Feedback Panel -->
-        <div id="feedbackPanel" class="position-absolute shadow bg-white rounded-4 p-3" style="display: none; width: 260px; top: 10px; left: 280px; z-index: 1002;"></div>
+        <div id="feedbackPanel" class="position-absolute shadow bg-white rounded-4 p-3" style="display: none; width: 260px; top: 10px; left: 280px; z-index: 1002; max-height: 300px; overflow-y: auto;"></div>
     </div>
 </div>
 
