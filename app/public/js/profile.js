@@ -100,16 +100,21 @@ $(document).ready(function () {
         console.log('✅ /api/validate-profile response:', res);
         ['nickname', 'aboutme', 'mbti', 'hobbies', 'preferences'].forEach(fld => {
           const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
-          $(`#error${cap}`).text('');               
-          $(`[name=${fld}]`).removeClass('is-invalid'); 
+          $(`#error${cap}`).text('');
+          $(`[name=${fld}]`).removeClass('is-invalid');
         });
 
         // if validation failed, show new ones
         if (!res.success) {
-          Object.entries(res.errors).forEach(([fld, msg]) => {
-            const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
-            $(`#error${cap}`).text(msg);               
-            $(`[name=${fld}]`).addClass('is-invalid'); 
+          Object.entries(res.errors || {}).forEach(([fld, msg]) => {
+            const cap = fld[0].toUpperCase() + fld.slice(1);
+            console.warn(fld, msg);
+            // highlight inputs/textareas
+            $(`[name=${fld}]`).addClass('is-invalid');
+            // highlight grids
+            $(`#${fld}List`).addClass('border-danger');
+            // show message
+            $(`#error${cap}`).text(msg);
           });
         }
       }
@@ -149,7 +154,20 @@ $(document).ready(function () {
     $mbti.val(init.mbti);
     $hBtns.each((_, b) => styleBtn($(b), init.hobbies.includes(b.dataset.value)));
     $pBtns.each((_, b) => styleBtn($(b), init.preferences.includes(b.dataset.value)));
+
+    ['nickname', 'aboutme', 'mbti'].forEach(fld => {
+      const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
+      $(`#error${cap}`).text('');
+      $(`[name=${fld}]`).removeClass('is-invalid');
+    });
+    ['hobbies', 'preferences'].forEach(grid => {
+      const cap = grid.charAt(0).toUpperCase() + grid.slice(1);
+      $(`#error${cap}`).text('');
+      $(`#${grid}List`).removeClass('border-danger');
+    });
+
     validateForm();
+
   });
 
   // initial run

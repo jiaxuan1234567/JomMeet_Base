@@ -87,7 +87,7 @@
                     <input type="text" id="nickname" name="nickname" class="form-control w-75  <?= isset($errors['nickname']) ? 'is-invalid' : '' ?>" maxlength="30" placeholder="Nickname for your profile." required />
                     <div id="nicknameCount" class="d-block text-end fs-6 w-75" style="color:#0C0C0D; opacity:40%;">0/20 characters</div>
                     <div class="invalid-feedback text-danger" id="errorNickname"> <?= $errors['nickname'] ?? '' ?>
-                </div>
+                    </div>
                 </div>
 
                 <div class="col-12 col-md-1">
@@ -102,8 +102,8 @@
                         <?php endforeach; ?>
                     </select>
                     <div id="errorMbti" class="invalid-feedback">
-        <?= $errors['mbti'] ?? '' ?>
-      </div>
+                        <?= $errors['mbti'] ?? '' ?>
+                    </div>
                 </div>
             </div>
 
@@ -114,8 +114,8 @@
                     <textarea id="aboutme" name="aboutme" class="form-control <?= isset($errors['aboutme']) ? 'is-invalid' : '' ?>" rows="4" maxlength="270" placeholder="Share a bit about yourself!" style="resize: none;" required></textarea>
                     <div id="aboutCount" class="d-block text-end fs-6" style="color:#0C0C0D; opacity:40%;">0/255 characters</div>
                     <div id="errorAboutme" class="invalid-feedback">
-        <?= $errors['aboutme'] ?? '' ?>
-      </div>
+                        <?= $errors['aboutme'] ?? '' ?>
+                    </div>
                 </div>
             </div>
 
@@ -134,8 +134,8 @@
                         <?php endforeach; ?>
                     </div>
                     <div id="errorHobbies" class="text-danger small">
-        <?= $errors['hobbies'] ?? '' ?>
-      </div>
+                        <?= $errors['hobbies'] ?? '' ?>
+                    </div>
                 </div>
             </div>
 
@@ -155,8 +155,8 @@
                         <?php endforeach; ?>
                     </div>
                     <div id="errorPreferences" class="text-danger small">
-        <?= $errors['preferences'] ?? '' ?>
-      </div>
+                        <?= $errors['preferences'] ?? '' ?>
+                    </div>
                 </div>
             </div>
 

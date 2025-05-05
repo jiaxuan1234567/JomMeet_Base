@@ -154,26 +154,13 @@ class ProfileController
         $hobbies     = !empty($_POST['hobbies']) ? explode(',', $_POST['hobbies']) : [];
         $preferences = !empty($_POST['preferences']) ? explode(',', $_POST['preferences']) : [];
 
-        $result = $this->profileModel->validateProfileData(
+        $response = $this->profileModel->validateProfileData(
             $nickname,
             $aboutMe,
             $mbti,
             $hobbies,
             $preferences
         );
-
-        if (isset($result['field'])) {
-            $response = [
-                'success' => $result['success'],
-                'errors'  => $result['success']
-                    ? []
-                    : [$result['field'] => $result['message']]
-            ];
-        } else {
-            // assume model already returned the new shape
-            $response = $result;
-        }
-
         echo json_encode($response);
         exit;
     }
