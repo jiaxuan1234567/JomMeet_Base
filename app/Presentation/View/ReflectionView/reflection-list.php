@@ -7,11 +7,12 @@ require_once __DIR__ . '/../HomeView/header.php';
 
 <div class="main d-flex flex-column min-vh-100">
     <?php if (!empty($_SESSION['flash_message'])): ?>
-        <div id="flashMessage" class="flash-message" data-type="<?=$_SESSION['flash_type'] ?? '' ?>" data-msg="<?=$_SESSION['flash_message'] ?>">
+        <div id="flashMessage" class="flash-message" data-type="<?= $_SESSION['flash_type'] ?? '' ?>" data-msg="<?= $_SESSION['flash_message'] ?>">
         </div>
-        <?php unset($_SESSION['flash_message']); unset($_SESSION['flash_type']) ?>
+        <?php unset($_SESSION['flash_message']);
+        unset($_SESSION['flash_type']) ?>
     <?php endif; ?>
-    <section class="page-header page-header-classic page-header-sm">
+    <!-- <section class="page-header page-header-classic page-header-sm">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-10 order-1 order-md-1 align-self-center p-static my-3">
@@ -27,7 +28,19 @@ require_once __DIR__ . '/../HomeView/header.php';
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
+
+    <div class="d-flex justify-content-between align-items-center mt-5 mb-4 px-6" style="padding-left: 3rem; padding-right: 6rem;">
+        <h2 class="fw-bold" style="padding-left: 2rem;">Self-Reflection</h2>
+        <a href="/reflection/create" class="btn btn-outline-dark d-flex align-items-center py-1 px-2 rounded">
+            <span class="d-inline-block bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;">
+                <i class="bi bi-plus" style="font-size: 1.25rem;"></i>
+            </span>
+            <span class="fw-bold me-1">Create</span>
+        </a>
+    </div>
+
+
     <div class="container">
         <div class="row">
             <div class="container">

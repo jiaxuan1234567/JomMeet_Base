@@ -46,7 +46,7 @@ require_once __DIR__ . '/../HomeView/header.php';
 <?php endif; ?>
 
 <!-- Header with “Profile” title and edit button -->
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4 px-6" style="padding-left: 4rem; padding-right: 1rem;">
     <h2 class="fw-bold ms-3 mt-3 mb-0">Profile</h2>
     <a href="/profile/edit">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="black" class="bi bi-pencil-square" style="margin-right:70px; margin-top:20px;" viewBox="0 0 16 16">

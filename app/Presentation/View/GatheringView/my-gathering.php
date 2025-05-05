@@ -35,10 +35,10 @@ $asset = new FileHelper('asset');
         </div>
         <?php unset($_SESSION['flash_message'], $_SESSION['flash_type']); ?>
     <?php endif; ?>
-
+<div>
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
-        <h2 class="fw-bold">My Gathering</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4 px-5">
+        <h2 class="fw-bold pl-5">My Gathering</h2>
         <a href="/my-gathering/create" class="btn btn-outline-dark d-flex align-items-center py-1 px-2 rounded">
             <span class="d-inline-block bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;"><i class="bi bi-plus" style="font-size: 1.25rem;"></i></span>
             <span class="fw-bold me-1">Create</span>
@@ -75,28 +75,28 @@ $asset = new FileHelper('asset');
 
             <!-- Hosted tab pane -->
             <div class="tab-pane fade" id="hosted" role="tabpanel" aria-labelledby="hosted-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;">
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;">
                 </div>
             </div>
 
             <!-- Upcoming tab pane -->
             <div class="tab-pane fade" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;"></div>
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;"></div>
             </div>
 
             <!-- Ongoing tab pane -->
             <div class="tab-pane fade" id="ongoing" role="tabpanel" aria-labelledby="ongoing-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;"></div>
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;"></div>
             </div>
 
             <!-- Completed tab pane -->
             <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;"></div>
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;"></div>
             </div>
 
             <!-- Cancelled tab pane -->
             <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;"></div>
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;"></div>
             </div>
         </div>
 
@@ -147,6 +147,7 @@ $asset = new FileHelper('asset');
         <!-- jx -->
     </div>
 </div>
+
 <script>
     $(function() {
         //const allGatherings = <?php //echo json_encode($myGatherings) 
@@ -208,45 +209,6 @@ $asset = new FileHelper('asset');
         `).join('');
 
             $container.html(html);
-        }
-
-        function renderActions(g) {
-            if (!g.action || !g.action.length) return '';
-            const actions = g.action.map(label => {
-                switch (label.toLowerCase()) {
-                    case 'send reminder':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>`;
-                    case 'edit gathering':
-                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
-                    case 'cancel gathering':
-                        return `<li><form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
-                                <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
-                            </form></li>`;
-                    case 'reply reminder':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>`;
-                    case 'leave gathering':
-                        return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
-                                <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
-                            </form></li>`;
-                    case 'gathering feedback':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>`;
-                    case 'location feedback':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>`;
-                    default:
-                        return '';
-                }
-            }).join('');
-
-            return `
-            <div class="dropdown rounded border-0">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
-                    Action
-                </button>
-                <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
-                    ${actions}
-                </ul>
-            </div>
-        `;
         }
 
         function renderActions(g) {
