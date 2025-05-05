@@ -15,10 +15,10 @@ class HomeController
         $this->fileHelper = new FileHelper('home');
     }
 
-    public function redirect($key)
-    {
-        return $this->fileHelper->getFilePath($key);
-    }
+    // public function redirect($key)
+    // {
+    //     return $this->fileHelper->getFilePath($key);
+    // }
 
     public function home()
     {
@@ -27,11 +27,9 @@ class HomeController
 
     public function profileHome()
     {
-        // $profile = (new HomeModel())->getProfileDetails();
         $userId = (int) ($_SESSION['profile_id'] ?? 0);
         $profile = (new HomeModel())->getUserProfileById($userId);
         $_SESSION['profile'] = $profile;
-        // include $this->fileHelper->getFilePath('Profile');
 
         include $this->fileHelper->getFilePath('Profile');
         error_log('[DEBUG] profileHome() called');
@@ -51,7 +49,8 @@ class HomeController
 
     public function myGatheringHome()
     {
-        $myGatherings = (new HomeModel())->getMyGatherings();
+        //$myGatherings = (new HomeModel())->getMyGatherings();
+        $tabs = (new HomeModel())->getMyGatherings();
         include $this->fileHelper->getFilePath('MyGatheringList');
     }
 

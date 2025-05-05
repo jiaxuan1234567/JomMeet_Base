@@ -3,7 +3,6 @@
 namespace Presentation\Controller\GatheringController;
 
 use BusinessLogic\Model\GatheringModel\GatheringModel;
-use BusinessLogic\Model\GatheringModel\LocationModel;
 
 use Database;
 use Exception;
@@ -154,28 +153,8 @@ class GatheringController
             echo json_encode(['error' => 'Unauthorized']);
             return;
         }
-
-        $allGatherings = $this->gatheringModel->getMyGatheringsWithTab($userID); // ← Your full list
+        $allGatherings = $this->gatheringModel->getMyGatheringsWithTab($userID);
         $status = strtolower($status);
-
-        // $filtered = array_filter($allGatherings, function ($g) use ($status) {
-        //     switch ($status) {
-        //         case 'hosted':
-        //             return $g['isHost'] && $g['status'] !== 'cancelled';
-        //         case 'upcoming':
-        //             return $g['status'] === 'new';
-        //         case 'ongoing':
-        //             return $g['status'] === 'start';
-        //         case 'completed':
-        //             return $g['status'] === 'end';
-        //         case 'cancelled':
-        //             return $g['isHost'] && $g['status'] === 'cancelled';
-        //         case 'all':
-        //         default:
-        //             return true;
-        //     }
-        // });
-
         header('Content-Type: application/json');
         echo json_encode($allGatherings[$status] ?? []);
     }
@@ -231,7 +210,7 @@ class GatheringController
     {
         header('Content-Type: application/json');
 
-        echo json_encode((new LocationModel())->getAllLocations());
+        echo json_encode($this->gatheringModel->getAllLocations());
     }
 
     public function ajaxSearchLocation()
@@ -239,8 +218,7 @@ class GatheringController
         header('Content-Type: application/json');
 
         $query = $_GET['q'] ?? '';
-        $model = new LocationModel();
-        $results = (new LocationModel())->searchLocations($query);
+        $results = $this->gatheringModel->searchLocations($query);
 
         echo json_encode($results);
     }

@@ -276,7 +276,6 @@ class GatheringDAO
 
 
     // my-gathering
-
     public function getUserAllGatherings($profileId)
     {
         try {
@@ -849,5 +848,38 @@ class GatheringDAO
         ]);
 
         return (int)$this->db->lastInsertId();
+    }
+
+    // ============================================================================
+    // LOCATION PART
+    // ============================================================================
+    public function fetchAll()
+    {
+        $sql = "SELECT * FROM `location`";
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getGatheringLocationById($id)
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM `location` WHERE locationID = :id");
+            $stmt->execute([':id' => $id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?? [];
+        } catch (PDOException $e) {
+            error_log("LocationDAO Error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function searchLocations($query)
+    {
+        $stmt = $this->db->prepare("
+        SELECT * FROM `location`
+        WHERE locationName LIKE :query OR address LIKE :query
+        ORDER BY locationName
+    ");
+        $stmt->execute([':query' => '%' . $query . '%']);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

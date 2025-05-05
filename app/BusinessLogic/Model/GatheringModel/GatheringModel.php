@@ -3,35 +3,29 @@
 namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
-use Persistence\DAO\GatheringDAO\LocationDAO;
-use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
-use BusinessLogic\Service\GatheringService\GatheringValidationService;
 use BusinessLogic\Service\GatheringService\NotificationService;
 use BusinessLogic\Service\GatheringService\GatheringHelperService;
+use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
 use Exception;
 use FileHelper;
 use DateTime;
-use Error;
 
 class GatheringModel
 {
     private $gatheringDAO;
-    private $locationDAO;
-    private $chkStatusService;
-    private $validatorService;
     private $notificationService;
     private $fileHelper;
 
     public function __construct()
     {
         $this->gatheringDAO = new GatheringDAO();
-        $this->locationDAO = new LocationDAO();
-        $this->chkStatusService = new CheckGatheringStatusService();
-        $this->validatorService = new GatheringValidationService();
         $this->notificationService = new NotificationService();
         $this->fileHelper = new FileHelper('gathering');
     }
 
+    // ============================================================================
+    // BR PART
+    // ============================================================================
     public function getPreference()
     {
         return ['FOOD', 'CHILL', 'STUDY', 'NATURAL', 'SHOPPING', 'WORKOUT', 'ENTERTAINMENT', 'MUSIC', 'MOVIE'];
@@ -80,6 +74,21 @@ class GatheringModel
         return $hoursDiff > 3;
     }
 
+    public function getMyGatheringRawTabs()
+    {
+        return [
+            'all',
+            'hosted',
+            'upcoming',
+            'ongoing',
+            'completed',
+            'cancelled',
+        ];;
+    }
+
+    // ============================================================================
+    // GATHERING PART
+    // ============================================================================
     // Fetch all gatherings
     public function getAllGatherings()
     {
@@ -346,16 +355,9 @@ class GatheringModel
         try {
             // jx
             $this->gatheringDAO->updateGatheringStatuses();
-            // jx
+            // -----
             $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
-            $grouped = [
-                'all'       => [],
-                'hosted'    => [],
-                'upcoming'  => [],
-                'ongoing'   => [],
-                'completed' => [],
-                'cancelled' => [],
-            ];
+            $grouped = $this->getMyGatheringRawTabs();
 
             foreach ($rows as $g) {
                 $status = strtolower($g['status']);
@@ -667,20 +669,20 @@ class GatheringModel
         }
     }
 
-    // validate Gathering Fields
-    public function validateGatheringFields($data, $fields, $editingId = null)
-    {
-        // 1) fetch persistence‐backed facts
-        $validTags = $this->getPreference();
-        $locRow = $this->locationDAO->getLocationById($post['locationId'] ?? '');
-        if ($locRow === false) $locRow = null;
-        $joined = $this->gatheringDAO->getJoinedGatheringByUserId(
-            $_SESSION['profile']['profileID'] ?? 0
-        );
+    // // validate Gathering Fields
+    // public function validateGatheringFields($data, $fields, $editingId = null)
+    // {
+    //     // 1) fetch persistence‐backed facts
+    //     $validTags = $this->getPreference();
+    //     $locRow = $this->locationDAO->getLocationById($post['locationId'] ?? '');
+    //     if ($locRow === false) $locRow = null;
+    //     $joined = $this->gatheringDAO->getJoinedGatheringByUserId(
+    //         $_SESSION['profile']['profileID'] ?? 0
+    //     );
 
-        // 2) call pure helper
-        return $this->validatorService->validate($data, $validTags, $locRow, $joined, $fields, $editingId);
-    }
+    //     // 2) call pure helper
+    //     return $this->validatorService->validate($data, $validTags, $locRow, $joined, $fields, $editingId);
+    // }
 
     /*
     [
@@ -726,7 +728,7 @@ class GatheringModel
                 case 'locationName':
                 case 'locationId':
                 case 'inputLocation':
-                    $validLoc = $this->locationDAO->getLocationById($data['value']['locationId'] ?? '');
+                    $validLoc = $this->gatheringDAO->getGatheringLocationById($data['value']['locationId'] ?? '');
                     $response = $gatheringHelper->validateLocation($data, $validLoc);
                     break;
                 case 'gatheringTag':
@@ -763,7 +765,7 @@ class GatheringModel
         $candidates = $this->gatheringDAO->fetchGatheringsToTransition();
 
         // 2) Service returns a map [id=>newStatus]
-        $toUpdate = $this->chkStatusService->identifyTransitions($candidates);
+        $toUpdate = (new CheckGatheringStatusService())->identifyTransitions($candidates);
 
         // 3) Persist each change
         $updated = false;
@@ -801,7 +803,32 @@ class GatheringModel
 
         return [];
     }
+    // ============================================================================
+    // LOCATION PART
+    // ============================================================================
+    public function getAllLocations()
+    {
+        try {
+            return $this->gatheringDAO->fetchAll();
+        } catch (Exception $e) {
+            error_log("LocationModel Error: " . $e->getMessage());
+            return [];
+        }
+    }
 
+    public function searchLocations($query)
+    {
+        try {
+            return $this->gatheringDAO->searchLocations($query);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return false;
+        }
+    }
+
+    // ============================================================================
+    // FEEDBACK PART
+    // ============================================================================
     // Location Feedback
     public function getLocationFeedback($locationId)
     {
@@ -843,6 +870,9 @@ class GatheringModel
         );
     }
 
+    // ============================================================================
+    // REMINDER PART
+    // ============================================================================
     public function getReminders($gatheringId, $profileId)
     {
         $gathering = $this->gatheringDAO->getGatheringById($gatheringId);

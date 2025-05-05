@@ -49,7 +49,7 @@ $asset = new FileHelper('asset');
     <div class="container">
         <ul class="nav justify-content-center nav-pills nav-justified mb-4 fw-semibold" id="gatheringTabs" role="tablist">
             <?php
-            $tabs = array_keys($myGatherings);
+            //$tabs = array_keys($myGatherings);
             foreach ($tabs as $tab): ?>
                 <li class="nav-item m-3" role="presentation">
                     <button
@@ -149,7 +149,8 @@ $asset = new FileHelper('asset');
 </div>
 <script>
     $(function() {
-        const allGatherings = <?= json_encode($myGatherings) ?>;
+        //const allGatherings = <?php //echo json_encode($myGatherings) 
+                                ?>;
         const $tabs = $('#gatheringTabs button');
         const $tabContent = $('#gatheringTabsContent .tab-pane');
 

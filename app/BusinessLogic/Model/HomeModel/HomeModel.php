@@ -30,14 +30,15 @@ class HomeModel
 
     public function getMyGatherings()
     {
-        $hostProfileId = $_SESSION['profile']['profileID'];
-        return (new GatheringModel())->getMyGatheringsWithTab($hostProfileId);
+        //$hostProfileId = $_SESSION['profile']['profileID'];
+        //return (new GatheringModel())->getMyGatheringsWithTab($hostProfileId);
+        return (new GatheringModel())->getMyGatheringRawtabs() ?? [];
     }
 
     public function getUserProfileById($userId)
     {
         return (new ProfileModel())->getUserByProfileID($userId);
-    }   
+    }
 
     public function logout()
     {
