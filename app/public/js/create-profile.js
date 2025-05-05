@@ -13,11 +13,6 @@ $(document).ready(function () {
   const $hiddenH = $('#hiddenHobbies');
   const $hiddenP = $('#hiddenPrefs');
   const $create = $('#createBtn');
-  const $reset = $('#resetBtn');
-
-  // ====== Initialize hidden fields ======
-  $hiddenH.val(init.hobbies.join(','));
-  $hiddenP.val(init.preferences.join(','));
 
   // ====== Style toggle helper ======
   function styleBtn($b, on) {
