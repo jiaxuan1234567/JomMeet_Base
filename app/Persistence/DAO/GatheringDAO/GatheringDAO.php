@@ -226,7 +226,7 @@ class GatheringDAO
     {
         $formattedStart = $startTime->format('Y-m-d H:i:s');
         $formattedEnd = $endTime->format('Y-m-d H:i:s');
-        // error_log("[hasTimeConflict] Checking time conflict for profile $profileId between $formattedStart and $formattedEnd");
+        error_log("[hasTimeConflict] Checking time conflict for profile $profileId between $formattedStart and $formattedEnd");
 
         $stmt = $this->db->prepare("
         SELECT g.* 
