@@ -33,10 +33,10 @@
 <body>
     <!-- Header -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light px-4 bg-blue-color">
-            <a class="navbar-brand" href="#">
+        <nav class="navbar navbar-expand-md navbar-light px-4 bg-blue-color">
+            <span class="navbar-brand">
                 <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" alt="Logo" width="40" height="40" />
-            </a>
+            </span>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li id="homeNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/">Home</a></li>
@@ -56,3 +56,11 @@
         </nav>
     </header>
     <main>
+        <?php if (!empty($_SESSION['flash_message'])): ?>
+            <div id="flashMessage"
+                class="flash-message"
+                data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
+                data-msg="<?= $_SESSION['flash_message'] ?>">
+            </div>
+            <?php unset($_SESSION['flash_message'], $_SESSION['flash_type']); ?>
+        <?php endif; ?>

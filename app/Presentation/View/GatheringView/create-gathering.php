@@ -32,7 +32,7 @@ $asset = new FileHelper('asset');
                             style="width: 120px; height: 120px;">
 
                             <!-- Tag Image -->
-                            <img src="<?= $asset->getFilePath('iconPNG') ?>"
+                            <img src="<?= $asset->getFilePath('defaultTag') ?>"
                                 id="selectedTagImage"
                                 class="w-100 h-100 rounded-circle object-fit-cover">
 
@@ -55,8 +55,7 @@ $asset = new FileHelper('asset');
                         <div class="gathering-input-wrapper position-relative">
                             <input type="text" id="inputTheme" name="inputTheme"
                                 class="form-control gathering-input w-100 text-start"
-                                placeholder="Enter Gathering Theme"
-                                value="<?= htmlspecialchars($_GET['inputTheme'] ?? '') ?>">
+                                placeholder="Enter Gathering Theme">
                         </div>
                     </div>
 
@@ -69,7 +68,8 @@ $asset = new FileHelper('asset');
                                 id="inputDate"
                                 name="inputDate"
                                 class="form-control gathering-input text-center"
-                                value="<?= htmlspecialchars($_GET['inputDate'] ?? '') ?>">
+                                value="<?= htmlspecialchars($allowedDate) ?>"
+                                min="<?= $allowedDate ?>">
                             <button type="button" id="triggerDatePicker"
                                 class="btn btn-primary button-blue-color text-white gathering-button">
                                 <i class="bi bi-calendar-event-fill"></i>
@@ -92,8 +92,8 @@ $asset = new FileHelper('asset');
                                 id="inputPax"
                                 name="inputPax"
                                 class="form-control gathering-input text-center"
-                                value="<?= htmlspecialchars($_GET['inputPax'] ?? '3') ?>"
-                                min="3" max="8" readonly
+                                value="<?= htmlspecialchars($paxLimit['minPax']) ?>"
+                                min="<?= $paxLimit['minPax'] ?>" max="<?= $paxLimit['maxPax'] ?>" readonly
                                 style="max-width: 60px;">
 
                             <button class="btn btn-primary button-blue-color text-white gathering-button"
@@ -110,19 +110,21 @@ $asset = new FileHelper('asset');
                                 <input type="time"
                                     id="startTime"
                                     name="startTime"
-                                    class="form-control gathering-input text-center time-blue btn btn-primary"
-                                    value="<?= htmlspecialchars($_GET['startTime'] ?? '') ?>">
+                                    step="60"
+                                    class="form-control gathering-input text-center time-blue btn btn-primary">
                             </div>
 
                             <span class="fw-bold d-flex align-items-center">to</span>
 
                             <div class="flex-grow-1 position-relative">
+                                <small id="nextDayNote" class="text-black position-absolute end-0 top-100" style="display: none;">
+                                    (next day)
+                                </small>
                                 <input type="time"
                                     id="endTime"
                                     name="endTime"
-                                    class="form-control gathering-input text-center time-blue btn btn-primary"
-                                    value="<?= htmlspecialchars($_GET['endTime'] ?? '') ?>"
-                                    <?= isset($_GET['endTime']) ? 'data-persisted="true"' : '' ?>>
+                                    step="60"
+                                    class="form-control gathering-input text-center time-blue btn btn-primary">
                             </div>
                         </div>
                     </div>
@@ -138,24 +140,24 @@ $asset = new FileHelper('asset');
                             <input type="text"
                                 id="inputLocation"
                                 name="inputLocation"
-                                class="form-control gathering-input"
+                                class="form-control gathering-input text-start"
                                 placeholder="Select a location"
-                                value="<?= htmlspecialchars($_GET['locationName'] ?? '') ?>"
                                 readonly
                                 style="cursor: default;">
 
-                            <input type="hidden" name="locationId" value="<?= htmlspecialchars($_GET['locationID'] ?? '') ?>">
+                            <input type="hidden" name="locationId" id="locationId">
 
-                            <button type="button"
-                                class="btn btn-primary button-blue-color text-white gathering-button"
+                            <a href="/my-gathering/create/location"
+                                class="btn btn-primary button-blue-color text-white gathering-button border-0"
                                 id="chooseLocationBtn">
                                 Choose
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-12 text-start">
+                    <div class="text-danger small error-message" id="error-gatheringTag"></div>
                     <div class="text-danger small error-message" id="error-inputTheme"></div>
                     <div class="text-danger small error-message" id="error-inputDate"></div>
                     <div class="text-danger small error-message" id="error-inputPax"></div>
@@ -169,7 +171,7 @@ $asset = new FileHelper('asset');
                     <button type="reset" class="btn border-black rounded-1 px-4 py-2 fw-semibold" id="createResetBtn">
                         Reset
                     </button>
-                    <button type="submit" class="btn btn-primary py-2 px-4 button-blue-color border-0" id="createBtn">Create</button>
+                    <button type="submit" class="btn btn-primary py-2 px-4 button-blue-color border-0" id="createBtn" disabled>Create</button>
                 </div>
 
             </form>
@@ -179,7 +181,7 @@ $asset = new FileHelper('asset');
     <div id="selectLocationForm"></div>
 
     <!-- Select Preference Modal -->
-    <div class="modal fade" id="tagSelectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="tagSelectionModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-3 rounded-4 shadow-lg">
                 <div class="modal-header border-0">
@@ -188,27 +190,15 @@ $asset = new FileHelper('asset');
                 </div>
                 <div class="modal-body">
                     <div class="row row-cols-3 g-4 justify-content-center">
-                        <?php
-                        $tags = [
-                            ['label' => 'Food', 'value' => 'food'],
-                            ['label' => 'Chill', 'value' => 'chill'],
-                            ['label' => 'Study', 'value' => 'study'],
-                            ['label' => 'Natural', 'value' => 'natural'],
-                            ['label' => 'Shopping', 'value' => 'shopping'],
-                            ['label' => 'Workout', 'value' => 'workout'],
-                            ['label' => 'Entertainment', 'value' => 'entertainment'],
-                            ['label' => 'Music', 'value' => 'music'],
-                            ['label' => 'Movie', 'value' => 'movie'],
-                        ];
-                        foreach ($tags as $tag): ?>
+                        <?php foreach ($preferenceTags as $tag): ?>
                             <div class="col text-center tag-option px-2"
                                 data-value="<?= $tag['value'] ?>"
                                 data-label="<?= $tag['label'] ?>"
-                                data-image="<?= $asset->getFilePath($tag['value']) ?>"
+                                data-image="<?= $tag['image'] ?>"
                                 style="cursor: pointer;">
                                 <div class="position-relative mx-auto"
                                     style="width: 80px; height: 80px;">
-                                    <img src="<?= $tag['image'] ?? $asset->getFilePath($tag['value']) ?>"
+                                    <img src="<?= $tag['image'] ?>"
                                         class="rounded-circle border border-2 border-secondary shadow-sm tag-image w-100 h-100"
                                         style="object-fit: cover;">
                                 </div>
@@ -222,190 +212,8 @@ $asset = new FileHelper('asset');
     </div>
 </div>
 
-<script src="/js/gatheringMap.js"></script>
-
-<script>
-    // Preference 
-    $('#selectTagBtn').on('click', function() {
-        $('#tagSelectionModal').modal('show');
-    });
-
-    $('.tag-option').on('click', function() {
-        const value = $(this).data('value');
-        const label = $(this).data('label');
-        const image = $(this).data('image');
-
-        $('#gatheringTag').val(value);
-        $('#selectedTagLabel').text(label);
-        $('#selectedTagImage').attr('src', image);
-        $('#tagSelectionModal').modal('hide');
-    });
-
-    (function() {
-        //const $selectedTagLabel = $('selectedTagLabel');
-        const $inputTheme = $('#inputTheme');
-        const $inputDate = $('#inputDate');
-        const $inputPax = $('#inputPax');
-        const $startTime = $('#startTime');
-        const $endTime = $('#endTime');
-        const $inputLocation = $('#inputLocation');
-        const $createBtn = $('#createBtn');
-        const $increase = $('#increasePax');
-        const $decrease = $('#decreasePax');
-
-        // ====== Choose Location Button ======
-        $('#chooseLocationBtn').on('click', function() {
-            const query = new URLSearchParams({
-                inputTheme: $inputTheme.val(),
-                inputPax: $inputPax.val(),
-                inputDate: $inputDate.val(),
-                startTime: $startTime.val(),
-                endTime: $endTime.val()
-            }).toString();
-
-            window.location.href = `/my-gathering/create/location?${query}`;
-        });
-
-        // ====== Pax Button Adjustment ======
-        function updateButtons() {
-            const val = parseInt($inputPax.val());
-            const min = parseInt($inputPax.attr('min'));
-            const max = parseInt($inputPax.attr('max'));
-            $decrease.prop('disabled', val <= min);
-            $increase.prop('disabled', val >= max);
-        }
-
-        $increase.on('click', function() {
-            let current = parseInt($inputPax.val());
-            const max = parseInt($inputPax.attr('max'));
-            if (current < max) {
-                $inputPax.val(current + 1);
-                updateButtons();
-                toggleSubmitButton();
-            }
-        });
-
-        $decrease.on('click', function() {
-            let current = parseInt($inputPax.val());
-            const min = parseInt($inputPax.attr('min'));
-            if (current > min) {
-                $inputPax.val(current - 1);
-                updateButtons();
-                toggleSubmitButton();
-            }
-        });
-
-        updateButtons();
-
-        // ====== Date Setup ======
-        const today = new Date().toISOString().split('T')[0];
-        $inputDate.attr('min', today);
-        if (!$inputDate.val()) $inputDate.val(today);
-        $inputDate.trigger('change');
-
-        // ====== Open Date Picker on Icon Click ======
-        $('#triggerDatePicker').on('click', function() {
-            $inputDate[0].showPicker?.();
-        });
-
-        // ====== Time Picker Logic ======
-        function getCurrentTimePlus(minutes = 1) {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() + minutes);
-            return now.toTimeString().slice(0, 5);
-        }
-
-        function isToday(dateStr) {
-            return dateStr === today;
-        }
-
-        // ====== Create Button Enable/Disable Logic ======
-        function isFormValid() {
-            return $inputTheme.val().trim() !== '' &&
-                $inputDate.val().trim() !== '' &&
-                $inputPax.val().trim() !== '' &&
-                $startTime.val().trim() !== '' &&
-                $endTime.val().trim() !== '' &&
-                $inputLocation.val().trim() !== '';
-        }
-
-        const touched = new Set();
-        const fields = ['inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
-
-        function toggleSubmitButton() {
-            const hasError = fields.some(id => $(`#${id}`).hasClass('is-invalid'));
-            $createBtn.prop('disabled', hasError || !isFormValid());
-        }
-
-        $('#inputTheme, #inputDate, #inputPax, #startTime, #endTime, #inputLocation').on('input change', toggleSubmitButton);
-        toggleSubmitButton();
-
-        // ====== Reset Button ======
-        $('#createResetBtn').on('click', function() {
-            $('#inputTheme, #inputDate, #startTime, #endTime, #inputLocation, input[name="locationId"]').val('');
-            $inputPax.val(3);
-            updateButtons();
-            toggleSubmitButton();
-            const cleanUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, cleanUrl);
-        });
-
-        // ====== AJAX Field Validation with Native Popup ======
-        function validateField(fieldId) {
-            const $input = $(`#${fieldId}`);
-            const data = {
-                inputTheme: $inputTheme.val(),
-                inputDate: $inputDate.val(),
-                inputPax: $inputPax.val(),
-                startTime: $startTime.val(),
-                endTime: $endTime.val(),
-                inputLocation: $inputLocation.val(),
-                locationId: $('input[name="locationId"]').val()
-            };
-
-            console.log(data);
-
-            $.post('/api/validate-gathering', data, function(response) {
-                const errors = response.errors || {};
-
-                // only update the fields the user has touched
-                touched.forEach(fieldId => {
-                    if (errors[fieldId]) {
-                        showValidationError(fieldId, errors[fieldId]);
-                    } else {
-                        clearValidationError(fieldId);
-                    }
-                });
-
-                toggleSubmitButton();
-            }, 'json');
-        }
-
-        fields.forEach(fieldId => {
-            $(`#${fieldId}`).on('input change', function() {
-                touched.add(fieldId);
-
-                // when date changes, also force re-validate times
-                if (fieldId === 'inputDate') {
-                    touched.add('startTime');
-                }
-
-                validateField(fieldId);
-            });
-        });
-
-        function showValidationError(fieldId, message) {
-            const $input = $(`#${fieldId}`);
-            $input.addClass('is-invalid');
-            $(`#error-${fieldId}`).text(message + '*').show();
-        }
-
-        function clearValidationError(fieldId) {
-            const $input = $(`#${fieldId}`);
-            $input.removeClass('is-invalid');
-            $(`#error-${fieldId}`).text('').hide();
-        }
-    })();
-</script>
+<!-- <script src="/js/gatheringForm.js"></script> -->
+<script src="/js/gatheringFormCommon.js"></script>
+<script src="/js/gatheringCreate.js"></script>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

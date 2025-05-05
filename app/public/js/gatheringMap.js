@@ -1,5 +1,3 @@
-// gatheringMap.js (Switched to classic google.maps.Marker)
-
 let map;
 let markers = [];
 let savedLocations = null;
@@ -46,8 +44,8 @@ function updateCoordinates({ lat, lng }) {
     $('#longitude').val(lng);
 }
 
-function onMarkerSelect(marker) {
-    showDetailPanel(marker.placeData, marker.getPosition());
+function onMarkerSelect(marker, liElem = null) {
+    showDetailPanel(marker.placeData, marker.getPosition(), liElem);
     if (currentActiveMarker && currentActiveMarker !== marker) {
         resetMarker(currentActiveMarker);
     }
@@ -56,6 +54,13 @@ function onMarkerSelect(marker) {
 
 async function showDetailPanel(loc, pos, liElem) {
     let imageUrl = '/asset/image-comingsoon.jpg';
+    let feedbacks = [];
+
+    try {
+        feedbacks = await $.getJSON(`/api/location-feedback?locationId=${loc.locationID}`);
+    } catch (err) {
+        console.warn('Feedback fetch failed:', err);
+    }
 
     try {
         const place = new google.maps.places.Place({ id: loc.placeID });
@@ -64,10 +69,20 @@ async function showDetailPanel(loc, pos, liElem) {
         if (photo?.name) {
             const apiKey = 'AIzaSyCIm3LWq0gbsblgi0kmbEscuFq9zUoERD4';
             imageUrl = `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxWidthPx=400`;
+            //imageUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=PHOTO_REF&key=${apiKey}`;
+
         }
     } catch (err) {
         console.warn('Google photo fetch failed:', err);
     }
+
+    // Location comment (FEEDBACK)
+    // const feedbackBtnHTML = `<button id="viewFeedbackBtn" class="btn btn-outline-secondary btn-sm w-100 rounded border mt-2" style="font-weight: 500;">View Feedback</button>`;
+    const feedbackBtnHTML = feedbacks.length ? `
+    <p class="mb-2 small">
+      <span id="viewFeedbackBtn" class="text-decoration-underline text-primary" style="cursor: pointer;">More Comments</span>
+    </p>
+  `: '';
 
     const html = `
     <div class="card shadow border-0 rounded-4" style="width: 260px;">
@@ -77,7 +92,8 @@ async function showDetailPanel(loc, pos, liElem) {
         <h6 class="fw-bold mb-1">${loc.locationName || 'Unnamed Location'}</h6>
         <p class="mb-2 small text-muted">${loc.address || ''}</p>
         ${loc.closeTime ? `<p class="mb-2 small text-muted">Close: ${loc.closeTime}</p>` : ''}
-        ${typeof loc.commentCount !== 'undefined' ? `<p class="mb-1 small text-muted">Comment(${loc.commentCount})</p>` : ''}
+        <p class="mb-1 small text-muted">Comment(${feedbacks.length})</p>
+        ${feedbackBtnHTML}
         <button id="selectBtn" class="btn btn-primary btn-sm w-100 rounded border-0 button-blue-color" style="font-weight: 500;">Select</button>
       </div>
     </div>`;
@@ -88,29 +104,63 @@ async function showDetailPanel(loc, pos, liElem) {
         : '10px');
 
     $('#selectBtn').on('click', () => submitLocationForm(loc));
+    $('#viewFeedbackBtn').on('click', () => {
+        $('#feedbackPanel')
+            .html('<div class="text-muted small">Loading feedback...</div>')
+            .css({
+                top: $('#detailPanel').position().top + 'px',
+                left: ($('#detailPanel').outerWidth() + 20) + 'px' // 20px padding beside
+            })
+            .show();
+
+        try {
+            //const feedbacks = await $.getJSON(`/api/location-feedback?locationId=${loc.locationID}`);
+            if (feedbacks.length) {
+                let feedbackHTML = '<div class="small text-muted">';
+                feedbacks.forEach(fb => {
+                    feedbackHTML += `<div class="border-top pt-1 mb-2">
+                            <div><strong>${fb.name}</strong></div>
+                            <div>${fb.feedbackDesc}</div>
+                        </div>`;
+                });
+                feedbackHTML += '</div>';
+                $('#feedbackPanel').html(feedbackHTML);
+            } else {
+                $('#feedbackPanel').html('<div class="small text-muted">No feedback yet.</div>');
+            }
+        } catch (err) {
+            $('#feedbackPanel').html('<div class="text-danger small">Failed to load feedback.</div>');
+        }
+    });
+
     map.panTo(pos);
     map.setZoom(17);
 }
 
 function submitLocationForm(loc) {
+    // Restore current fieldStates or create fresh
+    const fieldStates = JSON.parse(sessionStorage.getItem('__field_states__')) || {};
+
+    fieldStates['inputLocation'].value = loc.locationName;
+
+    // Optionally store raw ID for post-processing
+    sessionStorage.setItem('locationId', loc.locationID);
+
+    // Save full state
+    sessionStorage.setItem('__field_states__', JSON.stringify(fieldStates));
+
+    // Redirect
+    //window.location.href = '/my-gathering/create';
+
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/my-gathering/create/location';
-
-    const fields = {
-        locationID: loc.locationID,
-        locationName: loc.locationName,
-        ...Object.fromEntries(new URLSearchParams(window.location.search).entries())
-    };
-
-    for (const [key, val] of Object.entries(fields)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = val;
-        form.appendChild(input);
-    }
-
+    form.style.display = 'none';
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'locationId';
+    input.value = loc.locationID;
+    form.appendChild(input);
     document.body.appendChild(form);
     form.submit();
 }
@@ -122,37 +172,37 @@ async function performSearch() {
 
     if (!query) return;
 
-    const results = savedLocations.filter(loc =>
-        loc.locationName.toLowerCase().includes(query) ||
-        (loc.address && loc.address.toLowerCase().includes(query))
-    );
+    try {
+        const results = await $.getJSON(`/api/search-location?q=${encodeURIComponent(query)}`);
 
-    if (results.length === 0) {
-        $('<li>').addClass('list-group-item text-start text-black fw-semibold border-0 bg-transparent')
-            .text('Location Not Available')
-            .appendTo('#resultsList');
-        return;
-    }
-
-    results.forEach(loc => {
-        const pos = { lat: +loc.latitude, lng: +loc.longitude };
-        const marker = markerMap[loc.locationID];
-        if (marker) {
-            marker.setIcon({
-                url: '/asset/geo-alt.svg',
-                scaledSize: new google.maps.Size(36, 36)
-            });
+        if (!results.length) {
+            $('<li>').addClass('list-group-item text-start text-black fw-semibold border-0 bg-transparent')
+                .text('Location Not Available')
+                .appendTo('#resultsList');
+            return;
         }
 
-        $('<li>')
-            .addClass('list-group-item list-group-item-action bg-transparent rounded-0')
-            .css({ borderBottom: '1px solid #dee2e6' })
-            .html(`<strong>${loc.locationName}</strong><br>${loc.address || ''}`)
-            .appendTo('#resultsList')
-            .on('click', function () {
-                onMarkerSelect(marker);
-            });
-    });
+        results.forEach(loc => {
+            const marker = markerMap[loc.locationID];
+            if (marker) {
+                marker.setIcon({
+                    url: '/asset/geo-alt.svg',
+                    scaledSize: new google.maps.Size(36, 36)
+                });
+            }
+
+            $('<li>')
+                .addClass('list-group-item list-group-item-action bg-transparent rounded-0')
+                .css({ borderBottom: '1px solid #dee2e6' })
+                .html(`<strong>${loc.locationName}</strong><br>${loc.address || ''}`)
+                .appendTo('#resultsList')
+                .on('click', function () {
+                    onMarkerSelect(marker, this);
+                });
+        });
+    } catch (err) {
+        console.error("Search failed:", err);
+    }
 }
 
 window.initMap = async function () {
@@ -203,9 +253,20 @@ window.initMap = async function () {
 
 $(document).on('click', '#detailOverlay', function (e) {
     if (e.target.id === 'detailOverlay') {
-        $('#detailOverlay').hide();
-        $('#detailPanel').hide();
-        resetActiveMarker();
+        // $('#detailOverlay').hide();
+        // $('#detailPanel').hide();
+        // $('#feedbackPanel').hide();
+        // resetActiveMarker();
+        const $feedbackPanel = $('#feedbackPanel');
+        const $detailPanel = $('#detailPanel');
+
+        if ($feedbackPanel.is(':visible')) {
+            $feedbackPanel.hide();
+        } else if ($detailPanel.is(':visible')) {
+            $('#detailOverlay').hide();
+            $detailPanel.hide();
+            resetActiveMarker();
+        }
     }
 });
 
@@ -238,94 +299,3 @@ $(document).ready(function () {
         $('#vertBar').toggleClass('d-none', !hasText);
     });
 });
-
-
-
-/* ------------------------ use to add location ---------------------------------------- */
-// async function performSearch() {
-//     const query = $('#searchBox').val().trim();
-//     if (!query) return;
-
-//     $('#resultsList').empty();
-
-//     const { Place, Marker, LatLng, Size, Animation } = await loadLibraries();
-
-//     // build the request
-//     const request = {
-//         textQuery: query,
-//         fields: ['id', 'displayName', 'formattedAddress', 'location'],
-//         locationBias: map.getCenter().toJSON(),
-//         maxResultCount: 10
-//     };
-
-//     // call the new searchByText endpoint :contentReference[oaicite:0]{index=0}
-//     //@ts-ignore
-//     const { places } = await Place.searchByText(request);
-
-//     places.forEach(place => {
-//         console.log(place.id, place.displayName, place.formattedAddress, place.location);
-//         const pos = place.location;
-
-//         // 3a) list item
-//         const $li = $('<li>')
-//             .addClass('list-group-item list-group-item-action')
-//             .html(`<strong>${place.displayName}</strong><br>${place.formattedAddress || ''}`)
-//             .appendTo('#resultsList')
-//             .on('click', () => selectPlace(place));
-
-//         // 3b) marker
-//         const m = new google.maps.Marker({
-//             position: pos,
-//             map,
-//             icon: {
-//                 url: '/asset/geo-alt.svg',
-//                 scaledSize: google.maps.Size(32, 32)
-//             },
-//         });
-//         m.placeData = place;  // stash the full Place object
-//         m.addListener('click', () => {
-//             selectPlace(place);
-//             m.setAnimation(google.maps.Animation.BOUNCE);
-//             setTimeout(() => m.setAnimation(null), 700);
-//         });
-//         markers.push(m);
-//     });
-
-//     // zoom to first result
-//     if (places[0]) {
-//         map.panTo(places[0].location);
-//         map.setZoom(15);
-//     }
-// }
-// async function selectPlace(place) {
-//     // pan & zoom
-//     map.panTo(place.location);
-//     map.setZoom(17);
-
-//     // update hidden coords
-//     updateCoordinates(place.location.toJSON());
-
-//     // if you need more fields than your initial search, you can do:
-//     // const detailer = new Place({ id: place.placeId });
-//     // await detailer.fetchFields({ fields:['displayName','formattedAddress','openingHours','rating'] });
-//     // then read detailer.displayName, etc. :contentReference[oaicite:1]{index=1}
-
-//     const payload = {
-//         place_id: place.id,
-//         name: place.displayName,
-//         address: place.formattedAddress,
-//         latitude: place.location.lat(),
-//         longitude: place.location.lng()
-//     };
-//     console.log('About to save:', payload);
-
-//     // POST back to your server
-//     $.ajax({
-//         url: '/gathering/location/save',
-//         method: 'POST',
-//         contentType: 'application/json',
-//         data: JSON.stringify(payload),
-//         success: e => console.log('Location saved!', e),
-//         error: e => console.error('Save failed', e)
-//     });
-// }

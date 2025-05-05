@@ -16,10 +16,11 @@ class ReflectionDAO
         $this->db = Database::getConnection();
     }
 
-    public function getAllReflections()
+    // ------------------------------------------ View List Part ------------------------------------------//
+    public function getAllReflections($profileId)
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM self_reflect");
+            $stmt = $this->db->prepare("SELECT * FROM self_reflect WHERE profileID = $profileId");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -28,6 +29,7 @@ class ReflectionDAO
         }
     }
 
+    // ------------------------------------------ Create Part ------------------------------------------//
     public function saveReflection($profileId,$reflectionDate,$reflectionTitle,$reflectionContent) 
     {
         try {
@@ -41,10 +43,11 @@ class ReflectionDAO
         }
     }
 
-    public function getReflectionById($reflectionId) 
+    // ------------------------------------------ View Detail Part ------------------------------------------//
+    public function getReflectionById($profileId,$reflectionId) 
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM self_reflect WHERE selfreflectID = $reflectionId");
+            $stmt = $this->db->prepare("SELECT * FROM self_reflect WHERE selfreflectID = $reflectionId AND profileID = $profileId");
             $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -53,6 +56,7 @@ class ReflectionDAO
         }
     }
 
+    // ------------------------------------------ Edit Part ------------------------------------------//
     public function editSaveReflection($reflectionId,$reflectionTitle,$reflectionContent) 
     {
         try {
@@ -66,6 +70,7 @@ class ReflectionDAO
         }
     }
 
+    // ------------------------------------------ Delete Part ------------------------------------------//
     public function deleteReflectionById($reflectionId) 
     {
         try {

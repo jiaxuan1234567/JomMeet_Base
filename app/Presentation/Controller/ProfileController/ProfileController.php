@@ -15,33 +15,10 @@ class ProfileController
     {
         $this->profileModel = new ProfileModel();
         $this->fileHelper = new FileHelper('profile');
-        // $this->profileModel = new ProfileModel();
     }
 
     public function validateLogin()
     {
-        // try {
-        //     error_log("[ProfileController] Starting validateLogin");
-        //     error_log("[ProfileController] POST data: " . print_r($_POST, true));
-
-        //     $loginSuccess = $this->profileModel->validateLogin();
-        //     error_log("[ProfileController] Login result: " . ($loginSuccess ? "Success" : "Failed"));
-
-        //     if ($loginSuccess) {
-        //         error_log("[ProfileController] Redirecting after successful login");
-        //         header("Location: /");
-        //         error_log("Login userid is $_SESSION[profile_id]");
-        //         exit;
-        //     } else {
-        //         error_log("[ProfileController] Login failed, showing error page");
-        //         header("Location: /login");
-        //     }
-        // } catch (Exception $e) {
-        //     error_log("[ProfileController] Error in validateLogin: " . $e->getMessage());
-        //     error_log("[ProfileController] Stack trace: " . $e->getTraceAsString());
-        // }
-
-        //session_start();
 
         // Get submitted credentials
         $phoneNumber = $_POST['phoneNumber'] ?? '';
@@ -76,23 +53,6 @@ class ProfileController
         }
     }
 
-    // public function viewProfile()
-    // {
-    //     // 1) Ensure the user is logged in
-    //     $userId = (int) ($_SESSION['profile_id'] ?? 0);
-    //     // if ($userId <= 0) {
-    //     //     header('Location: /login');
-    //     //     exit;
-    //     // }
-
-    //     // 2) Fetch the latest profile from the DB
-    //     $profile = $this->profileModel->getUserByProfileID($userId);
-
-    //     // 3) Include the view which uses $profile
-    //     include $this->fileHelper->getFilePath('Profile');
-    // }
-
-
     // ------------------------------------------ Create Profile ------------------------------------------//
     public function createProfile()
     {
@@ -110,15 +70,6 @@ class ProfileController
 
     public function submitProfile()
     {
-        // if (session_status() === PHP_SESSION_NONE) {
-        //     session_start();
-        // }
-
-        // $_SESSION['profile'] = [
-        //     'phone'    => '0166824561',
-        //     'password' => 't1321'
-        // ];
-
         if (empty($_SESSION['new_profile'])) {
             throw new Exception('Session expired — please log in again.');
         }
@@ -182,11 +133,6 @@ class ProfileController
 
         $this->profileModel->saveProfile($userId, $nickname, $aboutMe, $mbti, $hobbies, $preferences);
 
-        // if (!$success) {
-        //     header('Location: /profile/edit');
-        //     exit;
-        // }
-
         $updatedProfile = $this->profileModel->getUserByProfileID($userId);
         $_SESSION['profile']    = $updatedProfile;
         $_SESSION['profile_id'] = $userId;
@@ -216,6 +162,22 @@ class ProfileController
             $hobbies,
             $preferences
         );
+<<<<<<< HEAD
+=======
+
+        if (isset($result['field'])) {
+            $response = [
+                'success' => $result['success'],
+                'errors'  => $result['success']
+                    ? []
+                    : [$result['field'] => $result['message']]
+            ];
+        } else {
+            // assume model already returned the new shape
+            $response = $result;
+        }
+
+>>>>>>> main
         echo json_encode($response);
         exit;
     }

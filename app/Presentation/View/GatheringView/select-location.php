@@ -1,40 +1,14 @@
 <?php
-$_title = 'Selecet Location';
+$_title = 'Select Location';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
-
-<style>
-    #searchBox:focus {
-        box-shadow: none;
-        outline: none;
-    }
-
-    input[type="search"]::-webkit-search-decoration,
-    input[type="search"]::-webkit-search-cancel-button,
-    input[type="search"]::-webkit-search-results-button,
-    input[type="search"]::-webkit-search-results-decoration {
-        display: none;
-    }
-
-    #resultsList {
-        max-height: 92vh;
-        ;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-</style>
-
-<script>
-    // so JS knows where to send the user back
-    window.redirectUrl = '<?= addslashes($redirectUrl) ?>';
-</script>
 
 <div class="row vh-100 g-0">
     <div class="col-md-4 bg-light d-flex flex-column p-2">
         <!-- Back + Search Bar -->
         <div class="input-group mb-3 border border-black rounded align-items-center flex-nowrap">
             <span class="input-group-text border-0 bg-white d-flex align-items-center justify-content-center">
-                <i class="bi bi-arrow-left h5 m-0" id="backToLastPage" style="cursor:pointer;"></i>
+                <a href="/my-gathering/create"><i class=" bi bi-arrow-left text-black h5 m-0" id="back" style="cursor:pointer;"></i></a>
             </span>
 
             <div class="position-relative flex-grow-1">
@@ -80,6 +54,9 @@ require_once __DIR__ . '/../HomeView/header.php';
         <div id="detailOverlay" class="position-absolute w-100 h-100 top-0 start-0" style="display: none; z-index: 10;">
             <div id="detailPanel" class="position-absolute"></div>
         </div>
+
+        <!-- Feedback Panel -->
+        <div id="feedbackPanel" class="position-absolute shadow bg-white rounded-4 p-3" style="display: none; width: 260px; top: 10px; left: 280px; z-index: 1002; max-height: 300px; overflow-y: auto;"></div>
     </div>
 </div>
 

@@ -75,6 +75,24 @@ $(function () {
     });
 });
 
+// Storage Clear
+$(function () {
+    const allowedPaths = [
+        '/my-gathering/create',
+        '/my-gathering/create/location'
+    ];
+
+    const currentPath = window.location.pathname;
+
+    if (!allowedPaths.includes(currentPath)) {
+        const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation', 'locationId'];
+        fields.forEach(id => sessionStorage.removeItem(id));
+        //sessionStorage.removeItem('locationId');
+        sessionStorage.removeItem('__field_states__');
+        sessionStorage.removeItem('locationId');
+    }
+});
+
 
 // ============================================================================
 // Page Load (jQuery)
@@ -105,15 +123,23 @@ $(() => {
         }
     });
 
-     //   message reflection
-     $('[data-confirm-deleteReflection]').on('click', function (e) {
+    //   message reflection
+    $('[data-confirm-deleteReflection]').on('click', function (e) {
         const text = e.currentTarget.dataset.confirm || 'Confirm to delete your self-reflection record?';
         if (!confirm(text)) {
             e.preventDefault();
             e.stopImmediatePropagation();
         }
     });
-    
+
+    $('[data-confirm-updateReflection]').on('click', function (e) {
+        const text = e.currentTarget.dataset.confirm || 'Confirm to update your self-reflection record?';
+        if (!confirm(text)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    });
+
 
 
     // Initiate GET request

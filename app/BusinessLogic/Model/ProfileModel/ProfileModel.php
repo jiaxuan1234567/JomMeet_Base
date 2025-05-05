@@ -15,20 +15,6 @@ class ProfileModel
         $this->profileDAO = new ProfileDAO();
     }
 
-    // public function getAllProfiles()
-    // {
-    //     try {
-    //         $profiles = $this->profileDAO->getAllProfiles();
-    //         if ($profiles === false) {
-    //             throw new Exception("Failed to fetch profiles");
-    //         }
-    //         return $profiles;
-    //     } catch (Exception $e) {
-    //         error_log("Error in getAllProfiles: " . $e->getMessage());
-    //         return [];
-    //     }
-    // }
-
     public function getAllMbti()
     {
         return [
@@ -73,25 +59,18 @@ class ProfileModel
         ];
     }
 
+    // public function getPreference()
+    // {
+    //     return ['FOOD', 'CHILL', 'STUDY', 'NATURAL', 'SHOPPING', 'WORKOUT', 'ENTERTAINMENT', 'MUSIC', 'MOVIE'];
+    // }
+
     public function getAllPreferences()
     {
-        return [
-            'Entertainment',
-            'Sports',
-            'Dining',
-            'Nature',
-            'Hangout',
-            'Coffee',
-            'Picnic',
-            'Chill'
-        ];
+        return ['Food', 'Chill', 'Study', 'Natural', 'Shopping', 'Workout', 'Entertainment', 'Music', 'Movie'];
     }
 
     public function validateLogin($phoneNumber, $password)
     {
-        // $phoneNumber = $_POST['phoneNumber'];
-        // $password = $_POST['password'];
-
         $profile = $this->profileDAO->getUserByPhoneNumber($phoneNumber);
 
         if (!$profile) {
@@ -104,26 +83,6 @@ class ProfileModel
             $_SESSION['profile_id'] = $profile['profileID'];
             return "valid";
         }
-
-
-        // $profiles = $this->getAllProfiles();
-        // // Validate phone number and password
-        // if (empty($phoneNumber) || empty($password)) {
-        //     return false; // or handle error
-        // }
-
-        // // Here you would typically check the credentials against a database
-        // foreach ($profiles as $p) {
-        //     error_log("Checking profile: " . print_r($p, true));
-        //     if ($p['phone'] == $phoneNumber && $p['password'] == $password) {
-        //         $_SESSION['profile_id'] = $p['profileID'];
-        //         $_SESSION['name'] = $p['nickname'];
-        //         $_SESSION['phone'] = $p['phone'];
-        //         $_SESSION['password'] = $p['password'];
-        //         return true;
-        //     }
-        // }
-        // return false;
     }
 
     public function logout()
@@ -138,24 +97,6 @@ class ProfileModel
 
         return true;
     }
-
-
-    // public function getProfileDetails($profileId)
-    // {
-    //     return $this->profileDAO->getProfileDetails($profileId);
-    // }
-
-    // // Fetch a gathering by its ID
-    // public function getProfileById(int $id): array
-    // {
-    //     return $this->profileDAO->getProfileById($id);
-    // }
-
-
-    // public function fetchProfile(string $phone): array|false
-    // {
-    //     return $this->profileDAO->getUserByPhoneNumber($phone);
-    // }
 
     public function submitProfile(
         string $nickname,
@@ -175,8 +116,6 @@ class ProfileModel
         ];
         return $this->profileDAO->submitProfile($data);
     }
-
-
 
     public function saveProfile(
         int    $userId,
