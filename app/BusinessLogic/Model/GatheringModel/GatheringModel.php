@@ -292,6 +292,16 @@ class GatheringModel
             return false;
         }
 
+        $now = new DateTime();
+        $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+        $endTime = new DateTime($gathering['date'] . ' ' . $gathering['endTime']);
+        if ($this->gatheringDAO->hasTimeConflict($userID, $startTime, $endTime)) {
+            error_log("User $userID cannot join gathering $gatheringID: time conflict with another gathering.");
+            $_SESSION['flash_message'] = "You have a time conflict with another gathering.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
         // Add the user to the gathering
         $result = $this->gatheringDAO->addUserToGathering($userID, $gatheringID);
 
@@ -803,13 +813,13 @@ class GatheringModel
         $desc = trim($data['description'] ?? '');
         if ($desc === '') {
             return [
-                'success' => false, 
+                'success' => false,
                 'message' => 'Description cannot be empty.'
             ];
         }
         if (mb_strlen($desc) > 255) {
             return [
-                'success' => false, 
+                'success' => false,
                 'message' => 'Description must be less than 255 characters.'
             ];
         }
@@ -846,7 +856,7 @@ class GatheringModel
 
         return ['success' => true];
     }
-    
+
     // ============================================================================
     // FUNCTIONS
     // ============================================================================
