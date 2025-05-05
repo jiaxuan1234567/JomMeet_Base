@@ -35,10 +35,10 @@ $asset = new FileHelper('asset');
         </div>
         <?php unset($_SESSION['flash_message'], $_SESSION['flash_type']); ?>
     <?php endif; ?>
-
+<div>
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
-        <h2 class="fw-bold">My Gathering</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4 px-5">
+        <h2 class="fw-bold pl-5">My Gathering</h2>
         <a href="/my-gathering/create" class="btn btn-outline-dark d-flex align-items-center py-1 px-2 rounded">
             <span class="d-inline-block bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;"><i class="bi bi-plus" style="font-size: 1.25rem;"></i></span>
             <span class="fw-bold me-1">Create</span>
@@ -75,28 +75,28 @@ $asset = new FileHelper('asset');
 
             <!-- Hosted tab pane -->
             <div class="tab-pane fade" id="hosted" role="tabpanel" aria-labelledby="hosted-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;">
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;">
                 </div>
             </div>
 
             <!-- Upcoming tab pane -->
             <div class="tab-pane fade" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;"></div>
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;"></div>
             </div>
 
             <!-- Ongoing tab pane -->
             <div class="tab-pane fade" id="ongoing" role="tabpanel" aria-labelledby="ongoing-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;"></div>
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;"></div>
             </div>
 
             <!-- Completed tab pane -->
             <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;"></div>
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;"></div>
             </div>
 
             <!-- Cancelled tab pane -->
             <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
-                <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;"></div>
+                <div class="row g-5 rounded p-3 text-dark mt-3 mb-3" style="background-color: #DEECFF;"></div>
             </div>
         </div>
 
@@ -147,6 +147,7 @@ $asset = new FileHelper('asset');
         <!-- jx -->
     </div>
 </div>
+
 <script>
     $(function() {
         //const allGatherings = <?php //echo json_encode($myGatherings) 

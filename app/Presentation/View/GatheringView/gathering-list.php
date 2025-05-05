@@ -30,7 +30,7 @@ $userid = $_SESSION['profile']['profileID'];
     <div class="container-sm mt-4">
         <div class="row">
             <div class="col">
-                <h2>Gathering List</h2>
+                <h2 class="fw-bold">Gathering List</h2>
             </div>
             <div class="col">
                 <form class="d-flex" id="search" style="width: 750px;" action="/gathering/search" method="POST">
