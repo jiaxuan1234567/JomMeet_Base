@@ -1,5 +1,3 @@
-// gatheringMap.js (Switched to classic google.maps.Marker)
-
 let map;
 let markers = [];
 let savedLocations = null;
@@ -56,6 +54,13 @@ function onMarkerSelect(marker, liElem = null) {
 
 async function showDetailPanel(loc, pos, liElem) {
     let imageUrl = '/asset/image-comingsoon.jpg';
+    let feedbacks = [];
+
+    try {
+        feedbacks = await $.getJSON(`/api/location-feedback?locationId=${loc.locationID}`);
+    } catch (err) {
+        console.warn('Feedback fetch failed:', err);
+    }
 
     try {
         const place = new google.maps.places.Place({ id: loc.placeID });
@@ -69,28 +74,13 @@ async function showDetailPanel(loc, pos, liElem) {
         console.warn('Google photo fetch failed:', err);
     }
 
-    // feedback btn
-    const feedbackBtnHTML = `<button id="viewFeedbackBtn" class="btn btn-outline-secondary btn-sm w-100 rounded border mt-2" style="font-weight: 500;">View Feedback</button>`;
-    // // Load feedback data via AJAX
-    // let feedbackHTML = '';
-    // try {
-    //     const feedbacks = await $.getJSON(`/api/location-feedback?locationId=${loc.locationID}`);
-    //     if (feedbacks.length) {
-    //         feedbackHTML = '<div class="mt-2 small text-muted">';
-    //         feedbacks.forEach(fb => {
-    //             feedbackHTML += `<div class="border-top pt-1">
-    //                 <div><strong>${fb.name}</strong></div>
-    //                 <div>${fb.feedbackDesc}</div>
-    //             </div>`;
-    //         });
-    //         feedbackHTML += '</div>';
-    //     } else {
-    //         feedbackHTML = '<div class="mt-2 small text-muted">No feedback yet.</div>';
-    //     }
-    // } catch (err) {
-    //     console.error("Feedback fetch failed:", err);
-    //     feedbackHTML = '<div class="mt-2 text-danger small">Failed to load feedback.</div>';
-    // }
+    // Location comment (FEEDBACK)
+    // const feedbackBtnHTML = `<button id="viewFeedbackBtn" class="btn btn-outline-secondary btn-sm w-100 rounded border mt-2" style="font-weight: 500;">View Feedback</button>`;
+    const feedbackBtnHTML = feedbacks.length ? `
+    <p class="mb-2 small">
+      <span id="viewFeedbackBtn" class="text-decoration-underline text-primary" style="cursor: pointer;">More Comments</span>
+    </p>
+  `: '';
 
     const html = `
     <div class="card shadow border-0 rounded-4" style="width: 260px;">
@@ -100,9 +90,9 @@ async function showDetailPanel(loc, pos, liElem) {
         <h6 class="fw-bold mb-1">${loc.locationName || 'Unnamed Location'}</h6>
         <p class="mb-2 small text-muted">${loc.address || ''}</p>
         ${loc.closeTime ? `<p class="mb-2 small text-muted">Close: ${loc.closeTime}</p>` : ''}
-        ${typeof loc.commentCount !== 'undefined' ? `<p class="mb-1 small text-muted">Comment(${loc.commentCount})</p>` : ''}
-        <button id="selectBtn" class="btn btn-primary btn-sm w-100 rounded border-0 button-blue-color" style="font-weight: 500;">Select</button>
+        <p class="mb-1 small text-muted">Comment(${feedbacks.length})</p>
         ${feedbackBtnHTML}
+        <button id="selectBtn" class="btn btn-primary btn-sm w-100 rounded border-0 button-blue-color" style="font-weight: 500;">Select</button>
       </div>
     </div>`;
 
@@ -112,18 +102,24 @@ async function showDetailPanel(loc, pos, liElem) {
         : '10px');
 
     $('#selectBtn').on('click', () => submitLocationForm(loc));
-    $('#viewFeedbackBtn').on('click', async () => {
-        $('#feedbackPanel').html('<div class="text-muted small">Loading feedback...</div>').show();
+    $('#viewFeedbackBtn').on('click', () => {
+        $('#feedbackPanel')
+            .html('<div class="text-muted small">Loading feedback...</div>')
+            .css({
+                top: $('#detailPanel').position().top + 'px',
+                left: ($('#detailPanel').outerWidth() + 20) + 'px' // 20px padding beside
+            })
+            .show();
 
         try {
-            const feedbacks = await $.getJSON(`/api/location-feedback?locationId=${loc.locationID}`);
+            //const feedbacks = await $.getJSON(`/api/location-feedback?locationId=${loc.locationID}`);
             if (feedbacks.length) {
                 let feedbackHTML = '<div class="small text-muted">';
                 feedbacks.forEach(fb => {
                     feedbackHTML += `<div class="border-top pt-1 mb-2">
-                        <div><strong>${fb.name}</strong></div>
-                        <div>${fb.feedbackDesc}</div>
-                    </div>`;
+                            <div><strong>${fb.name}</strong></div>
+                            <div>${fb.feedbackDesc}</div>
+                        </div>`;
                 });
                 feedbackHTML += '</div>';
                 $('#feedbackPanel').html(feedbackHTML);
@@ -134,6 +130,7 @@ async function showDetailPanel(loc, pos, liElem) {
             $('#feedbackPanel').html('<div class="text-danger small">Failed to load feedback.</div>');
         }
     });
+
     map.panTo(pos);
     map.setZoom(17);
 }
@@ -274,10 +271,20 @@ window.initMap = async function () {
 
 $(document).on('click', '#detailOverlay', function (e) {
     if (e.target.id === 'detailOverlay') {
-        $('#detailOverlay').hide();
-        $('#detailPanel').hide();
-        $('#feedbackPanel').hide();
-        resetActiveMarker();
+        // $('#detailOverlay').hide();
+        // $('#detailPanel').hide();
+        // $('#feedbackPanel').hide();
+        // resetActiveMarker();
+        const $feedbackPanel = $('#feedbackPanel');
+        const $detailPanel = $('#detailPanel');
+
+        if ($feedbackPanel.is(':visible')) {
+            $feedbackPanel.hide();
+        } else if ($detailPanel.is(':visible')) {
+            $('#detailOverlay').hide();
+            $detailPanel.hide();
+            resetActiveMarker();
+        }
     }
 });
 

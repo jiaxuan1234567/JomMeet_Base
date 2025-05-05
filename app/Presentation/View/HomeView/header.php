@@ -56,3 +56,11 @@
         </nav>
     </header>
     <main>
+        <?php if (!empty($_SESSION['flash_message'])): ?>
+            <div id="flashMessage"
+                class="flash-message"
+                data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
+                data-msg="<?= $_SESSION['flash_message'] ?>">
+            </div>
+            <?php unset($_SESSION['flash_message'], $_SESSION['flash_type']); ?>
+        <?php endif; ?>

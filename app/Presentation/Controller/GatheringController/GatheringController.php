@@ -23,6 +23,7 @@ class GatheringController
     // GET: create-gathering
     public function viewCreate()
     {
+        $_SESSION['allow_select_location'] = true;
         $preferenceTags = $this->gatheringModel->getPreferenceTags();
         $paxLimit = $this->gatheringModel->getPaxLimit();
         $allowedDate = $this->gatheringModel->getCreateAllowedDate();
@@ -48,6 +49,8 @@ class GatheringController
 
         try {
             $newId = $this->gatheringModel->createGathering($data);
+            unset($_SESSION['allow_select_location']);
+
             $_SESSION['flash_message'] = 'Gathering has been created successfully!';
             $_SESSION['flash_type'] = 'success';
 
@@ -87,6 +90,7 @@ class GatheringController
         $profileId = $_SESSION['profile']['profileID'];
 
         $this->gatheringModel->updateGathering($data, $profileId, $gatheringId);
+        unset($_SESSION['allow_select_location']);
         $_SESSION['flash_message'] = 'Gathering updated successfully!';
         $_SESSION['flash_type'] = 'success';
         header("Location: /my-gathering");
@@ -96,6 +100,15 @@ class GatheringController
     // GET: select-location
     public function viewSelectLocation()
     {
+        if (empty($_SESSION['allow_select_location'])) {
+            $_SESSION['flash_message'] = 'Restricted Page';
+            $_SESSION['flash_type'] = 'error';
+            header('Location: /');
+            exit;
+        }
+
+        unset($_SESSION['allow_select_location']);
+
         $redirectUrl = $_GET['redirect'] ?? '/my-gathering/create';
         include $this->fileHelper->getFilePath('SelectLocation');
     }

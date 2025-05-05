@@ -5,6 +5,11 @@ $(() => {
         location.reload();
     }
 
+    $('#selectLocationBtn').on('click', function () {
+        sessionStorage.setItem('fromCreatePage', 'true');
+        window.location.href = '/my-gathering/create/location';
+    });
+
     const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
     const initFields = ['inputDate', 'inputPax'];
     const timeFields = ['inputDate', 'startTime', 'endTime'];
