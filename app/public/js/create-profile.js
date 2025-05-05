@@ -101,16 +101,21 @@ $(document).ready(function () {
         console.log('✅ /api/validate-profile response:', res);
         ['nickname', 'aboutme', 'mbti', 'hobbies', 'preferences'].forEach(fld => {
           const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
-          $(`#error${cap}`).text('');               
-          $(`[name=${fld}]`).removeClass('is-invalid'); 
+          $(`#error${cap}`).text('');
+          $(`[name=${fld}]`).removeClass('is-invalid');
         });
 
         // if validation failed, show new ones
         if (!res.success) {
-          Object.entries(res.errors).forEach(([fld, msg]) => {
-            const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
-            $(`#error${cap}`).text(msg);               
-            $(`[name=${fld}]`).addClass('is-invalid'); 
+          Object.entries(res.errors || {}).forEach(([fld, msg]) => {
+            const cap = fld[0].toUpperCase() + fld.slice(1);
+            console.warn(fld, msg);
+            // highlight inputs/textareas
+            $(`[name=${fld}]`).addClass('is-invalid');
+            // highlight grids
+            $(`#${fld}List`).addClass('border-danger');
+            // show message
+            $(`#error${cap}`).text(msg);
           });
         }
       }
@@ -131,14 +136,31 @@ $(document).ready(function () {
   });
 
   // ====== Reset form ======
-  $reset.on('click', function () {
-    $nick.val(''); updNick();
-    $about.val(''); updAbout();
-    $mbti.val('').removeClass('is-invalid');
-    $hBtns.each(function () { styleBtn($(this), false); });
-    $pBtns.each(function () { styleBtn($(this), false); });
-    $hContainer.removeClass('border-danger'); $pContainer.removeClass('border-danger');
+  $form.on('reset', function () {
+    // restore values
+    $nick.val(init.nickname);
+    $about.val(init.aboutme);
+    $mbti.val(init.mbti);
+    $hBtns.each((_, b) => styleBtn($(b), init.hobbies.includes(b.dataset.value)));
+    $pBtns.each((_, b) => styleBtn($(b), init.preferences.includes(b.dataset.value)));
+
+    // clear old UI errors/styles
+    ['nickname', 'aboutme', 'mbti', 'hobbies', 'preferences'].forEach(fld => {
+      const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
+      $(`#error${cap}`).text('');
+      $(`[name=${fld}]`).removeClass('is-invalid');
+      if (fld === 'hobbies' || fld === 'preferences') {
+        $(`#${fld}List`).removeClass('border-danger');
+      }
+    });
+
+    //re‐run local form enable/disable
     validateForm();
+
+    //re‐run AJAX validation _for each_ field so
+    //  MBTI + all others get their error state applied
+    ['nickname', 'aboutme', 'mbti', 'hobbies', 'preferences']
+      .forEach(fld => validateField(fld));
   });
 
   // ====== Form submit ======
@@ -156,4 +178,9 @@ $(document).ready(function () {
 
   // initial run
   validateForm();
+  validateField('nickname');
+  validateField('aboutme');
+  validateField('mbti');
+  validateField('hobbies');
+  validateField('preferences');
 });

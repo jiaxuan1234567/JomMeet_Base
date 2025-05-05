@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 02, 2025 at 02:27 PM
+-- Generation Time: May 03, 2025 at 11:28 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -57,7 +57,7 @@ CREATE TABLE `gathering` (
   `endTime` time NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `status` enum('NEW','START','END','CANCELLED') NOT NULL DEFAULT 'NEW',
-  `preference` enum('ENTERTAINMENT','SPORTS','DINING','NATURE','HANGOUT','COFFEE','PICNIC','CHILL') NOT NULL,
+  `preference` enum('FOOD','CHILL','STUDY','NATURAL','SHOPPING','WORKOUT','ENTERTAINMENT','MUSIC','MOVIE') NOT NULL,
   `hostProfileID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -66,20 +66,30 @@ CREATE TABLE `gathering` (
 --
 
 INSERT INTO `gathering` (`gatheringID`, `locationID`, `theme`, `maxParticipant`, `minParticipant`, `currentParticipant`, `date`, `startTime`, `endTime`, `createdAt`, `status`, `preference`, `hostProfileID`) VALUES
-(1, 39, 'Movie', 5, 3, 3, '2025-05-25', '20:00:00', '00:00:00', '2025-04-30 06:39:06', 'NEW', 'ENTERTAINMENT', 1),
-(3, 31, 'JomMovie', 5, 1, 1, '2025-05-25', '22:00:00', '00:00:00', '2025-04-29 16:14:50', 'NEW', 'ENTERTAINMENT', 2),
-(4, 3, 'JomMovie', 5, 1, 1, '2025-06-25', '13:13:33', '15:13:33', '2025-04-29 15:34:06', 'NEW', 'ENTERTAINMENT', 1),
+(1, 39, 'Test 3', 4, 3, 4, '2025-05-19', '20:00:00', '22:00:00', '2025-05-03 08:06:52', 'CANCELLED', 'WORKOUT', 1),
+(3, 31, 'JomMovie', 5, 1, 0, '2025-05-25', '22:00:00', '00:00:00', '2025-05-03 08:06:43', 'NEW', 'ENTERTAINMENT', 2),
+(4, 3, 'JomMovie', 6, 1, 1, '2025-06-25', '13:13:00', '15:13:00', '2025-05-03 08:07:11', 'NEW', 'ENTERTAINMENT', 1),
 (5, 55, 'happy', 4, 3, 1, '2025-01-01', '16:00:00', '19:00:00', '2025-04-29 16:17:58', 'END', 'ENTERTAINMENT', 1),
-(6, 59, 'do assignment', 6, 3, 1, '2025-05-01', '15:00:00', '19:00:00', '2025-04-29 15:34:10', 'NEW', 'ENTERTAINMENT', 1),
-(12, 3, 'g1', 4, 3, 2, '2025-05-01', '01:37:00', '04:37:00', '2025-04-30 09:08:06', 'CANCELLED', 'ENTERTAINMENT', 3),
+(6, 59, 'do assignment', 6, 3, 1, '2025-05-01', '15:00:00', '19:00:00', '2025-05-01 11:10:11', 'END', 'ENTERTAINMENT', 1),
+(12, 3, 'g1', 4, 3, 2, '2025-05-01', '01:37:00', '04:37:00', '2025-05-01 10:46:00', 'END', 'ENTERTAINMENT', 3),
 (13, 59, 'library vibe', 5, 3, 2, '2025-05-03', '14:54:00', '18:58:00', '2025-04-30 09:11:45', 'CANCELLED', 'ENTERTAINMENT', 3),
 (14, 15, 'stay', 6, 3, 2, '2025-05-01', '17:30:00', '19:30:00', '2025-04-30 09:08:31', 'CANCELLED', 'ENTERTAINMENT', 3),
-(15, 6, 'happy', 3, 3, 2, '2025-04-30', '20:31:00', '23:31:00', '2025-04-30 09:14:02', 'CANCELLED', 'ENTERTAINMENT', 3),
-(16, 3, 'happy', 3, 3, 2, '2025-04-30', '17:32:00', '21:32:00', '2025-04-30 08:32:41', 'NEW', 'ENTERTAINMENT', 3),
-(17, 8, 'g1', 5, 3, 3, '2025-04-30', '16:37:00', '18:35:00', '2025-04-30 12:02:39', 'END', 'ENTERTAINMENT', 3),
-(18, 15, 'Test 1', 4, 3, 2, '2025-04-30', '18:43:00', '21:43:00', '2025-04-30 09:43:17', 'NEW', 'ENTERTAINMENT', 3),
+(15, 6, 'happy', 3, 3, 2, '2025-04-30', '20:31:00', '23:31:00', '2025-04-30 16:17:03', 'END', 'ENTERTAINMENT', 3),
+(16, 3, 'happy', 3, 3, 2, '2025-04-30', '17:32:00', '21:32:00', '2025-04-30 16:17:03', 'END', 'ENTERTAINMENT', 3),
+(17, 8, 'g1', 5, 3, 3, '2025-04-30', '16:37:00', '18:35:00', '2025-05-01 13:30:45', 'END', 'ENTERTAINMENT', 3),
+(18, 15, 'Test 1', 4, 3, 2, '2025-04-30', '18:43:00', '21:43:00', '2025-05-01 13:30:45', 'END', 'ENTERTAINMENT', 3),
 (19, 58, 'Test 1', 6, 3, 2, '2025-05-02', '18:45:00', '20:45:00', '2025-04-30 09:45:33', 'CANCELLED', 'ENTERTAINMENT', 3),
-(20, 59, 'look', 5, 3, 2, '2025-05-03', '18:59:00', '20:01:00', '2025-04-30 09:58:58', 'NEW', 'ENTERTAINMENT', 3);
+(20, 59, 'look', 5, 3, 2, '2025-05-03', '18:59:00', '20:01:00', '2025-05-02 05:43:27', 'CANCELLED', 'ENTERTAINMENT', 3),
+(21, 4, 'happy', 8, 3, 2, '2025-05-02', '13:15:00', '15:15:00', '2025-05-03 01:51:28', 'END', 'ENTERTAINMENT', 3),
+(22, 51, 'Happy', 4, 3, 2, '2025-05-01', '19:18:00', '20:18:00', '2025-05-01 13:25:15', 'END', 'ENTERTAINMENT', 3),
+(23, 44, 'abc', 6, 3, 0, '2025-05-03', '23:30:00', '23:59:00', '2025-05-02 05:52:45', 'CANCELLED', 'ENTERTAINMENT', 3),
+(24, 51, 'abv', 4, 3, 1, '2025-05-03', '20:58:00', '22:58:00', '2025-05-02 05:48:27', 'CANCELLED', 'ENTERTAINMENT', 3),
+(25, 7, 'q', 4, 3, 1, '2025-05-03', '04:10:00', '13:10:00', '2025-05-03 09:23:46', 'END', 'ENTERTAINMENT', 3),
+(26, 33, 'a', 4, 3, 1, '2025-05-03', '14:35:00', '16:35:00', '2025-05-03 09:22:16', 'END', 'ENTERTAINMENT', 3),
+(27, 23, 'Lets go eat a dinner', 8, 3, 1, '2025-05-03', '03:00:00', '04:00:00', '2025-05-03 09:23:46', 'END', 'FOOD', 3),
+(28, 5, 'New Gathering', 8, 3, 8, '2025-05-04', '01:27:00', '02:27:00', '2025-05-03 07:00:12', 'CANCELLED', 'FOOD', 3),
+(29, 5, 'New Gathering', 3, 3, 1, '2025-05-14', '01:27:00', '02:27:00', '2025-05-03 03:38:23', 'NEW', 'FOOD', 3),
+(30, 44, 'test', 3, 3, 1, '2025-05-03', '17:26:00', '21:24:00', '2025-05-03 09:26:16', 'START', 'SHOPPING', 3);
 
 -- --------------------------------------------------------
 
@@ -178,7 +188,7 @@ CREATE TABLE `profile` (
 
 INSERT INTO `profile` (`profileID`, `nickname`, `aboutme`, `mbti`, `profileStatus`, `phone`, `password`) VALUES
 (1, 'Yeoh', 'Yeah', 'INFJ', 'NEW', '0102348059', '123'),
-(2, 'Yeoh', 'Yeah', 'INFJ', 'NEW', '0102348059', '123'),
+(2, 'Yeoh', 'Yeah', 'INFJ', 'NEW', '0102348058', '123'),
 (3, 'Vin Sen', 'I am a person', 'INFJ', 'NEW', '0173098763', 'abc');
 
 -- --------------------------------------------------------
@@ -188,7 +198,6 @@ INSERT INTO `profile` (`profileID`, `nickname`, `aboutme`, `mbti`, `profileStatu
 --
 
 CREATE TABLE `profilegathering` (
-  `profileGatheringID` int(11) NOT NULL,
   `profileID` int(11) NOT NULL,
   `gatheringID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -197,23 +206,25 @@ CREATE TABLE `profilegathering` (
 -- Dumping data for table `profilegathering`
 --
 
-INSERT INTO `profilegathering` (`profileGatheringID`, `profileID`, `gatheringID`) VALUES
-(40, 1, 1),
-(41, 1, 1),
-(42, 1, 3),
-(43, 1, 4),
-(44, 1, 5),
-(45, 1, 6),
-(46, 3, 12),
-(47, 3, 13),
-(48, 3, 1),
-(49, 3, 14),
-(50, 3, 15),
-(51, 3, 16),
-(52, 3, 17),
-(53, 1, 17),
-(54, 3, 18),
-(56, 3, 20);
+INSERT INTO `profilegathering` (`profileID`, `gatheringID`) VALUES
+(1, 4),
+(1, 5),
+(1, 6),
+(1, 17),
+(3, 12),
+(3, 13),
+(3, 14),
+(3, 15),
+(3, 16),
+(3, 17),
+(3, 18),
+(3, 21),
+(3, 22),
+(3, 25),
+(3, 26),
+(3, 27),
+(3, 29),
+(3, 30);
 
 -- --------------------------------------------------------
 
@@ -222,7 +233,7 @@ INSERT INTO `profilegathering` (`profileGatheringID`, `profileID`, `gatheringID`
 --
 
 CREATE TABLE `profile_hobby` (
-  `hobby` enum('Basketball','Badminton','Hiking','Singing','Photography','Reading','Jogging','Camping','Traveling','Swimming','Yoga','Mediation','Drawing','Painting','Squash','Gym') NOT NULL,
+  `hobby` enum('Basketball','Badminton','Hiking','Singing','Photography','Reading','Jogging','Camping','Traveling','Swimming','Yoga','Meditation','Drawing','Painting','Squash','Gym') NOT NULL,
   `profileID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -274,7 +285,8 @@ CREATE TABLE `reminder` (
   `reminderID` int(11) NOT NULL,
   `profileID` int(11) NOT NULL,
   `description` text NOT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `gatheringID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -339,7 +351,7 @@ ALTER TABLE `profile`
 -- Indexes for table `profilegathering`
 --
 ALTER TABLE `profilegathering`
-  ADD PRIMARY KEY (`profileGatheringID`),
+  ADD PRIMARY KEY (`profileID`,`gatheringID`),
   ADD KEY `gatheringID` (`gatheringID`),
   ADD KEY `profileID` (`profileID`);
 
@@ -361,7 +373,8 @@ ALTER TABLE `profile_preference`
 --
 ALTER TABLE `reminder`
   ADD PRIMARY KEY (`reminderID`),
-  ADD KEY `profileID` (`profileID`);
+  ADD KEY `profileID` (`profileID`),
+  ADD KEY `gatheringID` (`gatheringID`);
 
 --
 -- Indexes for table `self_reflect`
@@ -384,7 +397,7 @@ ALTER TABLE `feedback`
 -- AUTO_INCREMENT for table `gathering`
 --
 ALTER TABLE `gathering`
-  MODIFY `gatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `gatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `location`
@@ -397,12 +410,6 @@ ALTER TABLE `location`
 --
 ALTER TABLE `profile`
   MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `profilegathering`
---
-ALTER TABLE `profilegathering`
-  MODIFY `profileGatheringID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `reminder`
@@ -452,462 +459,14 @@ ALTER TABLE `profile_hobby`
 -- Constraints for table `reminder`
 --
 ALTER TABLE `reminder`
-  ADD CONSTRAINT `reminder_ibfk_1` FOREIGN KEY (`profileID`) REFERENCES `profile` (`profileID`);
+  ADD CONSTRAINT `reminder_ibfk_1` FOREIGN KEY (`profileID`) REFERENCES `profile` (`profileID`),
+  ADD CONSTRAINT `reminder_ibfk_2` FOREIGN KEY (`gatheringID`) REFERENCES `gathering` (`gatheringID`);
 
 --
 -- Constraints for table `self_reflect`
 --
 ALTER TABLE `self_reflect`
   ADD CONSTRAINT `self_reflect_ibfk_1` FOREIGN KEY (`profileID`) REFERENCES `profile` (`profileID`);
---
--- Database: `phpmyadmin`
---
-CREATE DATABASE IF NOT EXISTS `phpmyadmin` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
-USE `phpmyadmin`;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__bookmark`
---
-
-CREATE TABLE `pma__bookmark` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `dbase` varchar(255) NOT NULL DEFAULT '',
-  `user` varchar(255) NOT NULL DEFAULT '',
-  `label` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `query` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Bookmarks';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__central_columns`
---
-
-CREATE TABLE `pma__central_columns` (
-  `db_name` varchar(64) NOT NULL,
-  `col_name` varchar(64) NOT NULL,
-  `col_type` varchar(64) NOT NULL,
-  `col_length` text DEFAULT NULL,
-  `col_collation` varchar(64) NOT NULL,
-  `col_isNull` tinyint(1) NOT NULL,
-  `col_extra` varchar(255) DEFAULT '',
-  `col_default` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Central list of columns';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__column_info`
---
-
-CREATE TABLE `pma__column_info` (
-  `id` int(5) UNSIGNED NOT NULL,
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `table_name` varchar(64) NOT NULL DEFAULT '',
-  `column_name` varchar(64) NOT NULL DEFAULT '',
-  `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `mimetype` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `transformation` varchar(255) NOT NULL DEFAULT '',
-  `transformation_options` varchar(255) NOT NULL DEFAULT '',
-  `input_transformation` varchar(255) NOT NULL DEFAULT '',
-  `input_transformation_options` varchar(255) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Column information for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__designer_settings`
---
-
-CREATE TABLE `pma__designer_settings` (
-  `username` varchar(64) NOT NULL,
-  `settings_data` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Settings related to Designer';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__export_templates`
---
-
-CREATE TABLE `pma__export_templates` (
-  `id` int(5) UNSIGNED NOT NULL,
-  `username` varchar(64) NOT NULL,
-  `export_type` varchar(10) NOT NULL,
-  `template_name` varchar(64) NOT NULL,
-  `template_data` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved export templates';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__favorite`
---
-
-CREATE TABLE `pma__favorite` (
-  `username` varchar(64) NOT NULL,
-  `tables` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Favorite tables';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__history`
---
-
-CREATE TABLE `pma__history` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `username` varchar(64) NOT NULL DEFAULT '',
-  `db` varchar(64) NOT NULL DEFAULT '',
-  `table` varchar(64) NOT NULL DEFAULT '',
-  `timevalue` timestamp NOT NULL DEFAULT current_timestamp(),
-  `sqlquery` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='SQL history for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__navigationhiding`
---
-
-CREATE TABLE `pma__navigationhiding` (
-  `username` varchar(64) NOT NULL,
-  `item_name` varchar(64) NOT NULL,
-  `item_type` varchar(64) NOT NULL,
-  `db_name` varchar(64) NOT NULL,
-  `table_name` varchar(64) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Hidden items of navigation tree';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__pdf_pages`
---
-
-CREATE TABLE `pma__pdf_pages` (
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `page_nr` int(10) UNSIGNED NOT NULL,
-  `page_descr` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='PDF relation pages for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__recent`
---
-
-CREATE TABLE `pma__recent` (
-  `username` varchar(64) NOT NULL,
-  `tables` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Recently accessed tables';
-
---
--- Dumping data for table `pma__recent`
---
-
-INSERT INTO `pma__recent` (`username`, `tables`) VALUES
-('root', '[{\"db\":\"jommeet\",\"table\":\"profile_hobby\"},{\"db\":\"jommeet\",\"table\":\"profile_preference\"},{\"db\":\"jommeet\",\"table\":\"profile\"},{\"db\":\"jommeet\",\"table\":\"profilegathering\"},{\"db\":\"jommeet\",\"table\":\"gathering\"},{\"db\":\"jommeet\",\"table\":\"self_reflect\"},{\"db\":\"jommeet\",\"table\":\"reminder\"},{\"db\":\"jommeet\",\"table\":\"feedback\"}]');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__relation`
---
-
-CREATE TABLE `pma__relation` (
-  `master_db` varchar(64) NOT NULL DEFAULT '',
-  `master_table` varchar(64) NOT NULL DEFAULT '',
-  `master_field` varchar(64) NOT NULL DEFAULT '',
-  `foreign_db` varchar(64) NOT NULL DEFAULT '',
-  `foreign_table` varchar(64) NOT NULL DEFAULT '',
-  `foreign_field` varchar(64) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Relation table';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__savedsearches`
---
-
-CREATE TABLE `pma__savedsearches` (
-  `id` int(5) UNSIGNED NOT NULL,
-  `username` varchar(64) NOT NULL DEFAULT '',
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `search_name` varchar(64) NOT NULL DEFAULT '',
-  `search_data` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved searches';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__table_coords`
---
-
-CREATE TABLE `pma__table_coords` (
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `table_name` varchar(64) NOT NULL DEFAULT '',
-  `pdf_page_number` int(11) NOT NULL DEFAULT 0,
-  `x` float UNSIGNED NOT NULL DEFAULT 0,
-  `y` float UNSIGNED NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table coordinates for phpMyAdmin PDF output';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__table_info`
---
-
-CREATE TABLE `pma__table_info` (
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `table_name` varchar(64) NOT NULL DEFAULT '',
-  `display_field` varchar(64) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table information for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__table_uiprefs`
---
-
-CREATE TABLE `pma__table_uiprefs` (
-  `username` varchar(64) NOT NULL,
-  `db_name` varchar(64) NOT NULL,
-  `table_name` varchar(64) NOT NULL,
-  `prefs` text NOT NULL,
-  `last_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Tables'' UI preferences';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__tracking`
---
-
-CREATE TABLE `pma__tracking` (
-  `db_name` varchar(64) NOT NULL,
-  `table_name` varchar(64) NOT NULL,
-  `version` int(10) UNSIGNED NOT NULL,
-  `date_created` datetime NOT NULL,
-  `date_updated` datetime NOT NULL,
-  `schema_snapshot` text NOT NULL,
-  `schema_sql` text DEFAULT NULL,
-  `data_sql` longtext DEFAULT NULL,
-  `tracking` set('UPDATE','REPLACE','INSERT','DELETE','TRUNCATE','CREATE DATABASE','ALTER DATABASE','DROP DATABASE','CREATE TABLE','ALTER TABLE','RENAME TABLE','DROP TABLE','CREATE INDEX','DROP INDEX','CREATE VIEW','ALTER VIEW','DROP VIEW') DEFAULT NULL,
-  `tracking_active` int(1) UNSIGNED NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Database changes tracking for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__userconfig`
---
-
-CREATE TABLE `pma__userconfig` (
-  `username` varchar(64) NOT NULL,
-  `timevalue` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `config_data` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User preferences storage for phpMyAdmin';
-
---
--- Dumping data for table `pma__userconfig`
---
-
-INSERT INTO `pma__userconfig` (`username`, `timevalue`, `config_data`) VALUES
-('root', '2025-05-02 12:26:22', '{\"Console\\/Mode\":\"collapse\"}');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__usergroups`
---
-
-CREATE TABLE `pma__usergroups` (
-  `usergroup` varchar(64) NOT NULL,
-  `tab` varchar(64) NOT NULL,
-  `allowed` enum('Y','N') NOT NULL DEFAULT 'N'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User groups with configured menu items';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pma__users`
---
-
-CREATE TABLE `pma__users` (
-  `username` varchar(64) NOT NULL,
-  `usergroup` varchar(64) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users and their assignments to user groups';
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `pma__bookmark`
---
-ALTER TABLE `pma__bookmark`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `pma__central_columns`
---
-ALTER TABLE `pma__central_columns`
-  ADD PRIMARY KEY (`db_name`,`col_name`);
-
---
--- Indexes for table `pma__column_info`
---
-ALTER TABLE `pma__column_info`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `db_name` (`db_name`,`table_name`,`column_name`);
-
---
--- Indexes for table `pma__designer_settings`
---
-ALTER TABLE `pma__designer_settings`
-  ADD PRIMARY KEY (`username`);
-
---
--- Indexes for table `pma__export_templates`
---
-ALTER TABLE `pma__export_templates`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `u_user_type_template` (`username`,`export_type`,`template_name`);
-
---
--- Indexes for table `pma__favorite`
---
-ALTER TABLE `pma__favorite`
-  ADD PRIMARY KEY (`username`);
-
---
--- Indexes for table `pma__history`
---
-ALTER TABLE `pma__history`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `username` (`username`,`db`,`table`,`timevalue`);
-
---
--- Indexes for table `pma__navigationhiding`
---
-ALTER TABLE `pma__navigationhiding`
-  ADD PRIMARY KEY (`username`,`item_name`,`item_type`,`db_name`,`table_name`);
-
---
--- Indexes for table `pma__pdf_pages`
---
-ALTER TABLE `pma__pdf_pages`
-  ADD PRIMARY KEY (`page_nr`),
-  ADD KEY `db_name` (`db_name`);
-
---
--- Indexes for table `pma__recent`
---
-ALTER TABLE `pma__recent`
-  ADD PRIMARY KEY (`username`);
-
---
--- Indexes for table `pma__relation`
---
-ALTER TABLE `pma__relation`
-  ADD PRIMARY KEY (`master_db`,`master_table`,`master_field`),
-  ADD KEY `foreign_field` (`foreign_db`,`foreign_table`);
-
---
--- Indexes for table `pma__savedsearches`
---
-ALTER TABLE `pma__savedsearches`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `u_savedsearches_username_dbname` (`username`,`db_name`,`search_name`);
-
---
--- Indexes for table `pma__table_coords`
---
-ALTER TABLE `pma__table_coords`
-  ADD PRIMARY KEY (`db_name`,`table_name`,`pdf_page_number`);
-
---
--- Indexes for table `pma__table_info`
---
-ALTER TABLE `pma__table_info`
-  ADD PRIMARY KEY (`db_name`,`table_name`);
-
---
--- Indexes for table `pma__table_uiprefs`
---
-ALTER TABLE `pma__table_uiprefs`
-  ADD PRIMARY KEY (`username`,`db_name`,`table_name`);
-
---
--- Indexes for table `pma__tracking`
---
-ALTER TABLE `pma__tracking`
-  ADD PRIMARY KEY (`db_name`,`table_name`,`version`);
-
---
--- Indexes for table `pma__userconfig`
---
-ALTER TABLE `pma__userconfig`
-  ADD PRIMARY KEY (`username`);
-
---
--- Indexes for table `pma__usergroups`
---
-ALTER TABLE `pma__usergroups`
-  ADD PRIMARY KEY (`usergroup`,`tab`,`allowed`);
-
---
--- Indexes for table `pma__users`
---
-ALTER TABLE `pma__users`
-  ADD PRIMARY KEY (`username`,`usergroup`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `pma__bookmark`
---
-ALTER TABLE `pma__bookmark`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pma__column_info`
---
-ALTER TABLE `pma__column_info`
-  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pma__export_templates`
---
-ALTER TABLE `pma__export_templates`
-  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pma__history`
---
-ALTER TABLE `pma__history`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pma__pdf_pages`
---
-ALTER TABLE `pma__pdf_pages`
-  MODIFY `page_nr` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pma__savedsearches`
---
-ALTER TABLE `pma__savedsearches`
-  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- Database: `test`
---
-CREATE DATABASE IF NOT EXISTS `test` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `test`;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

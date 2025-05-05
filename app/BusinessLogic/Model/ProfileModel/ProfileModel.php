@@ -214,36 +214,43 @@ class ProfileModel
         string $mbti,
         array  $hobbies,
         array  $preferences
-    ) {
-        // Nickname must be 1–20 chars
+    ): array {
+        $errors = [];
+
+        // Nickname
         $nickLen = mb_strlen(trim($nickname));
         if ($nickLen === 0) {
-            return ['success' => false, 'field' => 'nickname', 'message' => 'Nickname is required.'];
+            $errors['nickname'] = 'Nickname is required.';
         } elseif ($nickLen > 20) {
-            return ['success' => false, 'field' => 'nickname', 'message' => 'Nickname must not exceed 20 characters.'];
+            $errors['nickname'] = 'Nickname must not exceed 20 characters.';
         }
 
-        // About Me must be 1–255 chars
+        // About Me
         $aboutLen = mb_strlen(trim($aboutMe));
         if ($aboutLen === 0) {
-            return ['success' => false, 'field' => 'aboutme', 'message' => 'About Me is required.'];
+            $errors['aboutme'] = 'About Me is required.';
         } elseif ($aboutLen > 255) {
-            return ['success' => false, 'field' => 'aboutme', 'message' => 'About Me must not exceed 255 characters.'];
+            $errors['aboutme'] = 'About Me must not exceed 255 characters.';
         }
 
-        // MBTI must be one of the defined types
+        // MBTI
         if (!in_array($mbti, $this->getAllMbti(), true)) {
-            return ['success' => false, 'field' => 'mbti', 'message' => 'Please select a valid MBTI.'];
+            $errors['mbti'] = 'Please select a valid MBTI.';
         }
 
-        // At least one hobby & one preference
+        // Hobbies
         if (count($hobbies) === 0) {
-            return ['success' => false, 'field' => 'hobbies', 'message' => 'Select at least one hobby.'];
-        }
-        if (count($preferences) === 0) {
-            return ['success' => false, 'field' => 'preferences', 'message' => 'Select at least one preference.'];
+            $errors['hobbies'] = 'Select at least one hobby.';
         }
 
-        return ['success' => true];
+        // Preferences
+        if (count($preferences) === 0) {
+            $errors['preferences'] = 'Select at least one preference.';
+        }
+
+        return [
+            'success' => empty($errors),
+            'errors'  => $errors
+        ];
     }
 }
