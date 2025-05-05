@@ -251,21 +251,45 @@ class GatheringDAO
     //     return $stmt->rowCount() > 0;
     // }
 
-    public function hasTimeConflict($profileId, $startTime)
+    public function hasTimeConflict($profileId, $startTime, $endTime)
     {
-        $formatted = $startTime->format('Y-m-d H:i:s');
-        error_log("[hasTimeConflict] Checking time conflict for profile $profileId at $formatted");
+        $formattedStart = $startTime->format('Y-m-d H:i:s');
+        $formattedEnd = $endTime->format('Y-m-d H:i:s');
+        error_log("[hasTimeConflict] Checking time conflict for profile $profileId between $formattedStart and $formattedEnd");
 
         $stmt = $this->db->prepare("
-        SELECT g.* FROM gathering g
+        SELECT g.* 
+        FROM gathering g
         JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
         WHERE pg.profileID = :pid
         AND g.status = 'NEW'
-        AND CONCAT(g.date, ' ', g.startTime) = :start
+        AND (
+            (:start BETWEEN CONCAT(g.date, ' ', g.startTime) AND 
+                CASE 
+                    WHEN g.endTime < g.startTime THEN DATE_ADD(CONCAT(g.date, ' ', g.endTime), INTERVAL 1 DAY)
+                    ELSE CONCAT(g.date, ' ', g.endTime)
+                END
+            )
+            OR (:end BETWEEN CONCAT(g.date, ' ', g.startTime) AND 
+                CASE 
+                    WHEN g.endTime < g.startTime THEN DATE_ADD(CONCAT(g.date, ' ', g.endTime), INTERVAL 1 DAY)
+                    ELSE CONCAT(g.date, ' ', g.endTime)
+                END
+            )
+            OR (CONCAT(g.date, ' ', g.startTime) BETWEEN :start AND :end)
+            OR (
+                CASE 
+                    WHEN g.endTime < g.startTime THEN DATE_ADD(CONCAT(g.date, ' ', g.endTime), INTERVAL 1 DAY)
+                    ELSE CONCAT(g.date, ' ', g.endTime)
+                END
+                BETWEEN :start AND :end
+            )
+        )
     ");
         $stmt->execute([
             ':pid' => $profileId,
-            ':start' => $formatted
+            ':start' => $formattedStart,
+            ':end' => $formattedEnd
         ]);
         $conflict = $stmt->rowCount() > 0;
 

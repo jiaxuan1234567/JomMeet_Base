@@ -161,6 +161,7 @@ class GatheringModel
         // 5. Not started
         $now = new DateTime();
         $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+        $endTime = new DateTime($gathering['date'] . ' ' . $gathering['endTime']);
         if ($startTime <= $now) {
             error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
             return false;
@@ -168,7 +169,7 @@ class GatheringModel
 
 
         // 6. Not clashing with user’s active joined gatherings
-        if ($this->gatheringDAO->hasTimeConflict($profileId, $startTime)) {
+        if ($this->gatheringDAO->hasTimeConflict($profileId, $startTime, $endTime)) {
             error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: time conflict with another joined gathering.");
             return false;
         }
