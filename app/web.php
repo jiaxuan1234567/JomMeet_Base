@@ -26,10 +26,10 @@ Route::post('/profile/create', [ProfileController::class, 'submitProfile']);
 // self-reflection routes
 Route::get('/reflection/create', [ReflectionController::class, 'createReflection']);
 Route::post('/reflection/create', [ReflectionController::class, 'saveReflection']);
+Route::get('/reflection/view/{id}', [ReflectionController::class, 'viewReflection']);
 Route::get('/reflection/edit/{id}', [ReflectionController::class, 'editReflection']);
 Route::post('/reflection/edit/{id}', [ReflectionController::class, 'editSaveReflection']);
-Route::get('/reflection/delete/{id}', [ReflectionController::class, 'deleteReflection']);
-Route::get('/reflection/view/{id}', [ReflectionController::class, 'viewReflection']);
+Route::post('/reflection/delete/{id}', [ReflectionController::class, 'deleteReflection']);
 
 // gathering routes
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);
@@ -48,12 +48,11 @@ Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGat
 
 // Gathering feedback
 // show the anonymous gathering‐feedback page
-Route::get('/my-gathering/gatheringFeedback', [GatheringController::class, 'showGatheringFeedback']);
-Route::post('/my-gathering/gatheringFeedback', [GatheringController::class, 'submitGatheringFeedback']);
-
+Route::post('/my-gathering/gatheringFeedback', [GatheringController::class, 'showGatheringFeedback']);
+Route::post('/my-gathering/postGatheringFeedback', [GatheringController::class, 'submitGatheringFeedback']);
 // Location feedback
-Route::get('/my-gathering/locationFeedback', [GatheringController::class, 'showLocationFeedback']);
-Route::post('/my-gathering/locationFeedback', [GatheringController::class, 'locationFeedback']);
+Route::post('/my-gathering/locationFeedback', [GatheringController::class, 'showLocationFeedback']);
+Route::post('/my-gathering/postLocationFeedback', [GatheringController::class, 'locationFeedback']);
 Route::get('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'viewEdit']);
 Route::post('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'editSubmit']);
 // reminder

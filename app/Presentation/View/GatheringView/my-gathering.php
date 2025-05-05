@@ -215,80 +215,55 @@ $asset = new FileHelper('asset');
             const actions = g.action.map(label => {
                 switch (label.toLowerCase()) {
                     case 'send reminder':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>`;
-                    case 'edit gathering':
-                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
-                    case 'cancel gathering':
-                        return `<li><form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
-                                <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
-                            </form></li>`;
-                    case 'reply reminder':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>`;
-                    case 'leave gathering':
-                        return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
-                                <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
-                            </form></li>`;
-                    case 'gathering feedback':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>`;
-                    case 'location feedback':
-                        return `<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>`;
-                    default:
-                        return '';
-                }
-            }).join('');
-
-            return `
-            <div class="dropdown rounded border-0">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
-                    Action
-                </button>
-                <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
-                    ${actions}
-                </ul>
-            </div>
-        `;
-        }
-
-        function renderActions(g) {
-            if (!g.action || !g.action.length) return '';
-            const actions = g.action.map(label => {
-                switch (label.toLowerCase()) {
-                    case 'send reminder':
                         return `<li><a class="dropdown-item fw-bold" href="/my-gathering/reminder/view/${g.id}">Send Reminder</a></li>`;
                     case 'edit gathering':
                         return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
                     case 'cancel gathering':
-                        // return `<li><button type="submit" class="dropdown-item fw-bold" onclick="confirmCancelGathering(${g.id})">Cancel Gathering</button></li>`;
-                        return `<li><form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
-                                <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
-                            </form></li>`;
+                        return `<li>
+                    <form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
+                        <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
+                    </form>
+                </li>`;
                     case 'reply reminder':
                         return `<li><a class="dropdown-item fw-bold" href="/my-gathering/reminder/view/${g.id}">Reply Reminder</a></li>`;
                     case 'leave gathering':
-                        // return `<li><button type = "button" class = "dropdown-item fw-bold text-danger" onclick = "confirmLeaveGathering(${g.id})" > Leave Gathering </button> </li>`;
-                        return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
-                                <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
-                            </form></li>`;
+                        return `<li>
+                    <form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
+                        <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
+                    </form>
+                </li>`;
                     case 'gathering feedback':
-                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/gatheringFeedback?gatheringID=${g.id}">Gathering Feedback</a></li>`;
+                        return `<li>
+                    <form method="POST" action="/my-gathering/gatheringFeedback">
+                        <input type="hidden" name="gatheringID" value="${g.id}">
+                        <button type="submit" class="dropdown-item fw-bold">Gathering Feedback</button>
+                    </form>
+                </li>`;
                     case 'location feedback':
-                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/locationFeedback?gatheringID=${g.id}&locationID=${g.locationID}">Location Feedback</a></li>`;
+                        return `<li>
+                    <form method="POST" action="/my-gathering/locationFeedback">
+                        <input type="hidden" name="gatheringID" value="${g.id}">
+                        <input type="hidden" name="locationID" value="${g.locationID}">
+                        <button type="submit" class="dropdown-item fw-bold">Location Feedback</button>
+                    </form>
+                </li>`;
                     default:
                         return '';
                 }
             }).join('');
 
             return `
-            <div class="dropdown rounded border-0">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
-                    Action
-                </button>
-                <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
-                    ${actions}
-                </ul>
-            </div>
-        `;
+        <div class="dropdown rounded border-0">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
+                Action
+            </button>
+            <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
+                ${actions}
+            </ul>
+        </div>
+    `;
         }
+
 
         function ajaxRender(status) {
             $.get(`/api/my-gathering/${status}`, function(gatherings) {

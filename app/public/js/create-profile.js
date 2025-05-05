@@ -98,21 +98,21 @@ $(document).ready(function () {
       data: payload,
       dataType: 'json',
       success(res) {
-        console.log('✅ /api/validate-profile', res);
-        if (res.success) {
-          // clear all error boxes
-          ['Nickname', 'Aboutme', 'Mbti', 'Hobbies', 'Preferences']
-            .forEach(s => $(`#error${s}`).text(''));
-        } else {
-          // show errors
-          Object.entries(res.errors || {}).forEach(([fld, msg]) => {
-            const label = fld.charAt(0).toUpperCase() + fld.slice(1);
-            $(`#error${label}`).text(msg);
+        console.log('✅ /api/validate-profile response:', res);
+        ['nickname', 'aboutme', 'mbti', 'hobbies', 'preferences'].forEach(fld => {
+          const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
+          $(`#error${cap}`).text('');               
+          $(`[name=${fld}]`).removeClass('is-invalid'); 
+        });
+
+        // if validation failed, show new ones
+        if (!res.success) {
+          Object.entries(res.errors).forEach(([fld, msg]) => {
+            const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
+            $(`#error${cap}`).text(msg);               
+            $(`[name=${fld}]`).addClass('is-invalid'); 
           });
         }
-      },
-      error(xhr, status, err) {
-        console.error('❌ Validation failed:', status, err);
       }
     });
   }

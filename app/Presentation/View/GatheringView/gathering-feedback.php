@@ -60,7 +60,7 @@ if (isset($_SESSION['profile']['profileID'])) {
     <!-- Bottom Input Section -->
     <div style="background: #F5F7F7; border-top: 1px solid #ccc; padding: 15px; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; z-index: 1000;">
       <div style="width: 100%; max-width: 900px; margin: 0 auto;">
-        <form action="/my-gathering/gatheringFeedback" method="POST" style="display: flex; align-items: center;">
+        <form action="/my-gathering/postGatheringFeedback" method="POST" style="display: flex; align-items: center;">
           <input type="hidden" name="gatheringID" value="<?= (int)$gatheringID ?>">
 
           <textarea name="feedbackDesc"

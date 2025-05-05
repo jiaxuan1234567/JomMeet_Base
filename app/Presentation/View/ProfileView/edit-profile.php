@@ -77,14 +77,15 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
     <div class="col-12 col-md-9">
       <label for="nickname" class="form-label fw-bold fs-5">Nickname</label>
 
-      <input type="text" id="nickname" name="nickname" class="form-control w-75 <?= isset($errors['nickname'])?'is-invalid':'' ?>" maxlength="30" value="<?php echo htmlspecialchars($profile['nickname'] ?? '') ?>" />
+      <input type="text" id="nickname" name="nickname" class="form-control w-75 <?= isset($errors['nickname']) ? 'is-invalid' : '' ?>" maxlength="30" value="<?php echo htmlspecialchars($profile['nickname'] ?? '') ?>" />
       <div id="nicknameCount" class="d-block text-end fs-6 w-75" style="color:#0C0C0D; opacity:40%;">0/20 characters</div>
-      <div class="invalid-profile text-danger" id="errorNickname"> <?= $errors['nickname'] ?? '' ?></div>
+      <div class="invalid-feedback text-danger" id="errorNickname"> <?= $errors['nickname'] ?? '' ?>
+    </div>
     </div>
 
     <div class="col-12 col-md-1">
       <label for="mbti" class="form-label fw-bold fs-5">MBTI</label>
-      <select class="form-select" name="mbti" required>
+      <select class="form-select <?= isset($errors['mbti']) ? 'is-invalid' : '' ?>" name="mbti" required>
         <option value="" disabled <?= $selectedMBTI === '' ? 'selected' : '' ?>>Select</option>
         <?php foreach ($types as $t): ?>
           <option
@@ -94,6 +95,9 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
           </option>
         <?php endforeach; ?>
       </select>
+      <div id="errorMbti" class="invalid-feedback">
+        <?= $errors['mbti'] ?? '' ?>
+      </div>
     </div>
   </div>
 
@@ -101,8 +105,11 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
   <div class="row mb-4">
     <div class="col-12 col-md-10 offset-md-1">
       <label class="form-label fw-bold fs-5">About Me</label>
-      <textarea id="aboutme" name="aboutme" class="form-control" rows="4" maxlength="270" style="resize: none;" required><?php echo htmlspecialchars($profile['aboutme']) ?></textarea>
+      <textarea id="aboutme" name="aboutme" class="form-control <?= isset($errors['aboutme']) ? 'is-invalid' : '' ?>" rows="4" maxlength="270" style="resize: none;" required><?php echo htmlspecialchars($profile['aboutme']) ?></textarea>
       <div id="aboutCount" class="d-block text-end fs-6" style="color:#0C0C0D; opacity:40%;">0/255 characters</div>
+      <div id="errorAboutme" class="invalid-feedback">
+        <?= $errors['aboutme'] ?? '' ?>
+      </div>
     </div>
   </div>
 
@@ -125,6 +132,9 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
             <?php echo htmlspecialchars($hobby) ?>
           </button>
         <?php endforeach; ?>
+      </div>
+      <div id="errorHobbies" class="text-danger small">
+        <?= $errors['hobbies'] ?? '' ?>
       </div>
     </div>
   </div>
@@ -149,6 +159,9 @@ $savedPrefs = $_SESSION['profile']['preferences'] ?? [];
             <?php echo htmlspecialchars($pref) ?>
           </button>
         <?php endforeach; ?>
+      </div>
+      <div id="errorPreferences" class="text-danger small">
+        <?= $errors['preferences'] ?? '' ?>
       </div>
     </div>
   </div>
