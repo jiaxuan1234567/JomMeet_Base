@@ -74,6 +74,3 @@ Route::post('/api/validate-gathering-edit', [GatheringController::class, 'ajaxVa
 Route::post('/api/validate-reminder', [GatheringController::class, 'validateReminder']);
 
 Route::get('/api/my-gathering/{status}', [GatheringController::class, 'ajaxGetMyGathering']);
-
-// helper route to save location (need delete in future)
-Route::post('/gathering/location/save', [GatheringController::class, 'saveLocation']);
