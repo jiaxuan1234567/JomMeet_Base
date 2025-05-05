@@ -851,10 +851,7 @@ class GatheringModel
 
     public function validateGatheringAllFields($data, $editingId = null)
     {
-        $response = [
-            'valid' => true,
-            'errors' => []
-        ];
+        $response = false;
 
         if (!isset($data['value']) || !is_array($data['value'])) {
             return [
@@ -865,10 +862,12 @@ class GatheringModel
 
         foreach ($data['value'] as $field => $fieldData) {
             $result = $this->validateGathering($fieldData, $editingId);
+            error_log('result: ' . $result['valid'] . ', errors: ' . implode($result['errors']));
 
-            if (!$result['valid']) {
-                $response['valid'] = false;
-                $response['errors'] = array_merge($response['errors'], $result['errors'] ?? []);
+            if ($result['valid']) {
+                $response = true;
+            } else {
+                return false;
             }
         }
 

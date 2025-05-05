@@ -16,6 +16,10 @@ class GatheringHelperService
         $startTimeStr = $value['startTime'] ?? '';
         $endTimeStr   = $value['endTime'] ?? '';
 
+        $joinedGatherings = array_values(array_filter($joinedGatherings, function ($g) {
+            return $g['status'] == 'NEW';
+        }));
+
         if (!empty($editingId)) {
             $joinedGatherings = array_values(array_filter($joinedGatherings, function ($g) use ($editingId) {
                 return $g['gatheringID'] != $editingId;
@@ -82,8 +86,8 @@ class GatheringHelperService
                         'field' => $field,
                         'touched' => $touched,
                         'errors' => [
-                            'startTime' => 'Start time and end time cannot be same.',
-                            'endTime' => 'Start time and end time cannot be same.'
+                            'startTime' => 'Invalid start time option.',
+                            'endTime' => 'Invalid end time option.'
                         ]
                     ];
                 }

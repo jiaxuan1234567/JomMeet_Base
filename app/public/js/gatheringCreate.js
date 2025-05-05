@@ -77,8 +77,12 @@ $(() => {
     updateButtons();
 
     $('#createGatheringFormEl').on('submit', function (e) {
-        $('#createBtn').prop('disabled', true).text('Creating...');
-        sessionStorage.removeItem('__field_states__');
+        if ($('#createBtn').prop('disabled')) {
+            e.preventDefault(); // prevent if not valid or no changes
+        } else {
+            $('#createBtn').prop('disabled', true).text('Creating...');
+            sessionStorage.removeItem('__field_states__');
+        }
     });
 
     fields.forEach(fieldId => {
