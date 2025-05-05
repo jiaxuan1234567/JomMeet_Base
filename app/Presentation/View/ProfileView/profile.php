@@ -56,7 +56,7 @@ require_once __DIR__ . '/../HomeView/header.php';
     </a>
 
 </div>
-<div class="container my-4">
+<div class="container my-4" style="min-height: 60vh;">
     <!-- Phone Number -->
     <div class="row mb-4">
         <div class="col-12">

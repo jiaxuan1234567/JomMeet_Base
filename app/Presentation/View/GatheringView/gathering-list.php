@@ -10,7 +10,7 @@ $userid = $_SESSION['profile']['profileID'];
 
 <script src="/js/gatheringlist.js"></script>
 
-<div class="container-fluid my-5 mb-5">
+<div class="container-fluid my-5 mb-5" style="min-height: 70vh;">
     <!-- Flash Message -->
     <?php
     if (!empty($_SESSION['flash_message'])):

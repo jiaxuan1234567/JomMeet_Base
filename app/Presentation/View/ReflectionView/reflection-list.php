@@ -5,7 +5,7 @@ require_once __DIR__ . '/../HomeView/header.php';
 
 
 
-<div class="main d-flex flex-column min-vh-100">
+<div class="main d-flex flex-column" style="min-height: 70vh;">
     <?php if (!empty($_SESSION['flash_message'])): ?>
         <div id="flashMessage" class="flash-message" data-type="<?= $_SESSION['flash_type'] ?? '' ?>" data-msg="<?= $_SESSION['flash_message'] ?>">
         </div>

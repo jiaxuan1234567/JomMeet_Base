@@ -3,7 +3,7 @@ $_title = 'Jom Meet';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
-<section class="text-center my-5 position-relative" style="height: 600px;">
+<section class="text-center my-5 position-relative" style="min-height: 60vh;">
     <h1 class="fw-bold display-5 mb-4">JomMeet A NewFriend</h1>
 
     <!-- Spline 3D Object -->
