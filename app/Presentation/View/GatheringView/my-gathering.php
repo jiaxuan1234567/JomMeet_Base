@@ -3,27 +3,6 @@ $_title = 'My Gathering';
 
 require_once __DIR__ . '/../HomeView/header.php';
 $asset = new FileHelper('asset');
-
-// Determine active status and filter gatherings in PHP
-// $status = $_GET['status'] ?? 'all';
-// $currentStatus = strtolower($status);
-// $filteredGatherings = array_filter($myGatherings, function ($g) use ($currentStatus) {
-//     switch ($currentStatus) {
-//         case 'hosted':
-//             return $g['isHost'] && $g['status'] !== 'cancelled';
-//         case 'upcoming':
-//             return $g['status'] === 'new';
-//         case 'ongoing':
-//             return $g['status'] === 'start';
-//         case 'completed':
-//             return $g['status'] === 'end';
-//         case 'cancelled':
-//             return $g['isHost'] && $g['status'] === 'cancelled';
-//         case 'all':
-//         default:
-//             return true;
-//     }
-// });
 ?>
 
 <div class="container-fluid my-5 mb-5" style="min-height: 70vh;">
@@ -39,7 +18,7 @@ $asset = new FileHelper('asset');
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
         <h2 class="fw-bold">My Gathering</h2>
-        <a href="/my-gathering/create" class="btn btn-outline-dark d-flex align-items-center py-1 px-2 rounded">
+        <a href="/my-gathering/create" id="createGatheringBtn" class="btn btn-outline-dark d-flex align-items-center py-1 px-2 rounded">
             <span class="d-inline-block bg-dark text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;"><i class="bi bi-plus" style="font-size: 1.25rem;"></i></span>
             <span class="fw-bold me-1">Create</span>
         </a>
@@ -99,73 +78,19 @@ $asset = new FileHelper('asset');
                 <div class="row g-5 rounded p-3 text-dark mt-4" style="background-color: #DEECFF;"></div>
             </div>
         </div>
-
-        <!-- jx -->
-        <!-- Cancel Gathering Modal -->
-        <!-- <div class="modal fade" id="cancelGatheringModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-            <div class="modal-dialog custom-modal-dialog">
-                <div class="modal-content custom-modal-content">
-                    <div class="modal-header border-0">
-                        <h5 class="modal-title modal-title-custom" id="cancelModalLabel">JomMeet</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body modal-body-custom">
-                        Confirm to cancel the gathering?
-                    </div>
-                    <div class="modal-footer justify-content-end border-0">
-                        <form method="POST" action="/my-gathering/cancel" id="cancelGatheringForm" class="d-flex gap-3">
-                            <input type="hidden" name="gatheringID" id="modalCancelGatheringID">
-                            <button type="button" class="btn btn-outline-primary custom-cancel-btn" data-bs-dismiss="modal">No</button>
-                            <button type="submit" class="btn custom-leave-btn text-white" style="background-color: #FF5C56;">Cancel</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
-        <!-- Leave Gathering Modal -->
-        <!-- <div class="modal fade" id="leaveGatheringModal" tabindex="-1" aria-labelledby="leaveModalLabel" aria-hidden="true">
-            <div class="modal-dialog custom-modal-dialog">
-                <div class="modal-content custom-modal-content">
-                    <div class="modal-header border-0">
-                        <h5 class="modal-title modal-title-custom" id="leaveModalLabel">JomMeet</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body modal-body-custom">
-                        Confirm to leave the gathering?
-                    </div>
-                    <div class="modal-footer justify-content-end border-0">
-                        <form method="POST" action="/my-gathering/leave" id="leaveGatheringForm" class="d-flex gap-3">
-                            <input type="hidden" name="gatheringID" id="modalLeaveGatheringID">
-                            <button type="button" class="btn btn-outline-primary custom-cancel-btn" data-bs-dismiss="modal">No</button>
-                            <button type="submit" class="btn custom-leave-btn text-white" style="background-color: #FF5C56;">Leave</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        <!-- jx -->
     </div>
 </div>
 <script>
     $(function() {
-        //const allGatherings = <?php //echo json_encode($myGatherings) 
-                                ?>;
         const $tabs = $('#gatheringTabs button');
         const $tabContent = $('#gatheringTabsContent .tab-pane');
-
-        // Render all tabs at once based on the key
-        // Object.entries(allGatherings).forEach(([key, gatherings]) => {
-        //     const $container = $(`#${key} .row`);
-        //     renderGatheringList($container, gatherings);
-        // });
 
         // Update tab UI (active color)
         function setActiveTab(status) {
             $tabs.each(function() {
                 const $btn = $(this);
                 const isActive = $btn.data('status') === status;
-                $btn.toggleClass('text-white', isActive)
+                $btn.toggleClass('text-white isActive', isActive)
                     .toggleClass('bg-white text-black border border-black', !isActive)
                     .css('background-color', isActive ? '#569FFF' : '');
             });

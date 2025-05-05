@@ -148,7 +148,19 @@ function submitLocationForm(loc) {
     sessionStorage.setItem('__field_states__', JSON.stringify(fieldStates));
 
     // Redirect
-    window.location.href = '/my-gathering/create';
+    //window.location.href = '/my-gathering/create';
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/my-gathering/create/location';
+    form.style.display = 'none';
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'locationId';
+    input.value = loc.locationID;
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
 }
 
 async function performSearch() {
@@ -189,38 +201,6 @@ async function performSearch() {
     } catch (err) {
         console.error("Search failed:", err);
     }
-
-    // const results = savedLocations.filter(loc =>
-    //     loc.locationName.toLowerCase().includes(query) ||
-    //     (loc.address && loc.address.toLowerCase().includes(query))
-    // );
-
-    // if (results.length === 0) {
-    //     $('<li>').addClass('list-group-item text-start text-black fw-semibold border-0 bg-transparent')
-    //         .text('Location Not Available')
-    //         .appendTo('#resultsList');
-    //     return;
-    // }
-
-    // results.forEach(loc => {
-    //     const pos = { lat: +loc.latitude, lng: +loc.longitude };
-    //     const marker = markerMap[loc.locationID];
-    //     if (marker) {
-    //         marker.setIcon({
-    //             url: '/asset/geo-alt.svg',
-    //             scaledSize: new google.maps.Size(36, 36)
-    //         });
-    //     }
-
-    //     $('<li>')
-    //         .addClass('list-group-item list-group-item-action bg-transparent rounded-0')
-    //         .css({ borderBottom: '1px solid #dee2e6' })
-    //         .html(`<strong>${loc.locationName}</strong><br>${loc.address || ''}`)
-    //         .appendTo('#resultsList')
-    //         .on('click', function () {
-    //             onMarkerSelect(marker);
-    //         });
-    // });
 }
 
 window.initMap = async function () {

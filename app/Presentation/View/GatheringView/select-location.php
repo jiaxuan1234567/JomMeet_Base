@@ -3,18 +3,12 @@ $_title = 'Select Location';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
-<script>
-    // so JS knows where to send the user back
-    window.redirectUrl = '<?= addslashes($redirectUrl) ?>';
-</script>
-
 <div class="row vh-100 g-0">
     <div class="col-md-4 bg-light d-flex flex-column p-2">
         <!-- Back + Search Bar -->
         <div class="input-group mb-3 border border-black rounded align-items-center flex-nowrap">
             <span class="input-group-text border-0 bg-white d-flex align-items-center justify-content-center">
-                <!-- <i class="bi bi-arrow-left h5 m-0" id="backToLastPage" style="cursor:pointer;"></i> -->
-                <a href="/my-gathering/create"><i class="bi bi-arrow-left text-black h5 m-0" id="back" style="cursor:pointer;"></i></a>
+                <a href="/my-gathering/create"><i class=" bi bi-arrow-left text-black h5 m-0" id="back" style="cursor:pointer;"></i></a>
             </span>
 
             <div class="position-relative flex-grow-1">
@@ -62,7 +56,7 @@ require_once __DIR__ . '/../HomeView/header.php';
         </div>
 
         <!-- Feedback Panel -->
-        <div id="feedbackPanel" class="position-absolute shadow bg-white rounded-4 p-3" style="display: none; width: 260px; top: 10px; left: 280px; z-index: 1002;"></div>
+        <div id="feedbackPanel" class="position-absolute shadow bg-white rounded-4 p-3" style="display: none; width: 260px; top: 10px; left: 280px; z-index: 1002; max-height: 300px; overflow-y: auto;"></div>
     </div>
 </div>
 

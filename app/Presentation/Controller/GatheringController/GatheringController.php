@@ -24,6 +24,7 @@ class GatheringController
     public function viewCreate()
     {
         $_SESSION['allow_select_location'] = true;
+
         $preferenceTags = $this->gatheringModel->getPreferenceTags();
         $paxLimit = $this->gatheringModel->getPaxLimit();
         $allowedDate = $this->gatheringModel->getCreateAllowedDate();
@@ -53,17 +54,26 @@ class GatheringController
     // GET: select-location
     public function viewSelectLocation()
     {
-        if (empty($_SESSION['allow_select_location'])) {
-            $_SESSION['flash_message'] = 'Restricted Page';
+        //empty($_SESSION['allow_select_location'])
+        if ($_SESSION['previous_page'] != '/api/validate-gathering' && $_SESSION['previous_page'] != '/api/savedLocations' && $_SESSION['previous_page'] != '/my-gathering/create') {
+            $_SESSION['flash_message'] = 'Restricted Page' . $_SESSION['previous_page'];
             $_SESSION['flash_type'] = 'error';
             header('Location: /');
             exit;
         }
 
-        unset($_SESSION['allow_select_location']);
-
-        $redirectUrl = $_GET['redirect'] ?? '/my-gathering/create';
+        //unset($_SESSION['allow_select_location']);
         include $this->fileHelper->getFilePath('SelectLocation');
+    }
+
+    // POST: select-location
+    public function SelectedLocation()
+    {
+        if (isset($_SESSION['allow_select_location'])) {
+            unset($_SESSION['allow_select_location']);
+        }
+        header('Location: /my-gathering/create');
+        exit;
     }
 
     // POST: create-gathering
@@ -79,7 +89,7 @@ class GatheringController
                 $_SESSION['flash_message'] = 'Gathering has been created successfully!';
                 $_SESSION['flash_type'] = 'success';
 
-                header("Location: /my-gathering#hosted");
+                header("Location: /my-gathering");
                 exit;
             }
         } catch (Exception $e) {
@@ -120,7 +130,8 @@ class GatheringController
     {
         $result = $this->gatheringModel->cancelGathering($id);
 
-        $returnLoc = is_array($result) ? "/my-gathering#cancelled" : "/my-gathering";
+        //$returnLoc = is_array($result) ? "/my-gathering#cancelled" : "/my-gathering";
+        $returnLoc = "/my-gathering";
         header("Location: " . $returnLoc);
         exit;
     }
@@ -128,6 +139,7 @@ class GatheringController
     // POST: leave-gathering
     public function leaveGathering($gatheringId)
     {
+
         $profileId = $_SESSION['profile']['profileID'];
         $result = $this->gatheringModel->leaveGathering($profileId, $gatheringId);
 
