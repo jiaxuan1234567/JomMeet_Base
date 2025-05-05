@@ -26,10 +26,10 @@ Route::post('/profile/create', [ProfileController::class, 'submitProfile']);
 // self-reflection routes
 Route::get('/reflection/create', [ReflectionController::class, 'createReflection']);
 Route::post('/reflection/create', [ReflectionController::class, 'saveReflection']);
+Route::get('/reflection/view/{id}', [ReflectionController::class, 'viewReflection']);
 Route::get('/reflection/edit/{id}', [ReflectionController::class, 'editReflection']);
 Route::post('/reflection/edit/{id}', [ReflectionController::class, 'editSaveReflection']);
-Route::get('/reflection/delete/{id}', [ReflectionController::class, 'deleteReflection']);
-Route::get('/reflection/view/{id}', [ReflectionController::class, 'viewReflection']);
+Route::post('/reflection/delete/{id}', [ReflectionController::class, 'deleteReflection']);
 
 // gathering routes
 Route::get('/gathering', [HomeController::class, 'gatheringHome']);

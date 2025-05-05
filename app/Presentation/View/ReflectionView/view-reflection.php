@@ -14,40 +14,29 @@ require_once __DIR__ . '/../HomeView/header.php';
     </div>
 
     <div class="container mb-5">
-        <?php if (!$reflectionViewed): ?>
-            <section class="text-center my-5">
-                <img src="/asset/bubble.png">
-                <div class="mt-5">
-                    <h4 class="fw-bold">Sorry, the reflection you are looking for was not found.</h4>
-                    <a href="/reflection" class="btn hero-btn px-4 py-2">Go Back Reflection List Page</a>
-                </div>
-            </section>
-        <?php else: ?>
-            <div class="container border border-2 rounded-3 m-2 align-content-center" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
-                <div class="container d-flex align-items-center">
-                    <div class="row">
-                        <div class="my-3">
-                            <h5 class="ps-2" style="font-size: 25px; color:rgb(135, 135, 135)">
-                                <?php echo htmlspecialchars(date('l, j F Y g:iA', strtotime($reflectionViewed['date']))); ?>
-                            </h5>
-                        </div>
-                        <div class="mb-3">
-                            <h4 class="ps-2" style="font-size: 40px;"><b>Title: </b></h4>
-                            <p class="ps-5" style="font-size: 30px; letter-spacing: -2px; color:rgb(86, 86, 86)">
-                                <?php echo $reflectionViewed['title']; ?>
-                            </p>
-                        </div>
-                        <div class="mb-3">
-                            <h4 class="ps-2" style="font-size: 40px;"><b>Content: </b></h4>
-                            <p class="ps-5" style="font-size: 30px; letter-spacing: -2px; color:rgb(86, 86, 86)">
-                                <?php echo $reflectionViewed['content']; ?>
-                            </p>
-                        </div>
+        <div class="container border border-2 rounded-3 m-2 align-content-center" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
+            <div class="container d-flex align-items-center">
+                <div class="row">
+                    <div class="my-3">
+                        <h5 class="ps-2" style="font-size: 25px; color:rgb(135, 135, 135)">
+                            <?php echo htmlspecialchars(date('l, j F Y g:iA', strtotime($reflectionViewed['date']))); ?>
+                        </h5>
+                    </div>
+                    <div class="mb-3">
+                        <h4 class="ps-2" style="font-size: 40px;"><b>Title: </b></h4>
+                        <p class="ps-5" style="font-size: 30px; letter-spacing: -2px; color:rgb(86, 86, 86)">
+                           <?php echo $reflectionViewed['title']; ?>
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <h4 class="ps-2" style="font-size: 40px;"><b>Content: </b></h4>
+                        <p class="ps-5" style="font-size: 30px; letter-spacing: -2px; color:rgb(86, 86, 86)">
+                            <?php echo $reflectionViewed['content']; ?>
+                        </p>
                     </div>
                 </div>
             </div>
-        <?php endif; ?>
-
+        </div>
     </div>
 </div>
 
