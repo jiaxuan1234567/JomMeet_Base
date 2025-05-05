@@ -192,10 +192,10 @@ class GatheringModel
         return $gathering;
     }
 
-    public function searchGatherings($searchTerm)
+    public function searchGatherings($searchTerm, $profileID)
     {
         try {
-            $results = $this->gatheringDAO->searchGatherings($searchTerm);
+            $results = $this->gatheringDAO->searchGatherings($searchTerm, $profileID);
             return $results ?: [];
         } catch (Exception $e) {
             error_log("[GatheringModel] Error in searchGatherings: " . $e->getMessage());
@@ -389,9 +389,9 @@ class GatheringModel
             error_log("[matchGathering] Start matching for userID: $userID");
 
             // Get user's profile to access their preferences and hobbies
-            $userProfile = $this->gatheringDAO->getProfileByUserId($userID);
-            $userHobbies = $this->gatheringDAO->getAllProfileHobby($userID); // array of strings
-            $userPreferences = $this->gatheringDAO->getAllProfilePreference($userID); // array of strings
+            $userProfile = $this->profileModel->getProfileByUserId($userID);
+            $userHobbies = $this->profileModel->getAllProfileHobby($userID); // array of strings
+            $userPreferences = $this->profileModel->getAllProfilePreference($userID); // array of strings
             $allGatherings = $this->getAvailableGatherings($userID);
 
             // Log user data for debugging
@@ -470,7 +470,7 @@ class GatheringModel
                 }
 
                 // Fetch host's hobbies
-                $hostHobbies = $this->gatheringDAO->getAllProfileHobby($hostProfileID);
+                $hostHobbies = $this->profileModel->getAllProfileHobby($hostProfileID);
                 $hostHobbies = array_map('strtolower', $hostHobbies); // Normalize host hobbies to lowercase
 
                 // Match host's hobbies (case-insensitive)
@@ -610,7 +610,7 @@ class GatheringModel
                     $this->notificationService->sendInfobipWhatsAppTemplate(
                         $g['phone'],
                         $g['nickname'],
-                        $gathering,
+                        $g,
                         "gathering_updated"
                     );
                     break; // Only send to the first participant for testing purposes

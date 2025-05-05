@@ -59,61 +59,51 @@ class GatheringDAO
         }
     }
 
-    public function searchGatherings($searchTerm)
+    public function searchGatherings($searchTerm, $profileId)
     {
         try {
             $searchTerm = "%{$searchTerm}%";
 
-            // Handle date formats
-            $dateFormats = [
-                'Y-m-d',    // 2025-06-10
-                'd-m-Y',    // 10-06-2025
-                'm/d/Y',    // 06/10/2025
-                'd/m/Y',    // 10/06/2025
-                'Y/m/d',    // 2025/06/10
-            ];
-
-            // Handle time formats
-            $timeFormats = [
-                'H:i:s',    // 22:00:00
-                'H:i',      // 22:00
-                'g:i A',    // 10:00 PM
-                'g:i a',    // 10:00 pm
-                'g A',      // 10 PM
-                'g a',      // 10 pm
-            ];
-
             $stmt = $this->db->prepare("
-    SELECT * FROM gathering 
-    WHERE (
-        theme LIKE :searchTerm 
-        OR preference LIKE :searchTerm
-        OR DATE_FORMAT(date, '%Y-%m-%d') LIKE :searchTerm
-        OR DATE_FORMAT(date, '%d-%m-%Y') LIKE :searchTerm
-        OR DATE_FORMAT(date, '%m/%d/%Y') LIKE :searchTerm
-        OR DATE_FORMAT(date, '%d/%m/%Y') LIKE :searchTerm
-        OR DATE_FORMAT(date, '%Y/%m/%d') LIKE :searchTerm
-        OR TIME_FORMAT(startTime, '%H:%i:%s') LIKE :searchTerm
-        OR TIME_FORMAT(startTime, '%H:%i') LIKE :searchTerm
-        OR TIME_FORMAT(startTime, '%h:%i %p') LIKE :searchTerm
-        OR TIME_FORMAT(startTime, '%h %p') LIKE :searchTerm
-        OR TIME_FORMAT(endTime, '%H:%i:%s') LIKE :searchTerm
-        OR TIME_FORMAT(endTime, '%H:%i') LIKE :searchTerm
-        OR TIME_FORMAT(endTime, '%h:%i %p') LIKE :searchTerm
-        OR TIME_FORMAT(endTime, '%h %p') LIKE :searchTerm
-    )
-    AND status = 'NEW'
-");
-
+            SELECT g.*, l.*
+            FROM gathering g
+            JOIN location l ON g.locationID = l.locationID
+            LEFT JOIN profilegathering p 
+              ON g.gatheringID = p.gatheringID AND p.profileID = :pid
+            WHERE (
+                g.theme LIKE :searchTerm 
+                OR g.preference LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%Y-%m-%d') LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%d-%m-%Y') LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%m/%d/%Y') LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%d/%m/%Y') LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%Y/%m/%d') LIKE :searchTerm
+                OR TIME_FORMAT(g.startTime, '%H:%i:%s') LIKE :searchTerm
+                OR TIME_FORMAT(g.startTime, '%H:%i') LIKE :searchTerm
+                OR TIME_FORMAT(g.startTime, '%h:%i %p') LIKE :searchTerm
+                OR TIME_FORMAT(g.startTime, '%h %p') LIKE :searchTerm
+                OR TIME_FORMAT(g.endTime, '%H:%i:%s') LIKE :searchTerm
+                OR TIME_FORMAT(g.endTime, '%H:%i') LIKE :searchTerm
+                OR TIME_FORMAT(g.endTime, '%h:%i %p') LIKE :searchTerm
+                OR TIME_FORMAT(g.endTime, '%h %p') LIKE :searchTerm
+            )
+            AND g.hostProfileID != :pid
+            AND p.profileID IS NULL
+            AND g.maxParticipant > g.currentParticipant
+            AND g.status = 'NEW'
+        ");
 
             $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+            $stmt->bindParam(':pid', $profileId, PDO::PARAM_INT);
             $stmt->execute();
+
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("[GatheringDAO] Database error in searchGatherings: " . $e->getMessage());
             return false;
         }
     }
+
 
     public function getGatheringById($id)
     {
@@ -161,25 +151,6 @@ class GatheringDAO
         } catch (PDOException $e) {
             error_log("userJoined error: " . $e->getMessage());
             return false;
-        }
-    }
-
-    // !!! why got profile here
-    public function getProfileByUserId($userID)
-    {
-        try {
-            $stmt = $this->db->prepare("
-            SELECT *
-            FROM profile
-            WHERE profileID = :profileID        
-        ");
-            $stmt->bindParam(':profileID', $userID, PDO::PARAM_INT);
-            $stmt->execute();
-
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log("Error in getProfileByUserId: " . $e->getMessage());
-            return null;
         }
     }
 
@@ -583,48 +554,6 @@ class GatheringDAO
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             error_log("[GatheringDAO] fetchGatheringsToTransition: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    public function getAllProfileHobby($profileId)
-    {
-        try {
-            $stmt = $this->db->prepare("
-            SELECT hobby 
-            FROM profile_hobby 
-            WHERE profileID = :profileId
-        ");
-            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
-            $stmt->execute();
-
-            // Fetch all hobby values into an array
-            $hobbies = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-            return $hobbies;
-        } catch (PDOException $e) {
-            error_log("[GatheringDAO] Error fetching hobbies: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    public function getAllProfilePreference($profileId)
-    {
-        try {
-            $stmt = $this->db->prepare("
-                SELECT preference 
-                FROM profile_preference 
-                WHERE profileID = :profileId
-            ");
-            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
-            $stmt->execute();
-
-            // Fetch all preference values into an array
-            $preferences = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-            return $preferences;
-        } catch (PDOException $e) {
-            error_log("[GatheringDAO] Error fetching preferences: " . $e->getMessage());
             return [];
         }
     }

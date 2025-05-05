@@ -352,17 +352,17 @@ class GatheringController
     public function searchGatherings()
     {
         try {
-            $userID = $_POST['userid'] ?? null;
+            $userID = $_SESSION['profile']['profileID'] ?? null;
             $searchTerm = $_POST['searchTerm'] ?? '';
 
             if ($searchTerm === '' || $searchTerm === null) {
                 $_SESSION['flash_message'] = "Please enter a search term.";
-                $_SESSION['flash_type'] = "error";
+                $_SESSION['flash_type'] = "error";  
                 header("Location: /gathering");
                 exit;
             }
 
-            $searchResults = $this->gatheringModel->searchGatherings($searchTerm);
+            $searchResults = $this->gatheringModel->searchGatherings($searchTerm, $userID);
 
             if (!$searchResults) {
                 error_log("[GatheringController] Search returned no results for term: '" . $searchTerm . "', showing all gatherings");
@@ -385,8 +385,6 @@ class GatheringController
                         error_log("[searchGatherings] Skipping gathering $gatheringID: not eligible (joined, private, or time conflict)");
                     }
                 }
-
-                error_log("[searchGatherings] Filtered Gatherings: " . print_r($filteredGatherings, true));
 
                 if (empty($filteredGatherings)) {
                     $_SESSION['flash_message'] = "No gatherings found matching the search criteria.";

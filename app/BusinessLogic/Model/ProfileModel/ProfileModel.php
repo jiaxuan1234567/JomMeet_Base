@@ -180,4 +180,36 @@ class ProfileModel
 
         return ['success' => true];
     }
+
+    public function getProfileByUserId(int $userId): array
+    {
+        $profile = $this->profileDAO->getUserByProfileID($userId);
+
+        if (empty($profile)) {
+            return [];
+        }
+
+        return $profile;
+    }
+
+    public function getAllProfileHobby(int $userId): array
+    {
+        $profile = $this->profileDAO->getAllProfileHobby($userId);
+
+        if (empty($profile)) {
+            return [];
+        }
+
+        return $profile;
+    }
+    public function getAllProfilePreference(int $userId): array
+    {
+        $profile = $this->profileDAO->getAllProfilePreference($userId);
+
+        if (empty($profile)) {
+            return [];
+        }
+
+        return $profile;
+    }
 }

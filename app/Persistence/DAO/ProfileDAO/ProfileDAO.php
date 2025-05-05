@@ -61,6 +61,24 @@ class ProfileDAO
         }
     }
 
+    public function getProfileByUserId($userID)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT *
+            FROM profile
+            WHERE profileID = :profileID        
+        ");
+            $stmt->bindParam(':profileID', $userID, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error in getProfileByUserId: " . $e->getMessage());
+            return null;
+        }
+    }
+
     public function getUserByProfileID($userId)
     {
         try {
@@ -213,6 +231,48 @@ class ProfileDAO
             $this->db->rollBack();
             error_log('ProfileDAO::update error: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    public function getAllProfileHobby($profileId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT hobby 
+            FROM profile_hobby 
+            WHERE profileID = :profileId
+        ");
+            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Fetch all hobby values into an array
+            $hobbies = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            return $hobbies;
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching hobbies: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAllProfilePreference($profileId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT preference 
+                FROM profile_preference 
+                WHERE profileID = :profileId
+            ");
+            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Fetch all preference values into an array
+            $preferences = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            return $preferences;
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching preferences: " . $e->getMessage());
+            return [];
         }
     }
 }
