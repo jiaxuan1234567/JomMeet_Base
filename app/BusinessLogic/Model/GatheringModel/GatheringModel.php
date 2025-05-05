@@ -3,6 +3,7 @@
 namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
+use BusinessLogic\Model\ProfileModel\ProfileModel;
 use BusinessLogic\Service\GatheringService\NotificationService;
 use BusinessLogic\Service\GatheringService\GatheringHelperService;
 use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
@@ -15,12 +16,14 @@ class GatheringModel
     private $gatheringDAO;
     private $notificationService;
     private $fileHelper;
+    private $profileModel;
 
     public function __construct()
     {
         $this->gatheringDAO = new GatheringDAO();
         $this->notificationService = new NotificationService();
         $this->fileHelper = new FileHelper('gathering');
+        $this->profileModel = new ProfileModel();
     }
 
     // ============================================================================
@@ -28,7 +31,8 @@ class GatheringModel
     // ============================================================================
     public function getPreference()
     {
-        return ['FOOD', 'CHILL', 'STUDY', 'NATURAL', 'SHOPPING', 'WORKOUT', 'ENTERTAINMENT', 'MUSIC', 'MOVIE'];
+        return $this->profileModel->getAllPreferences();
+        //return ['FOOD', 'CHILL', 'STUDY', 'NATURAL', 'SHOPPING', 'WORKOUT', 'ENTERTAINMENT', 'MUSIC', 'MOVIE'];
     }
 
     public function getPreferenceTags()

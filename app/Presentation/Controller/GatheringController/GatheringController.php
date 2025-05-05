@@ -4,10 +4,8 @@ namespace Presentation\Controller\GatheringController;
 
 use BusinessLogic\Model\GatheringModel\GatheringModel;
 
-use Database;
 use Exception;
 use FileHelper;
-use PDOException;
 
 class GatheringController
 {
@@ -62,7 +60,7 @@ class GatheringController
             $_SESSION['previous_page'] != '/api/search-location' &&
             $_SESSION['previous_page'] != '/my-gathering/create'
         ) {
-            $_SESSION['flash_message'] = 'Restricted Page' . $_SESSION['previous_page'];
+            $_SESSION['flash_message'] = 'Restricted Page';
             $_SESSION['flash_type'] = 'error';
             header('Location: /');
             exit;
