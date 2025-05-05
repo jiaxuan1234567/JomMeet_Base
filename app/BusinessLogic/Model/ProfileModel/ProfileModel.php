@@ -196,4 +196,25 @@ class ProfileModel
 
         return $profile;
     }
+
+    public function getAllProfileHobby(int $userId): array
+    {
+        $profile = $this->profileDAO->getAllProfileHobby($userId);
+
+        if (empty($profile)) {
+            return [];
+        }
+
+        return $profile;
+    }
+    public function getAllProfilePreference(int $userId): array
+    {
+        $profile = $this->profileDAO->getAllProfilePreference($userId);
+
+        if (empty($profile)) {
+            return [];
+        }
+
+        return $profile;
+    }
 }

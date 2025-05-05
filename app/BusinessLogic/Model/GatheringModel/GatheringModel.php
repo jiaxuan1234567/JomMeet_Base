@@ -391,8 +391,8 @@ class GatheringModel
 
             // Get user's profile to access their preferences and hobbies
             $userProfile = $this->profileModel->getProfileByUserId($userID);
-            $userHobbies = $this->gatheringDAO->getAllProfileHobby($userID); // array of strings
-            $userPreferences = $this->gatheringDAO->getAllProfilePreference($userID); // array of strings
+            $userHobbies = $this->profileModel->getAllProfileHobby($userID); // array of strings
+            $userPreferences = $this->profileModel->getAllProfilePreference($userID); // array of strings
             $allGatherings = $this->getAvailableGatherings($userID);
 
             // Log user data for debugging
@@ -471,7 +471,7 @@ class GatheringModel
                 }
 
                 // Fetch host's hobbies
-                $hostHobbies = $this->gatheringDAO->getAllProfileHobby($hostProfileID);
+                $hostHobbies = $this->profileModel->getAllProfileHobby($hostProfileID);
                 $hostHobbies = array_map('strtolower', $hostHobbies); // Normalize host hobbies to lowercase
 
                 // Match host's hobbies (case-insensitive)
