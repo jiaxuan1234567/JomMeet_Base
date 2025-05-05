@@ -136,31 +136,31 @@ class GatheringModel
     {
         $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
         if (!$gathering) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId not found.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId not found.");
             return false;
         }
 
         // 1. Must be ACTIVE
         if ($gathering['status'] !== 'NEW') {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: status is '{$gathering['status']}', not 'NEW'.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: status is '{$gathering['status']}', not 'NEW'.");
             return false;
         }
 
         // 2. Not hosted by user
         if ($gathering['hostProfileID'] == $profileId) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: hosted by profile ID $profileId.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: hosted by profile ID $profileId.");
             return false;
         }
 
         // 3. No.Pax not full
         if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: max participants reached ({$gathering['currentParticipant']}/{$gathering['maxParticipant']}).");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: max participants reached ({$gathering['currentParticipant']}/{$gathering['maxParticipant']}).");
             return false;
         }
 
         // 4. Not joined already
         if ($this->gatheringDAO->isUserJoined($gatheringId, $profileId)) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: user $profileId already joined.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: user $profileId already joined.");
             return false;
         }
 
@@ -168,7 +168,7 @@ class GatheringModel
         $now = new DateTime();
         $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
         if ($startTime <= $now) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
             return false;
         }
 
@@ -177,18 +177,18 @@ class GatheringModel
         $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
         $endTime = new DateTime($gathering['date'] . ' ' . $gathering['endTime']);
         if ($startTime <= $now) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
             return false;
         }
 
 
         // 6. Not clashing with user’s active joined gatherings
         if ($this->gatheringDAO->hasTimeConflict($profileId, $startTime, $endTime)) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: time conflict with another joined gathering.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: time conflict with another joined gathering.");
             return false;
         }
 
-        error_log("[getPublicGatheringById] Passed all checks before time conflict for gathering $gatheringId.");
+        // error_log("[getPublicGatheringById] Passed all checks before time conflict for gathering $gatheringId.");
 
         return $gathering;
     }
@@ -390,118 +390,58 @@ class GatheringModel
         try {
             error_log("[matchGathering] Start matching for userID: $userID");
 
-            // Get user's profile to access their preferences and hobbies
+            // Get user profile and preferences
             $userProfile = $this->profileModel->getProfileByUserId($userID);
-            $userHobbies = $this->profileModel->getAllProfileHobby($userID); // array of strings
-            $userPreferences = $this->profileModel->getAllProfilePreference($userID); // array of strings
-            $allGatherings = $this->getAvailableGatherings($userID);
+            $userHobbies = array_map('strtolower', $this->profileModel->getAllProfileHobby($userID));
+            $userPreferences = array_map('strtolower', $this->profileModel->getAllProfilePreference($userID));
+            $availableGatherings = $this->getAllGatherings();
 
-            // Log user data for debugging
-            error_log("[matchGathering] Retrieved profile for userID $userID: " . json_encode($userProfile));
-            error_log("[matchGathering] User hobbies: " . json_encode($userHobbies));
-            error_log("[matchGathering] User preferences: " . json_encode($userPreferences));
-
-            // Check if profile exists
-            if (!$userProfile) {
-                error_log("[matchGathering] User profile not found for userID: $userID");
+            if (!$userProfile || empty($availableGatherings)) {
+                error_log("[matchGathering] No profile or no available gatherings for userID: $userID");
                 return [];
             }
-
-            // Check if there are gatherings to match
-            if (empty($allGatherings)) {
-                error_log("[matchGathering] No gatherings available for matching");
-                return [];
-            }
-            error_log("[matchGathering] Total gatherings retrieved: " . count($allGatherings));
-
-            // Get gatherings the user has already joined
-            $joinedGatherings = $this->getJoinedGatheringByUserId($userID);
-            $joinedGatheringIds = array_column($joinedGatherings, 'gatheringID');
-            error_log("[matchGathering] User already joined gatherings: " . json_encode($joinedGatheringIds));
 
             $matchedGatherings = [];
 
-            // Normalize user preferences and hobbies to lowercase for comparison
-            $userPreferences = array_map('strtolower', $userPreferences);
-            $userHobbies = array_map('strtolower', $userHobbies);
-
-            // Loop through all gatherings to check for matching preferences and hobbies
-            foreach ($allGatherings as $gathering) {
+            foreach ($availableGatherings as $gathering) {
                 $gatheringID = $gathering['gatheringID'];
-                $hostProfileID = $gathering['hostProfileID'];
 
-                // Skip gatherings the user has already joined
-                if (in_array($gatheringID, $joinedGatheringIds)) {
-                    error_log("[matchGathering] Skipping gathering $gatheringID: already joined");
+                // Apply public gathering rules (already filters out joined/full/started/etc.)
+                $m = $this->getPublicGatheringById($userID, $gatheringID);
+                if (!$m) {
                     continue;
                 }
 
-                // Skip gatherings that are full
-                if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
-                    error_log("[matchGathering] Skipping gathering $gatheringID: full");
-                    continue;
-                }
-
-                // Skip gatherings that have already started
-                if (!$this->isBeforeStartTime($gatheringID)) {
-                    error_log("[matchGathering] Skipping gathering $gatheringID: already started");
-                    continue;
-                }
-
+                $hostProfileID = $m['hostProfileID'];
                 $score = 0;
-                $matchedPrefs = [];
-                $matchedHobbies = [];
 
-                // Match user preferences (case-insensitive)
-                if (isset($gathering['preference']) && !empty($gathering['preference'])) {
-                    error_log("[matchGathering] Checking if gathering preference '{$gathering['preference']}' is in userPreferences");
-                    if (in_array(strtolower($gathering['preference']), $userPreferences)) {
-                        $matchedPrefs[] = $gathering['preference'];
-                        $score += 5; // Award 5 points for each matched preference
-                        error_log("[matchGathering] Matched preference '{$gathering['preference']}' for gathering $gatheringID. Score: 5");
-                    }
+                // Match preference
+                if (!empty($m['preference']) && in_array(strtolower($m['preference']), $userPreferences)) {
+                    $score += 8;
                 }
 
-                // Match user hobbies (case-insensitive)
-                if (isset($gathering['hobby']) && !empty($gathering['hobby'])) {
-                    error_log("[matchGathering] Checking if gathering hobby '{$gathering['hobby']}' is in userHobbies");
-                    if (in_array(strtolower($gathering['hobby']), $userHobbies)) {
-                        $matchedHobbies[] = $gathering['hobby'];
-                        $score += 3; // Award 3 points for each matched hobby
-                    }
+                // Match host hobbies with user's hobbies
+                $hostHobbies = array_map('strtolower', $this->profileModel->getAllProfileHobby($hostProfileID));
+                $commonHobbies = array_intersect($hostHobbies, $userHobbies);
+                if (!empty($commonHobbies)) {
+                    $score += 1;
                 }
 
-                // Fetch host's hobbies
-                $hostHobbies = $this->profileModel->getAllProfileHobby($hostProfileID);
-                $hostHobbies = array_map('strtolower', $hostHobbies); // Normalize host hobbies to lowercase
-
-                // Match host's hobbies (case-insensitive)
-                if (!empty($hostHobbies)) {
-                    error_log("[matchGathering] Checking if gathering host hobbies " . json_encode($hostHobbies) . " match user hobbies");
-                    $commonHobbies = array_intersect($hostHobbies, $userHobbies);
-                    if (!empty($commonHobbies)) {
-                        $matchedHobbies = array_merge($matchedHobbies, $commonHobbies);
-                        $score += 2; // Award 2 points for each common hobby with the host
-                    }
-                }
-
-                // Log match score and details for debugging
-                error_log("[matchGathering] Gathering $gatheringID match score: $score (Prefs: " . json_encode($matchedPrefs) . ", Hobbies: " . json_encode($matchedHobbies) . ")");
-
-                // If there's a match, add gathering to the matched list
                 if ($score > 0) {
-                    $gathering['matchScore'] = $score;
-                    $matchedGatherings[] = $gathering;
+                    $m['matchScore'] = $score;
+                    $matchedGatherings[] = $m;
                 }
             }
 
-            // Sort matched gatherings by match score in descending order
-            usort($matchedGatherings, function ($a, $b) {
-                return $b['matchScore'] <=> $a['matchScore'];
-            });
+            // Sort matches by score descending
+            usort($matchedGatherings, fn($a, $b) => $b['matchScore'] <=> $a['matchScore']);
 
-            // Log total matched gatherings for debugging
             error_log("[matchGathering] Total matched gatherings: " . count($matchedGatherings));
+
+            // Log top 5 scores
+            foreach (array_slice($matchedGatherings, 0, 5) as $index => $match) {
+                error_log("[matchGathering] Top #" . ($index + 1) . ": GatheringID {$match['theme']} | Score: {$match['matchScore']}");
+            }
 
             return $matchedGatherings;
         } catch (Exception $e) {
@@ -697,6 +637,17 @@ class GatheringModel
             // Is Host?
             if ($gathering['hostProfileID'] == $profileId) {
                 // Host cannot leave
+                return false;
+            }
+
+            // validate time constraint
+            $start = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+            $hoursDiff = ($start->getTimestamp() - (new DateTime())->getTimestamp()) / 3600;
+
+            error_log('diff: ' . $hoursDiff);
+            if ($hoursDiff < 3) {
+                $_SESSION['flash_message'] = "Gathering can only be cancelled at least 3 hours before it starts.";
+                $_SESSION['flash_type'] = "error";
                 return false;
             }
 
