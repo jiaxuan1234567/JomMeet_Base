@@ -262,17 +262,31 @@ class GatheringController
 
             if ($gatheringid != null && $userid != null) {
                 $result = $this->gatheringModel->addUserToGathering($userid, $gatheringid);
-                error_log("Join Result: " . ($result ? 'Success' : 'Failure'));
-                $gatherings = $this->gatheringModel->getAllGatherings();
+
+                if ($result) {
+                    error_log("Join Result: Success");
+                    $_SESSION['flash_message'] = "You have successfully joined the gathering.";
+                    $_SESSION['flash_type'] = "success";
+                } else {
+                    error_log("Join Result: Failure");
+                    // Flash message is already set in addUserToGathering for failure cases
+                }
+
                 header("Location: /gathering");
-                $_SESSION['flash_message'] = "You have successfully joined the gathering.";
-                $_SESSION['flash_type'] = "success";
+                exit;
             } else {
                 error_log("Missing gatheringid or userid");
+                $_SESSION['flash_message'] = "Invalid request. Missing gathering ID or user ID.";
+                $_SESSION['flash_type'] = "error";
+                header("Location: /gathering");
+                exit;
             }
         } catch (Exception $e) {
             error_log("Error in joinGathering: " . $e->getMessage());
-            return false;
+            $_SESSION['flash_message'] = "An error occurred while trying to join the gathering.";
+            $_SESSION['flash_type'] = "error";
+            header("Location: /gathering");
+            exit;
         }
     }
 
@@ -393,6 +407,8 @@ class GatheringController
         try {
             $userID = $_SESSION['profile']['profileID'] ?? null;
             error_log("User ID: " . $userID);
+            $_SESSION['flash_message'] = "Match Gathering Found.";
+            $_SESSION['flash_type'] = "success";        
             $gatherings = $this->gatheringModel->matchGathering($userID);
 
             if (empty($gatherings)) {
