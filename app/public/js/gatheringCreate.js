@@ -5,6 +5,11 @@ $(() => {
         location.reload();
     }
 
+    $('#selectLocationBtn').on('click', function () {
+        sessionStorage.setItem('fromCreatePage', 'true');
+        window.location.href = '/my-gathering/create/location';
+    });
+
     const fields = ['gatheringTag', 'inputTheme', 'inputDate', 'inputPax', 'startTime', 'endTime', 'inputLocation'];
     const initFields = ['inputDate', 'inputPax'];
     const timeFields = ['inputDate', 'startTime', 'endTime'];
@@ -71,8 +76,13 @@ $(() => {
 
     updateButtons();
 
-    $('#createGatheringFormEl').on('submit', function () {
-        sessionStorage.removeItem('__field_states__');
+    $('#createGatheringFormEl').on('submit', function (e) {
+        if ($('#createBtn').prop('disabled')) {
+            e.preventDefault(); // prevent if not valid or no changes
+        } else {
+            $('#createBtn').prop('disabled', true).text('Creating...');
+            sessionStorage.removeItem('__field_states__');
+        }
     });
 
     fields.forEach(fieldId => {
@@ -244,7 +254,9 @@ $(() => {
         return {
             field: fieldId,
             touched: fieldId,
-            value: data
+            value: {
+                [fieldId]: data
+            }
         };
     }
 

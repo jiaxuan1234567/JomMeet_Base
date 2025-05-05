@@ -65,7 +65,7 @@ if (isset($_SESSION['profile']['profileID'])) {
   <!-- Bottom Input Section -->
   <div style="background: #F5F5F7; border-top: 1px solid #ccc; padding: 15px; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; z-index: 1000;">
     <div style="width: 100%; max-width: 900px; margin: 0 auto;">
-      <form action="/my-gathering/locationFeedback" method="POST" style="display: flex; align-items: center;">
+      <form action="/my-gathering/postLocationFeedback" method="POST" style="display: flex; align-items: center;">
         <input type="hidden" name="gatheringID" value="<?= (int)$gatheringId ?>">
         <input type="hidden" name="locationID" value="<?= (int)$locationId ?>">
 

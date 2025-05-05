@@ -3,12 +3,9 @@
 namespace Presentation\Controller\GatheringController;
 
 use BusinessLogic\Model\GatheringModel\GatheringModel;
-use BusinessLogic\Model\GatheringModel\LocationModel;
 
-use Database;
 use Exception;
 use FileHelper;
-use PDOException;
 
 class GatheringController
 {
@@ -24,41 +21,12 @@ class GatheringController
     // GET: create-gathering
     public function viewCreate()
     {
+        $_SESSION['allow_select_location'] = true;
+
         $preferenceTags = $this->gatheringModel->getPreferenceTags();
         $paxLimit = $this->gatheringModel->getPaxLimit();
         $allowedDate = $this->gatheringModel->getCreateAllowedDate();
         include $this->fileHelper->getFilePath('CreateGathering');
-    }
-
-    // POST: create-gathering
-    public function createGathering()
-    {
-        $data = [
-            'locationId'        => (int)($_POST['locationId'] ?? 0),
-            'theme'             => trim($_POST['inputTheme'] ?? ''),
-            'maxParticipant'    => (int)($_POST['inputPax'] ?? 0),
-            'minParticipant'    => (int)($_POST['minParticipant'] ?? 3),
-            'currentParticipant' => 0,
-            'date'              => $_POST['inputDate'] ?? '',
-            'startTime'         => $_POST['startTime'] ?? '',
-            'endTime'           => $_POST['endTime'] ?? '',
-            'status'            => 'NEW',
-            'preference'        => $_POST['gatheringTag'] ?? '',
-            'hostProfileID' => $_SESSION['profile']['profileID']
-        ];
-
-        try {
-            $newId = $this->gatheringModel->createGathering($data);
-            $_SESSION['flash_message'] = 'Gathering has been created successfully!';
-            $_SESSION['flash_type'] = 'success';
-
-            header("Location: /my-gathering#hosted");
-            exit;
-        } catch (Exception $e) {
-            // on error, you could re-render the form with $e->getMessage()
-            http_response_code(500);
-            echo "Error creating gathering: " . htmlspecialchars($e->getMessage());
-        }
     }
 
     // GET: edit-gathering
@@ -81,24 +49,84 @@ class GatheringController
         include $this->fileHelper->getFilePath('EditGathering');
     }
 
+    // GET: select-location
+    public function viewSelectLocation()
+    {
+        //empty($_SESSION['allow_select_location'])
+        if (
+            $_SESSION['previous_page'] != '/api/validate-gathering' &&
+            $_SESSION['previous_page'] != '/api/savedLocations' &&
+            $_SESSION['previous_page'] != '/api/location-feedback' &&
+            $_SESSION['previous_page'] != '/api/search-location' &&
+            $_SESSION['previous_page'] != '/my-gathering/create'
+        ) {
+            $_SESSION['flash_message'] = 'Restricted Page';
+            $_SESSION['flash_type'] = 'error';
+            header('Location: /');
+            exit;
+        }
+
+        //unset($_SESSION['allow_select_location']);
+        include $this->fileHelper->getFilePath('SelectLocation');
+    }
+
+    // POST: select-location
+    public function SelectedLocation()
+    {
+        if (isset($_SESSION['allow_select_location'])) {
+            unset($_SESSION['allow_select_location']);
+        }
+        header('Location: /my-gathering/create');
+        exit;
+    }
+
+    // POST: create-gathering
+    public function createGathering()
+    {
+        $data = $_POST;
+        $profileId = $_SESSION['profile']['profileID'];
+        unset($_SESSION['allow_select_location']);
+
+        try {
+            $newId = $this->gatheringModel->createGathering($data, $profileId);
+            if ($newId) {
+                $_SESSION['flash_message'] = 'Gathering has been created successfully!';
+                $_SESSION['flash_type'] = 'success';
+
+                header("Location: /my-gathering");
+                exit;
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+        }
+        $_SESSION['flash_message'] = 'Error occured while creating gathering.';
+        $_SESSION['flash_type'] = 'error';
+        header("Location: /my-gathering");
+        exit;
+    }
+
     // POST: edit-gathering
     public function editSubmit($gatheringId)
     {
         $data = $_POST;
         $profileId = $_SESSION['profile']['profileID'];
 
-        $this->gatheringModel->updateGathering($data, $profileId, $gatheringId);
-        $_SESSION['flash_message'] = 'Gathering updated successfully!';
-        $_SESSION['flash_type'] = 'success';
+        try {
+            $result = $this->gatheringModel->updateGathering($data, $profileId, $gatheringId);
+            if ($result) {
+                $_SESSION['flash_message'] = 'Gathering has been updated successfully!';
+                $_SESSION['flash_type'] = 'success';
+
+                header("Location: /my-gathering");
+                exit;
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+        }
+        $_SESSION['flash_message'] = 'Error occured while updating gathering.';
+        $_SESSION['flash_type'] = 'error';
         header("Location: /my-gathering");
         exit;
-    }
-
-    // GET: select-location
-    public function viewSelectLocation()
-    {
-        $redirectUrl = $_GET['redirect'] ?? '/my-gathering/create';
-        include $this->fileHelper->getFilePath('SelectLocation');
     }
 
     // POST: cancel-gathering
@@ -106,7 +134,8 @@ class GatheringController
     {
         $result = $this->gatheringModel->cancelGathering($id);
 
-        $returnLoc = is_array($result) ? "/my-gathering#cancelled" : "/my-gathering";
+        //$returnLoc = is_array($result) ? "/my-gathering#cancelled" : "/my-gathering";
+        $returnLoc = "/my-gathering";
         header("Location: " . $returnLoc);
         exit;
     }
@@ -114,6 +143,7 @@ class GatheringController
     // POST: leave-gathering
     public function leaveGathering($gatheringId)
     {
+
         $profileId = $_SESSION['profile']['profileID'];
         $result = $this->gatheringModel->leaveGathering($profileId, $gatheringId);
 
@@ -145,40 +175,20 @@ class GatheringController
         exit;
     }
 
-    // // AJAX GET: my gathering with status
-    // public function ajaxGetMyGathering($status)
-    // {
-    //     $userID = $_SESSION['userID'] ?? null;
-    //     if (!$userID) {
-    //         http_response_code(401);
-    //         echo json_encode(['error' => 'Unauthorized']);
-    //         return;
-    //     }
-
-    //     $allGatherings = $this->gatheringModel->getMyGatheringsWithTab($userID); // ← Your full list
-    //     $status = strtolower($status);
-
-    //     $filtered = array_filter($allGatherings, function ($g) use ($status) {
-    //         switch ($status) {
-    //             case 'hosted':
-    //                 return $g['isHost'] && $g['status'] !== 'cancelled';
-    //             case 'upcoming':
-    //                 return $g['status'] === 'new';
-    //             case 'ongoing':
-    //                 return $g['status'] === 'start';
-    //             case 'completed':
-    //                 return $g['status'] === 'end';
-    //             case 'cancelled':
-    //                 return $g['isHost'] && $g['status'] === 'cancelled';
-    //             case 'all':
-    //             default:
-    //                 return true;
-    //         }
-    //     });
-
-    //     header('Content-Type: application/json');
-    //     echo json_encode(array_values($filtered));
-    // }
+    // AJAX GET: my gathering with status
+    public function ajaxGetMyGathering($status)
+    {
+        $userID = $_SESSION['profile']['profileID'] ?? null;
+        if (!$userID) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Unauthorized']);
+            return;
+        }
+        $allGatherings = $this->gatheringModel->getMyGatheringsWithTab($userID);
+        $status = strtolower($status);
+        header('Content-Type: application/json');
+        echo json_encode($allGatherings[$status] ?? []);
+    }
 
     // GET: gathering-detail
     public function viewDetail($gatheringId)
@@ -231,7 +241,7 @@ class GatheringController
     {
         header('Content-Type: application/json');
 
-        echo json_encode((new LocationModel())->getAllLocations());
+        echo json_encode($this->gatheringModel->getAllLocations());
     }
 
     public function ajaxSearchLocation()
@@ -239,27 +249,26 @@ class GatheringController
         header('Content-Type: application/json');
 
         $query = $_GET['q'] ?? '';
-        $model = new LocationModel();
-        $results = (new LocationModel())->searchLocations($query);
+        $results = $this->gatheringModel->searchLocations($query);
 
         echo json_encode($results);
     }
 
     public function ajaxGetLocationFeedback()
-{
-    header('Content-Type: application/json');
+    {
+        header('Content-Type: application/json');
 
-    $locationId = $_GET['locationId'] ?? null;
+        $locationId = $_GET['locationId'] ?? null;
 
-    if (!$locationId) {
-        echo json_encode([]);
-        return;
+        if (!$locationId) {
+            echo json_encode([]);
+            return;
+        }
+
+        $feedbacks = $this->gatheringModel->getLocationFeedback($locationId);
+
+        echo json_encode($feedbacks);
     }
-    
-    $feedbacks = $this->gatheringModel->getLocationFeedback($locationId);
-
-    echo json_encode($feedbacks);
-}
 
 
     // -- Join Gathering --
@@ -271,15 +280,31 @@ class GatheringController
 
             if ($gatheringid != null && $userid != null) {
                 $result = $this->gatheringModel->addUserToGathering($userid, $gatheringid);
-                error_log("Join Result: " . ($result ? 'Success' : 'Failure'));
-                $gatherings = $this->gatheringModel->getAllGatherings();
+
+                if ($result) {
+                    error_log("Join Result: Success");
+                    $_SESSION['flash_message'] = "You have successfully joined the gathering.";
+                    $_SESSION['flash_type'] = "success";
+                } else {
+                    error_log("Join Result: Failure");
+                    // Flash message is already set in addUserToGathering for failure cases
+                }
+
                 header("Location: /gathering");
+                exit;
             } else {
                 error_log("Missing gatheringid or userid");
+                $_SESSION['flash_message'] = "Invalid request. Missing gathering ID or user ID.";
+                $_SESSION['flash_type'] = "error";
+                header("Location: /gathering");
+                exit;
             }
         } catch (Exception $e) {
             error_log("Error in joinGathering: " . $e->getMessage());
-            return false;
+            $_SESSION['flash_message'] = "An error occurred while trying to join the gathering.";
+            $_SESSION['flash_type'] = "error";
+            header("Location: /gathering");
+            exit;
         }
     }
 
@@ -327,21 +352,24 @@ class GatheringController
     public function searchGatherings()
     {
         try {
-            $userID = $_POST['userid'] ?? null;
+            $userID = $_SESSION['profile']['profileID'] ?? null;
             $searchTerm = $_POST['searchTerm'] ?? '';
 
             if ($searchTerm === '' || $searchTerm === null) {
-                $gatherings = $this->listGatherings($userID);
+                $_SESSION['flash_message'] = "Please enter a search term.";
+                $_SESSION['flash_type'] = "error";
                 header("Location: /gathering");
-                return;
+                exit;
             }
 
-            $searchResults = $this->gatheringModel->searchGatherings($searchTerm);
+            $searchResults = $this->gatheringModel->searchGatherings($searchTerm, $userID);
 
             if (!$searchResults) {
                 error_log("[GatheringController] Search returned no results for term: '" . $searchTerm . "', showing all gatherings");
-                $gatherings = $this->listGatherings($userID);
+                $_SESSION['flash_message'] = "No gatherings found for the search term.";
+                $_SESSION['flash_type'] = "error";
                 header("Location: /gathering");
+                exit;
             } else {
                 $filteredGatherings = [];
 
@@ -358,16 +386,26 @@ class GatheringController
                     }
                 }
 
-                $gatherings = $filteredGatherings;
-            }
+                if (empty($filteredGatherings)) {
+                    $_SESSION['flash_message'] = "No gatherings found matching the search criteria.";
+                    $_SESSION['flash_type'] = "error";
+                    header("Location: /gathering");
+                    exit;
+                }
 
-            return include $this->fileHelper->getFilePath('GatheringList');
+                $_SESSION['flash_message'] = "Search results found.";
+                $_SESSION['flash_type'] = "success";
+                $gatherings = $filteredGatherings;
+                return include $this->fileHelper->getFilePath('GatheringList');
+            }
         } catch (Exception $e) {
             error_log("[GatheringController] Error in searchGatherings: " . $e->getMessage());
-            return [];
+            $_SESSION['flash_message'] = "An error occurred while searching for gatherings.";
+            $_SESSION['flash_type'] = "error";
+            header("Location: /gathering");
+            exit;
         }
     }
-
 
 
     // public function isNewGatheringConflicting($userID, $gatheringID)
@@ -385,6 +423,8 @@ class GatheringController
         try {
             $userID = $_SESSION['profile']['profileID'] ?? null;
             error_log("User ID: " . $userID);
+            $_SESSION['flash_message'] = "Match Gathering Found.";
+            $_SESSION['flash_type'] = "success";
             $gatherings = $this->gatheringModel->matchGathering($userID);
 
             if (empty($gatherings)) {
@@ -404,77 +444,10 @@ class GatheringController
         $this->gatheringModel->checkAndTransitionGatherings();
     }
 
-    //
-    // HELPER FUNCTION to save location (will DELETE in future)
-    //
-    public function saveLocation()
-    {
-        // read JSON POST body
-        $loc = json_decode(file_get_contents('php://input'), true);
-
-        $db = Database::getConnection();
-
-        try {
-            try {
-                $placeId = $loc['place_id'];
-                $name = $loc['name'];
-                $address = $loc['address'];
-                $latitude = $loc['latitude'];
-                $longtitude = $loc['longitude'];
-
-                $sql = "
-                          INSERT INTO `location` (placeID, locationName, address,  longitude, latitude)
-                          VALUES (:pid, :name, :addr, :lng, :lat)
-                          ON DUPLICATE KEY UPDATE
-                            locationName = VALUES(locationName),
-                            `address`    = VALUES(`address`),
-                            latitude     = VALUES(latitude),
-                            longitude    = VALUES(longitude)
-            
-                        ";
-                $stmt = $db->prepare($sql);
-                return $stmt->execute([
-                    ':pid'  => $placeId,
-                    ':name' => $name,
-                    ':addr' => $address,
-                    ':lng'  => $longtitude,
-                    ':lat'  => $latitude,
-                ]);
-            } catch (PDOException $e) {
-                error_log("Error in saveLocation: " . $e->getMessage());
-                return false;
-            }
-            http_response_code(200);
-            echo $status;
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo $e->getMessage();
-        }
-    }
-
     // ============================================================================
     // FEEDBACK PART
     // ============================================================================
     // GET the feedback page
-    public function showLocationFeedback()
-    {
-        $profileId    = $_SESSION['profile']['profileID'];
-        $gatheringId  = (int)($_GET['gatheringID']  ?? 0);
-        $locationId   = (int)($_GET['locationID']   ?? 0);
-
-        // Only participants can view
-        if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringId)) {
-            $_SESSION['flash_message'] = "You must join this gathering to leave feedback.";
-            $_SESSION['flash_type']    = "error";
-            header("Location: /my-gathering/view/{$gatheringId}");
-            exit;
-        }
-
-        $locationFeedbacks = $this->gatheringModel->getLocationFeedback($locationId);
-
-        include $this->fileHelper->getFilePath('LocationFeedback');
-    }
-
     // POST to save feedback
     public function locationFeedback()
     {
@@ -498,15 +471,15 @@ class GatheringController
         }
 
         // Redirect back to the GET page
-        header("Location: /my-gathering/locationFeedback"
-            . "?gatheringID={$gatheringId}&locationID={$locationId}");
+        $gatheringFeedbacks = $this->gatheringModel->getLocationFeedback($gatheringId);
+        include $this->fileHelper->getFilePath('LocationFeedback');
         exit;
     }
 
     // GET: display all gathering feedback + form
     public function showGatheringFeedback()
     {
-        $gatheringID = (int)($_GET['gatheringID'] ?? 0);
+        $gatheringID = (int)($_POST['gatheringID'] ?? 0);
 
         // fetch all feedback entries for this gathering
         $gatheringFeedbacks = $this->gatheringModel
@@ -514,6 +487,25 @@ class GatheringController
 
         // include the view—which expects $gatheringID & $gatheringFeedbacks
         include $this->fileHelper->getFilePath('GatheringFeedback');
+    }
+
+    public function showLocationFeedback()
+    {
+        $profileId    = $_SESSION['profile']['profileID'];
+        $gatheringId  = (int)($_POST['gatheringID']  ?? 0);
+        $locationId   = (int)($_POST['locationID']   ?? 0);
+
+        // Only participants can view
+        if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringId)) {
+            $_SESSION['flash_message'] = "You must join this gathering to leave feedback.";
+            $_SESSION['flash_type']    = "error";
+            header("Location: /my-gathering/view/{$gatheringId}");
+            exit;
+        }
+
+        $locationFeedbacks = $this->gatheringModel->getLocationFeedback($locationId);
+
+        include $this->fileHelper->getFilePath('LocationFeedback');
     }
 
     // POST: save a new anonymous gathering feedback, then redirect back
@@ -538,7 +530,8 @@ class GatheringController
         }
 
         // Redirect back to the GET page
-        header("Location: /my-gathering/gatheringFeedback?gatheringID={$gatheringID}");
+        $locationFeedbacks = $this->gatheringModel->getGatheringFeedback($gatheringID);
+        include $this->fileHelper->getFilePath('GatheringFeedback');
         exit;
     }
 
@@ -552,6 +545,7 @@ class GatheringController
 
         $gathering = $this->gatheringModel->getUserGatheringById($profileId, $gatheringId);
 
+
         if (!$gathering) {
             $_SESSION['flash_message'] = "You are not authorized to view this gathering reminder.";
             $_SESSION['flash_type'] = "error";
@@ -561,9 +555,13 @@ class GatheringController
 
         $reminders = $this->gatheringModel->getReminders($gatheringId, $profileId);
 
-        foreach ($reminders as &$reminder) {
-            $reminder['timeAgo'] = $this->formatTimeAgo($reminder['createdAt']);
-            $reminder['role'] = $gathering['hostProfileID'] == $reminder['profileID'] ? 'Host' : 'Participant';
+        if (!empty($reminders)) {
+            foreach ($reminders as &$reminder) {
+                $reminder['timeAgo'] = $this->formatTimeAgo($reminder['createdAt']);
+                $reminder['role'] = $gathering['hostProfileID'] == $reminder['profileID'] ? 'Host' : 'Participant';
+            }
+        } else {
+            $userRole = ($gathering['hostProfileID'] == $profileId) ? 'Host' : 'Participant';
         }
 
         include $this->fileHelper->getFilePath('GatheringReminder');
@@ -590,16 +588,29 @@ class GatheringController
     public function createGatheringReminder()
     {
         $data = [
-            'profileId'         => $_SESSION['profile']['profileID'],
-            'gatheringId'       => (int)($_POST['gatheringID'] ?? null),
-            'description'       => $_POST['description'] ?? '',
-            'createdAt'         => date('Y-m-d H:i:s'),
+            'profileId'     => $_SESSION['profile']['profileID'],
+            'gatheringId'   => (int)($_POST['gatheringID'] ?? null),
+            'description'   => $_POST['description'] ?? '',
+            'createdAt'     => date('Y-m-d H:i:s'),
         ];
+
+        $validationResult = $this->gatheringModel->validateReminder($data['description']);
+
+        if (!$validationResult['success']) {
+            $_SESSION['flash_message'] = $validationResult['message'];
+            $_SESSION['flash_type'] = 'error';
+            $_SESSION['validation_errors'] = true;
+            $_SESSION['previous_desc'] = $validationResult['pre_desc'];
+
+            header("Location: /my-gathering/reminder/view/" . $data['gatheringId']);
+            exit;
+        }
 
         try {
             $newId = $this->gatheringModel->createReminder($data);
             $_SESSION['flash_message'] = 'Reminder has been created successfully!';
             $_SESSION['flash_type'] = 'success';
+            $_SESSION['validation_errors'] = false;
 
             header("Location: /my-gathering/reminder/view/" . $data['gatheringId']);
             exit;
@@ -607,5 +618,17 @@ class GatheringController
             http_response_code(500);
             echo "Error creating gathering: " . htmlspecialchars($e->getMessage());
         }
+    }
+
+    public function validateReminderData()
+    {
+        header('Content-Type: application/json');
+
+        $description = trim($_POST['description'] ?? null);
+
+        $result = $this->gatheringModel->validateReminder($description);
+
+        echo json_encode($result);
+        exit;
     }
 }

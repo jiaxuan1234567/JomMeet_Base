@@ -6,7 +6,6 @@ use PDO;
 use PDOException;
 use Database;
 
-
 class ProfileDAO
 {
     private $db;
@@ -20,7 +19,7 @@ class ProfileDAO
     {
         try {
             $sql = "SELECT p.*, ph.hobby, pp.preference 
-            FROM `profile` p
+            FROM profile p
             LEFT JOIN profile_hobby ph ON p.profileID = ph.profileID
             LEFT JOIN profile_preference pp ON p.profileID = pp.profileID
             WHERE p.phone = :phone";
@@ -59,6 +58,24 @@ class ProfileDAO
         } catch (PDOException $e) {
             error_log("Error in getAllProfiles: " . $e->getMessage());
             return false;
+        }
+    }
+
+    public function getProfileByUserId($userID)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT *
+            FROM profile
+            WHERE profileID = :profileID        
+        ");
+            $stmt->bindParam(':profileID', $userID, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error in getProfileByUserId: " . $e->getMessage());
+            return null;
         }
     }
 
@@ -108,17 +125,15 @@ class ProfileDAO
     public function submitProfile(array $data)
     {
         try {
-
             $this->db->beginTransaction();
 
-            // 1) insert into profile table
             $stmt = $this->db->prepare(
                 'INSERT INTO profile
                    (nickname, aboutme, mbti, profileStatus, phone, `password`)
                  VALUES
                    (?, ?, ?, ?, ?, ?)'
             );
-            // you can adjust profileStatus, phone, password as needed:
+
             $status   = 'active';
             $phone    = $data['phone']    ?? null;
             $password = $data['password'] ?? null;
@@ -132,10 +147,8 @@ class ProfileDAO
                 $password
             ]);
 
-            // 2) get the new profileID
             $profileId = (int)$this->db->lastInsertId();
 
-            // 3) insert into profile_hobby
             if (!empty($data['hobbies'])) {
                 $hobbyStmt = $this->db->prepare(
                     'INSERT INTO profile_hobby (hobby, profileID)
@@ -145,8 +158,6 @@ class ProfileDAO
                     $hobbyStmt->execute([$hobby, $profileId]);
                 }
             }
-
-            // 4) insert into profile_preference
             if (!empty($data['preferences'])) {
                 $prefStmt = $this->db->prepare(
                     'INSERT INTO profile_preference (preference, profileID)
@@ -166,14 +177,11 @@ class ProfileDAO
         }
     }
 
-
     public function saveProfile(int $userId, array $data)
     {
         try {
-            // 1) begin transaction
             $this->db->beginTransaction();
 
-            // 2) update main profile fields
             $updateStmt = $this->db->prepare(
                 'UPDATE `profile`
                 SET nickname = :nick,
@@ -188,7 +196,6 @@ class ProfileDAO
                 ':id'    => $userId,
             ]);
 
-            // 3) refresh hobbies
             $deleteStmt1 = $this->db->prepare('DELETE FROM profile_hobby WHERE profileID = :id');
             $deleteStmt1->execute([':id' => $userId]);
 
@@ -202,7 +209,6 @@ class ProfileDAO
                 ]);
             }
 
-            // 4) refresh preferences
             $deleteStmt2 = $this->db
                 ->prepare('DELETE FROM profile_preference WHERE profileID = :id');
             $deleteStmt2->execute([':id' => $userId]);
@@ -218,14 +224,55 @@ class ProfileDAO
                 ]);
             }
 
-            // 5) commit
             $this->db->commit();
             return true;
         } catch (PDOException $e) {
-            // something went wrong; roll back
+
             $this->db->rollBack();
             error_log('ProfileDAO::update error: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    public function getAllProfileHobby($profileId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT hobby 
+            FROM profile_hobby 
+            WHERE profileID = :profileId
+        ");
+            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Fetch all hobby values into an array
+            $hobbies = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            return $hobbies;
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching hobbies: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAllProfilePreference($profileId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT preference 
+                FROM profile_preference 
+                WHERE profileID = :profileId
+            ");
+            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Fetch all preference values into an array
+            $preferences = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            return $preferences;
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching preferences: " . $e->getMessage());
+            return [];
         }
     }
 }

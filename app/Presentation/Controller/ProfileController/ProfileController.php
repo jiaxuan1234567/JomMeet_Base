@@ -15,34 +15,10 @@ class ProfileController
     {
         $this->profileModel = new ProfileModel();
         $this->fileHelper = new FileHelper('profile');
-        // $this->profileModel = new ProfileModel();
     }
 
     public function validateLogin()
     {
-        // try {
-        //     error_log("[ProfileController] Starting validateLogin");
-        //     error_log("[ProfileController] POST data: " . print_r($_POST, true));
-
-        //     $loginSuccess = $this->profileModel->validateLogin();
-        //     error_log("[ProfileController] Login result: " . ($loginSuccess ? "Success" : "Failed"));
-
-        //     if ($loginSuccess) {
-        //         error_log("[ProfileController] Redirecting after successful login");
-        //         header("Location: /");
-        //         error_log("Login userid is $_SESSION[profile_id]");
-        //         exit;
-        //     } else {
-        //         error_log("[ProfileController] Login failed, showing error page");
-        //         header("Location: /login");
-        //     }
-        // } catch (Exception $e) {
-        //     error_log("[ProfileController] Error in validateLogin: " . $e->getMessage());
-        //     error_log("[ProfileController] Stack trace: " . $e->getTraceAsString());
-        // }
-
-        //session_start();
-
         // Get submitted credentials
         $phoneNumber = $_POST['phoneNumber'] ?? '';
         $password = $_POST['password'] ?? '';
@@ -63,6 +39,10 @@ class ProfileController
             header("Location: /");
             exit;
         } else if ($status == "newAcc") {
+            $_SESSION['new_profile'] = [
+                'phone'    => $phoneNumber,
+                'password' => $password,
+            ];
             header("Location: /profile/create");
             exit;
         } else {
@@ -72,24 +52,14 @@ class ProfileController
         }
     }
 
-    // public function viewProfile()
-    // {
-    //     // 1) Ensure the user is logged in
-    //     $userId = (int) ($_SESSION['profile_id'] ?? 0);
-    //     // if ($userId <= 0) {
-    //     //     header('Location: /login');
-    //     //     exit;
-    //     // }
-
-    //     // 2) Fetch the latest profile from the DB
-    //     $profile = $this->profileModel->getUserByProfileID($userId);
-
-    //     // 3) Include the view which uses $profile
-    //     include $this->fileHelper->getFilePath('Profile');
-    // }
-
+    // ------------------------------------------ Create Profile ------------------------------------------//
     public function createProfile()
     {
+        // Only allow here if new_profile exists
+        if (empty($_SESSION['new_profile'])) {
+            header('Location: /login');
+            exit;
+        }
         $types = $this->profileModel->getAllMbti();
         $hobbyOptions = $this->profileModel->getAllHobby();
         $preferenceOptions = $this->profileModel->getAllPreferences();
@@ -99,6 +69,14 @@ class ProfileController
 
     public function submitProfile()
     {
+        if (empty($_SESSION['new_profile'])) {
+            throw new Exception('Session expired — please log in again.');
+        }
+
+        $_SESSION['profile'] = [
+            'phone'       => $_SESSION['new_profile']['phone'],
+            'password'    => $_SESSION['new_profile']['password'],
+        ];
         $nickname   = trim($_POST['nickname']);
         $aboutMe    = trim($_POST['aboutme']);
         $mbti       = $_POST['mbti'];
@@ -109,12 +87,27 @@ class ProfileController
             ? explode(',', $_POST['preferences'])
             : [];
 
-        $this->profileModel->submitProfile($nickname, $aboutMe, $mbti, $hobbies, $preferences);
+        $newId = $this->profileModel->submitProfile(
+            $nickname,
+            $aboutMe,
+            $mbti,
+            $hobbies,
+            $preferences
+        );
 
-        header('Location: /profile');
-        exit;
+        $_SESSION['flash_message'] = "Your profile has been created successfully.";
+        $_SESSION['flash_type'] = "success";
+
+        if ($newId !== false) {
+            $_SESSION['profile_id'] = $newId;
+            header('Location: /profile');
+            exit;
+        }
+
+        throw new Exception('Failed to create profile.');
     }
 
+    // ------------------------------------------ Edit Profile ------------------------------------------//
     public function editProfile()
     {
         $types = $this->profileModel->getAllMbti();
@@ -139,61 +132,18 @@ class ProfileController
 
         $this->profileModel->saveProfile($userId, $nickname, $aboutMe, $mbti, $hobbies, $preferences);
 
-        // if (!$success) {
-        //     header('Location: /profile/edit');
-        //     exit;
-        // }
-
         $updatedProfile = $this->profileModel->getUserByProfileID($userId);
         $_SESSION['profile']    = $updatedProfile;
         $_SESSION['profile_id'] = $userId;
+
+        $_SESSION['flash_message'] = "Your profile has been updated successfully.";
+        $_SESSION['flash_type'] = "success";
 
         header('Location: /profile');
         exit;
     }
 
-    // public function validateProfile(): void
-    // {
-    //     header('Content-Type: application/json');
-    //     // grab field name + value
-    //     $field = key($_POST);
-    //     $value = $_POST[$field] ?? null;
-
-    //     $result = $this->profileModel->validateProfile($field, $value);
-    //     echo json_encode($result);
-    // }
-
-    // public function validateProfile(): void
-    // {
-    //     header('Content-Type: application/json');
-
-    //     // Determine which field was sent
-    //     $fields = ['nickname','aboutme','mbti','hobbies','preferences'];
-    //     $field  = null;
-    //     $value  = null;
-    //     foreach ($fields as $f) {
-    //         if (isset($_POST[$f])) {
-    //             $field = $f;
-    //             $value = $_POST[$f];
-    //             break;
-    //         }
-    //     }
-
-    //     // If nothing matched, bail out
-    //     if ($field === null) {
-    //         echo json_encode([
-    //             'success' => false,
-    //             'field'   => '',
-    //             'message' => 'No data provided.'
-    //         ]);
-    //         return;
-    //     }
-
-    //     // Delegate to model
-    //     $result = $this->profileModel->validateProfile($field, $value);
-    //     echo json_encode($result);
-    // }
-
+    // ------------------------------------------ Validate Profile ------------------------------------------//
     public function validateProfileData()
     {
         header('Content-Type: application/json');
@@ -201,22 +151,18 @@ class ProfileController
         $nickname    = trim($_POST['nickname']    ?? '');
         $aboutMe     = trim($_POST['aboutme']     ?? '');
         $mbti        = $_POST['mbti']             ?? '';
-        $hobbies     = !empty($_POST['hobbies'])
-            ? explode(',', $_POST['hobbies'])
-            : [];
-        $preferences = !empty($_POST['preferences'])
-            ? explode(',', $_POST['preferences'])
-            : [];
+        $hobbies     = !empty($_POST['hobbies']) ? explode(',', $_POST['hobbies']) : [];
+        $preferences = !empty($_POST['preferences']) ? explode(',', $_POST['preferences']) : [];
 
-        $result = $this->profileModel->validateProfileData(
+        $response = $this->profileModel->validateProfileData(
             $nickname,
             $aboutMe,
             $mbti,
             $hobbies,
             $preferences
         );
-
-        echo json_encode($result);
+        echo json_encode($response);
         exit;
     }
+
 }

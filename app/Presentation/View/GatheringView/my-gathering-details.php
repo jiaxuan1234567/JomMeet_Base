@@ -8,11 +8,12 @@ require_once __DIR__ . '/../HomeView/header.php';
 <div class="container-sm mt-4">
     <div class="d-flex align-items-center">
         <!-- back arrow -->
-        <button id="backToLastPage" class="btn p-0 me-2" style="width: auto; height: auto;">
+        <!-- <button id="backToLastPage" class="btn p-0 me-2" style="width: auto; height: auto;">
             <i class="bi bi-arrow-left h3 m-0"></i>
-        </button>
+        </button> -->
+        <a href="/my-gathering"><i class="bi bi-arrow-left text-black h3 me-3 m-0" id="back" style="cursor:pointer;"></i></a>
         <!-- title -->
-        <h2 class="h5 fw-bold mb-0">My Gathering Details</h2>
+        <h2 class="h3 fw-bold mb-0">Gathering Details</h2>
     </div>
 </div>
 

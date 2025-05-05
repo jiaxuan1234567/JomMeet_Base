@@ -59,61 +59,51 @@ class GatheringDAO
         }
     }
 
-    public function searchGatherings($searchTerm)
+    public function searchGatherings($searchTerm, $profileId)
     {
         try {
             $searchTerm = "%{$searchTerm}%";
 
-            // Handle date formats
-            $dateFormats = [
-                'Y-m-d',    // 2025-06-10
-                'd-m-Y',    // 10-06-2025
-                'm/d/Y',    // 06/10/2025
-                'd/m/Y',    // 10/06/2025
-                'Y/m/d',    // 2025/06/10
-            ];
-
-            // Handle time formats
-            $timeFormats = [
-                'H:i:s',    // 22:00:00
-                'H:i',      // 22:00
-                'g:i A',    // 10:00 PM
-                'g:i a',    // 10:00 pm
-                'g A',      // 10 PM
-                'g a',      // 10 pm
-            ];
-
             $stmt = $this->db->prepare("
-    SELECT * FROM gathering 
-    WHERE (
-        theme LIKE :searchTerm 
-        OR preference LIKE :searchTerm
-        OR DATE_FORMAT(date, '%Y-%m-%d') LIKE :searchTerm
-        OR DATE_FORMAT(date, '%d-%m-%Y') LIKE :searchTerm
-        OR DATE_FORMAT(date, '%m/%d/%Y') LIKE :searchTerm
-        OR DATE_FORMAT(date, '%d/%m/%Y') LIKE :searchTerm
-        OR DATE_FORMAT(date, '%Y/%m/%d') LIKE :searchTerm
-        OR TIME_FORMAT(startTime, '%H:%i:%s') LIKE :searchTerm
-        OR TIME_FORMAT(startTime, '%H:%i') LIKE :searchTerm
-        OR TIME_FORMAT(startTime, '%h:%i %p') LIKE :searchTerm
-        OR TIME_FORMAT(startTime, '%h %p') LIKE :searchTerm
-        OR TIME_FORMAT(endTime, '%H:%i:%s') LIKE :searchTerm
-        OR TIME_FORMAT(endTime, '%H:%i') LIKE :searchTerm
-        OR TIME_FORMAT(endTime, '%h:%i %p') LIKE :searchTerm
-        OR TIME_FORMAT(endTime, '%h %p') LIKE :searchTerm
-    )
-    AND status = 'NEW'
-");
-
+            SELECT g.*, l.*
+            FROM gathering g
+            JOIN location l ON g.locationID = l.locationID
+            LEFT JOIN profilegathering p 
+              ON g.gatheringID = p.gatheringID AND p.profileID = :pid
+            WHERE (
+                g.theme LIKE :searchTerm 
+                OR g.preference LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%Y-%m-%d') LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%d-%m-%Y') LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%m/%d/%Y') LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%d/%m/%Y') LIKE :searchTerm
+                OR DATE_FORMAT(g.date, '%Y/%m/%d') LIKE :searchTerm
+                OR TIME_FORMAT(g.startTime, '%H:%i:%s') LIKE :searchTerm
+                OR TIME_FORMAT(g.startTime, '%H:%i') LIKE :searchTerm
+                OR TIME_FORMAT(g.startTime, '%h:%i %p') LIKE :searchTerm
+                OR TIME_FORMAT(g.startTime, '%h %p') LIKE :searchTerm
+                OR TIME_FORMAT(g.endTime, '%H:%i:%s') LIKE :searchTerm
+                OR TIME_FORMAT(g.endTime, '%H:%i') LIKE :searchTerm
+                OR TIME_FORMAT(g.endTime, '%h:%i %p') LIKE :searchTerm
+                OR TIME_FORMAT(g.endTime, '%h %p') LIKE :searchTerm
+            )
+            AND g.hostProfileID != :pid
+            AND p.profileID IS NULL
+            AND g.maxParticipant > g.currentParticipant
+            AND g.status = 'NEW'
+        ");
 
             $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+            $stmt->bindParam(':pid', $profileId, PDO::PARAM_INT);
             $stmt->execute();
+
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("[GatheringDAO] Database error in searchGatherings: " . $e->getMessage());
             return false;
         }
     }
+
 
     public function getGatheringById($id)
     {
@@ -161,25 +151,6 @@ class GatheringDAO
         } catch (PDOException $e) {
             error_log("userJoined error: " . $e->getMessage());
             return false;
-        }
-    }
-
-    // !!! why got profile here
-    public function getProfileByUserId($userID)
-    {
-        try {
-            $stmt = $this->db->prepare("
-            SELECT *
-            FROM profile
-            WHERE profileID = :profileID        
-        ");
-            $stmt->bindParam(':profileID', $userID, PDO::PARAM_INT);
-            $stmt->execute();
-
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log("Error in getProfileByUserId: " . $e->getMessage());
-            return null;
         }
     }
 
@@ -251,21 +222,45 @@ class GatheringDAO
     //     return $stmt->rowCount() > 0;
     // }
 
-    public function hasTimeConflict($profileId, $startTime)
+    public function hasTimeConflict($profileId, $startTime, $endTime)
     {
-        $formatted = $startTime->format('Y-m-d H:i:s');
-        error_log("[hasTimeConflict] Checking time conflict for profile $profileId at $formatted");
+        $formattedStart = $startTime->format('Y-m-d H:i:s');
+        $formattedEnd = $endTime->format('Y-m-d H:i:s');
+        error_log("[hasTimeConflict] Checking time conflict for profile $profileId between $formattedStart and $formattedEnd");
 
         $stmt = $this->db->prepare("
-        SELECT g.* FROM gathering g
+        SELECT g.* 
+        FROM gathering g
         JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
         WHERE pg.profileID = :pid
         AND g.status = 'NEW'
-        AND CONCAT(g.date, ' ', g.startTime) = :start
+        AND (
+            (:start BETWEEN CONCAT(g.date, ' ', g.startTime) AND 
+                CASE 
+                    WHEN g.endTime < g.startTime THEN DATE_ADD(CONCAT(g.date, ' ', g.endTime), INTERVAL 1 DAY)
+                    ELSE CONCAT(g.date, ' ', g.endTime)
+                END
+            )
+            OR (:end BETWEEN CONCAT(g.date, ' ', g.startTime) AND 
+                CASE 
+                    WHEN g.endTime < g.startTime THEN DATE_ADD(CONCAT(g.date, ' ', g.endTime), INTERVAL 1 DAY)
+                    ELSE CONCAT(g.date, ' ', g.endTime)
+                END
+            )
+            OR (CONCAT(g.date, ' ', g.startTime) BETWEEN :start AND :end)
+            OR (
+                CASE 
+                    WHEN g.endTime < g.startTime THEN DATE_ADD(CONCAT(g.date, ' ', g.endTime), INTERVAL 1 DAY)
+                    ELSE CONCAT(g.date, ' ', g.endTime)
+                END
+                BETWEEN :start AND :end
+            )
+        )
     ");
         $stmt->execute([
             ':pid' => $profileId,
-            ':start' => $formatted
+            ':start' => $formattedStart,
+            ':end' => $formattedEnd
         ]);
         $conflict = $stmt->rowCount() > 0;
 
@@ -416,26 +411,49 @@ class GatheringDAO
         return $stmt->fetchColumn() > 0;
     }
 
-    public function createGathering($d)
+    public function createGathering($d, $hostProfileId)
     {
         $sql = "INSERT INTO `gathering` (locationID, theme, maxParticipant, minParticipant, currentParticipant, date, startTime, endTime, status, preference, hostProfileID) 
         VALUES (:locationID, :theme, :max, :min, :current, :date, :start, :end, :status, :preference, :hostProfileID)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':locationID'   => $d['locationId'],
-            ':theme'        => $d['theme'],
-            ':max'          => $d['maxParticipant'],
-            ':min'          => $d['minParticipant'],
-            ':current'      => $d['currentParticipant'] ?? 0,
-            ':date'         => $d['date'],
+            ':theme'        => $d['inputTheme'],
+            ':max'          => $d['inputPax'],
+            ':date'         => $d['inputDate'],
             ':start'        => $d['startTime'],
             ':end'          => $d['endTime'],
-            ':status'       => $d['status'],
-            ':preference'   => $d['preference'],
-            ':hostProfileID' => $d['hostProfileID']
+            ':preference'   => $d['gatheringTag'],
+            ':hostProfileID' => $hostProfileId,
+            ':min'          => $d['minPax'],
+            ':current'      => $d['currentPax'],
+            ':status'       => $d['status']
         ]);
 
         return (int)$this->db->lastInsertId();
+    }
+
+    public function updateGathering($d, $hostProfileId, $gatheringId)
+    {
+        $stmt = $this->db->prepare("
+            UPDATE `gathering`
+            SET theme = :theme, maxParticipant = :maxPax, date = :date,
+                startTime = :start, endTime = :end, preference = :preference,
+                locationID = :locationID
+            WHERE gatheringID = :id AND hostProfileID = :hostId
+        ");
+
+        return $stmt->execute([
+            ':theme' => $d['inputTheme'],
+            ':maxPax' => $d['inputPax'],
+            ':date' => $d['inputDate'],
+            ':start' => $d['startTime'],
+            ':end' => $d['endTime'],
+            ':preference' => $d['gatheringTag'],
+            ':locationID' => $d['locationId'],
+            ':id' => $gatheringId,
+            ':hostId' => $hostProfileId
+        ]);
     }
 
     public function addUserToGathering($userID, $gatheringID)
@@ -490,29 +508,6 @@ class GatheringDAO
         }
     }
 
-    public function updateGathering($d, $hostProfileId, $gatheringId)
-    {
-        $stmt = $this->db->prepare("
-            UPDATE `gathering`
-            SET theme = :theme, maxParticipant = :maxPax, date = :date,
-                startTime = :start, endTime = :end, preference = :preference,
-                locationID = :locationID
-            WHERE gatheringID = :id AND hostProfileID = :hostId
-        ");
-
-        return $stmt->execute([
-            ':theme' => $d['inputTheme'],
-            ':maxPax' => $d['inputPax'],
-            ':date' => $d['inputDate'],
-            ':start' => $d['startTime'],
-            ':end' => $d['endTime'],
-            ':preference' => $d['gatheringTag'],
-            ':locationID' => $d['locationId'],
-            ':id' => $gatheringId,
-            ':hostId' => $hostProfileId
-        ]);
-    }
-
     public function leaveGathering($profileId, $gatheringId)
     {
         try {
@@ -562,48 +557,6 @@ class GatheringDAO
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             error_log("[GatheringDAO] fetchGatheringsToTransition: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    public function getAllProfileHobby($profileId)
-    {
-        try {
-            $stmt = $this->db->prepare("
-            SELECT hobby 
-            FROM profile_hobby 
-            WHERE profileID = :profileId
-        ");
-            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
-            $stmt->execute();
-
-            // Fetch all hobby values into an array
-            $hobbies = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-            return $hobbies;
-        } catch (PDOException $e) {
-            error_log("[GatheringDAO] Error fetching hobbies: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    public function getAllProfilePreference($profileId)
-    {
-        try {
-            $stmt = $this->db->prepare("
-                SELECT preference 
-                FROM profile_preference 
-                WHERE profileID = :profileId
-            ");
-            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
-            $stmt->execute();
-
-            // Fetch all preference values into an array
-            $preferences = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-            return $preferences;
-        } catch (PDOException $e) {
-            error_log("[GatheringDAO] Error fetching preferences: " . $e->getMessage());
             return [];
         }
     }
@@ -852,5 +805,85 @@ class GatheringDAO
         ]);
 
         return (int)$this->db->lastInsertId();
+    }
+
+    // ============================================================================
+    // LOCATION PART
+    // ============================================================================
+    public function fetchAllGatheringLocation()
+    {
+        $sql = "SELECT * FROM `location`";
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getGatheringLocationById($id)
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM `location` WHERE locationID = :id");
+            $stmt->execute([':id' => $id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?? [];
+        } catch (PDOException $e) {
+            error_log("LocationDAO Error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function searchLocations($query)
+    {
+        $stmt = $this->db->prepare("
+        SELECT * FROM `location`
+        WHERE locationName LIKE :query OR address LIKE :query
+        ORDER BY locationName
+    ");
+        $stmt->execute([':query' => '%' . $query . '%']);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getLocationByGatheringId($gatheringId)
+    {
+        try {
+            $sql = "
+                SELECT 
+                    l.*
+                FROM location l
+                JOIN gathering g ON g.locationID = l.locationID
+                WHERE g.gatheringID = :gatheringId
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':gatheringId' => $gatheringId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching location by gathering ID: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+       public function getLocationFeedbackByGatheringAndLocation($gatheringId, $locationId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+              SELECT 
+                f.feedbackDesc,
+                f.date,
+                p.profileID,
+                p.nickname AS name,
+                NULL          AS avatar
+              FROM feedback f
+              JOIN profile p ON f.profileID = p.profileID
+             WHERE f.gatheringID  = :gid
+               AND f.locationID   = :lid
+               AND f.feedbackType = 'LOCATION'
+             ORDER BY f.date DESC
+            ");
+            $stmt->execute([
+              ':gid' => $gatheringId,
+              ':lid' => $locationId
+            ]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching location feedbacks: " . $e->getMessage());
+            return [];
+        }
     }
 }
