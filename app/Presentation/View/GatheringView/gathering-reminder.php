@@ -33,7 +33,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                 <a href="#" class="btn btn-secondary px-4 disabled" aria-disabled="true">Post</a>
 
             <?php else: ?>
-                <a href="#" class="btn btn-primary px-4" data-bs-toggle="collapse" data-bs-target="#createReminderForm">Post</a>
+                <a href="#" class="btn px-4 text-white fw-bold" style="background-color: #569FFF;" data-bs-toggle="collapse" data-bs-target="#createReminderForm">Post</a>
             <?php endif; ?>
 
         </div>
@@ -59,8 +59,8 @@ require_once __DIR__ . '/../HomeView/header.php';
 
         <div id="createReminderForm" class="<?php echo $show ?>">
             <div class="row justify-content-md-center">
-                <div class="mb-4 card w-50 shadow-sm border-primary">
-                    <div class="card-header bg-light text-primary fw-bold">
+                <div class="mb-4 card w-50 shadow-sm" style="border-color: #569FFF;">
+                    <div class="card-header bg-light fw-bold" style="color: #569FFF;">
                         New Reminder
                     </div>
                     <div class="card-body">
@@ -71,7 +71,7 @@ require_once __DIR__ . '/../HomeView/header.php';
                                 <small id="descCount" class="form-text text-muted">0/255 characters</small>
                             </div>
                             <input type="hidden" name="gatheringID" value="<?php echo htmlspecialchars($gathering['gatheringID']); ?>">
-                            <button type="submit" class="btn btn-primary">Post Reminder</button>
+                            <button type="submit" class="btn fw-bold text-white" style="background-color: #569FFF;">Post Reminder</button>
                         </form>
                     </div>
                 </div>
