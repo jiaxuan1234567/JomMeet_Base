@@ -94,7 +94,6 @@ class ProfileModel
 
         $profile = $this->profileDAO->getUserByPhoneNumber($phoneNumber);
 
-        //if (!$profile || !password_verify($password, $profile['password'])) {
         if (!$profile) {
             //$_SESSION['login_error'] = 'Invalid username or password.';
             return "newAcc";
@@ -158,9 +157,6 @@ class ProfileModel
     //     return $this->profileDAO->getUserByPhoneNumber($phone);
     // }
 
-
-
-
     public function submitProfile(
         string $nickname,
         string $aboutMe,
@@ -168,55 +164,9 @@ class ProfileModel
         array  $hobbies,
         array  $preferences
     ) {
-
-        //Validation
-        $nickLen = mb_strlen($nickname);
-        if ($nickLen === 0) {
-            $errors['nickname'] = 'Nickname is required.';
-        } elseif ($nickLen > 20) {
-            $errors['nickname'] = 'Nickname must not exceed 20 characters.';
-        }
-
-        $aboutLen = mb_strlen($aboutMe);
-        if ($aboutLen === 0) {
-            $errors['aboutme'] = 'About Me is required.';
-        } elseif ($aboutLen > 255) {
-            $errors['aboutme'] = 'About Me must not exceed 255 characters.';
-        }
-
-        $validMbti = $this->getAllMbti();
-        if (trim($mbti) === '') {
-            $errors['mbti'] = 'Please select your MBTI.';
-        } elseif (!in_array($mbti, $validMbti, true)) {
-            $errors['mbti'] = 'Invalid MBTI selection.';
-        }
-
-        if (empty($hobbies)) {
-            $errors['hobbies'] = 'Select at least one hobby.';
-        }
-
-        if (empty($preferences)) {
-            $errors['preferences'] = 'Select at least one preference.';
-        }
-
-        // 2) If any errors, store them and the old input, then redirect back
-        if (!empty($errors)) {
-            $_SESSION['profileErrors'] = $errors;
-            $_SESSION['old'] = [
-                'nickname'    => $nickname,
-                'about_me'    => $aboutMe,
-                'mbti'        => $mbti,
-                'hobbies'     => $hobbies,
-                'preferences' => $preferences,
-            ];
-            header('Location: /profile/create');
-            exit;
-        }
-
-        // 3) No errors → hand off to DAO to insert into the database
         $data = [
             'nickname'    => trim($nickname),
-            'about_me'    => trim($aboutMe),
+            'aboutme'    => trim($aboutMe),
             'mbti'        => $mbti,
             'hobbies'     => $hobbies,
             'preferences' => $preferences,
@@ -226,6 +176,8 @@ class ProfileModel
         return $this->profileDAO->submitProfile($data);
     }
 
+
+
     public function saveProfile(
         int    $userId,
         string $nickname,
@@ -234,52 +186,6 @@ class ProfileModel
         array  $hobbies,
         array  $preferences
     ) {
-
-        //Validation
-        $nickLen = mb_strlen($nickname);
-        if ($nickLen === 0) {
-            $errors['nickname'] = 'Nickname is required.';
-        } elseif ($nickLen > 20) {
-            $errors['nickname'] = 'Nickname must not exceed 20 characters.';
-        }
-
-        $aboutLen = mb_strlen($aboutMe);
-        if ($aboutLen === 0) {
-            $errors['aboutme'] = 'About Me is required.';
-        } elseif ($aboutLen > 255) {
-            $errors['aboutme'] = 'About Me must not exceed 255 characters.';
-        }
-
-        $validMbti = $this->getAllMbti();
-        if (trim($mbti) === '') {
-            $errors['mbti'] = 'Please select your MBTI.';
-        } elseif (!in_array($mbti, $validMbti, true)) {
-            $errors['mbti'] = 'Invalid MBTI selection.';
-        }
-
-        if (empty($hobbies)) {
-            $errors['hobbies'] = 'Select at least one hobby.';
-        }
-
-        if (empty($preferences)) {
-            $errors['preferences'] = 'Select at least one preference.';
-        }
-
-        // 3) If validation failed, stash errors + old input and bail
-        if (!empty($errors)) {
-            $_SESSION['profileErrors'] = $errors;
-            $_SESSION['oldProfile']    = [
-                'nickname'    => $nickname,
-                'aboutme'    => $aboutMe,
-                'mbti'        => $mbti,
-                'hobbies'     => $hobbies,
-                'preferences' => $preferences,
-            ];
-            header("Location: /profile/edit");
-            exit;
-        }
-
-        // 4) All good → update in DB
         $data = [
             'nickname'    => $nickname,
             'aboutme'     => $aboutMe,
@@ -293,10 +199,8 @@ class ProfileModel
 
     public function getUserByProfileID(int $userId): array
     {
-        // Delegate to the DAO
         $profile = $this->profileDAO->getUserByProfileID($userId);
 
-        // If the DAO returned false or empty, ensure we return an empty array
         if (!is_array($profile) || empty($profile)) {
             return [];
         }
@@ -304,150 +208,42 @@ class ProfileModel
         return $profile;
     }
 
-    // public function validateProfile(string $field, $value): array
-    // {
-    //     switch ($field) {
-    //         case 'nickname':
-    //             $len = mb_strlen(trim((string)$value));
-    //             if ($len === 0) {
-    //                 return ['success'=>false, 'field'=>'nickname', 'message'=>'Nickname cannot be empty.'];
-    //             }
-    //             if ($len > 20) {
-    //                 return ['success'=>false, 'field'=>'nickname', 'message'=>'Nickname must be ≤20 characters.'];
-    //             }
-    //             break;
-
-    //         case 'aboutme':
-    //             $len = mb_strlen(trim((string)$value));
-    //             if ($len === 0) {
-    //                 return ['success'=>false, 'field'=>'aboutme', 'message'=>'About Me cannot be empty.'];
-    //             }
-    //             if ($len > 255) {
-    //                 return ['success'=>false, 'field'=>'aboutme', 'message'=>'About Me must be ≤255 characters.'];
-    //             }
-    //             break;
-
-    //         case 'mbti':
-    //             $valid = $this->getAllMbti();
-    //             if (trim((string)$value) === '' || !in_array($value, $valid, true)) {
-    //                 return ['success'=>false, 'field'=>'mbti', 'message'=>'Please select a valid MBTI.'];
-    //             }
-    //             break;
-
-    //         case 'hobbies':
-    //             // value arrives as CSV string
-    //             $arr = array_filter(array_map('trim', explode(',', (string)$value)));
-    //             if (count($arr) === 0) {
-    //                 return ['success'=>false, 'field'=>'hobbies', 'message'=>'Select at least one hobby.'];
-    //             }
-    //             break;
-
-    //         case 'preferences':
-    //             $arr = array_filter(array_map('trim', explode(',', (string)$value)));
-    //             if (count($arr) === 0) {
-    //                 return ['success'=>false, 'field'=>'preferences', 'message'=>'Select at least one preference.'];
-    //             }
-    //             break;
-
-    //         default:
-    //             return ['success'=>false, 'field'=>$field, 'message'=>'Unknown field.'];
-    //     }
-
-    //     return ['success'=>true];
-    // }
-
-    // public function validateProfile(string $field, $value): array
-    // {
-    //     switch ($field) {
-    //         case 'nickname':
-    //             $len = mb_strlen(trim((string)$value));
-    //             if ($len === 0) {
-    //                 return ['success'=>false,'field'=>'nickname','message'=>'Nickname cannot be empty.'];
-    //             }
-    //             if ($len > 20) {
-    //                 return ['success'=>false,'field'=>'nickname','message'=>'Nickname must be ≤20 chars.'];
-    //             }
-    //             break;
-
-    //         case 'aboutme':
-    //             $len = mb_strlen(trim((string)$value));
-    //             if ($len === 0) {
-    //                 return ['success'=>false,'field'=>'aboutme','message'=>'About Me cannot be empty.'];
-    //             }
-    //             if ($len > 255) {
-    //                 return ['success'=>false,'field'=>'aboutme','message'=>'About Me must be ≤255 chars.'];
-    //             }
-    //             break;
-
-    //         case 'mbti':
-    //             $valid = $this->getAllMbti();
-    //             if (!in_array((string)$value, $valid, true)) {
-    //                 return ['success'=>false,'field'=>'mbti','message'=>'Please select a valid MBTI.'];
-    //             }
-    //             break;
-
-    //         case 'hobbies':
-    //             // value is comma‐separated
-    //             $arr = array_filter(array_map('trim', explode(',', (string)$value)));
-    //             if (count($arr) === 0) {
-    //                 return ['success'=>false,'field'=>'hobbies','message'=>'Select at least one hobby.'];
-    //             }
-    //             break;
-
-    //         case 'preferences':
-    //             $arr = array_filter(array_map('trim', explode(',', (string)$value)));
-    //             if (count($arr) === 0) {
-    //                 return ['success'=>false,'field'=>'preferences','message'=>'Select at least one preference.'];
-    //             }
-    //             break;
-
-    //         default:
-    //             return ['success'=>false,'field'=>$field,'message'=>'Unknown field.'];
-    //     }
-
-    //     return ['success'=>true,'field'=>$field,'message'=>''];
-    // }
-
     public function validateProfileData(
         string $nickname,
         string $aboutMe,
         string $mbti,
         array  $hobbies,
         array  $preferences
-    ): array {
-        $errors = [];
-
+    ) {
         // Nickname must be 1–20 chars
         $nickLen = mb_strlen(trim($nickname));
         if ($nickLen === 0) {
-            $errors['nickname'] = 'Nickname is required.';
+            return ['success' => false, 'field' => 'nickname', 'message' => 'Nickname is required.'];
         } elseif ($nickLen > 20) {
-            $errors['nickname'] = 'Must not exceed 20 characters.';
+            return ['success' => false, 'field' => 'nickname', 'message' => 'Nickname must not exceed 20 characters.'];
         }
 
         // About Me must be 1–255 chars
         $aboutLen = mb_strlen(trim($aboutMe));
         if ($aboutLen === 0) {
-            $errors['aboutme'] = 'About Me is required.';
+            return ['success' => false, 'field' => 'aboutme', 'message' => 'About Me is required.'];
         } elseif ($aboutLen > 255) {
-            $errors['aboutme'] = 'Must not exceed 255 characters.';
+            return ['success' => false, 'field' => 'aboutme', 'message' => 'About Me must not exceed 255 characters.'];
         }
 
         // MBTI must be one of the defined types
         if (!in_array($mbti, $this->getAllMbti(), true)) {
-            $errors['mbti'] = 'Please select a valid MBTI.';
+            return ['success' => false, 'field' => 'mbti', 'message' => 'Please select a valid MBTI.'];
         }
 
         // At least one hobby & one preference
         if (count($hobbies) === 0) {
-            $errors['hobbies'] = 'Select at least one hobby.';
+            return ['success' => false, 'field' => 'hobbies', 'message' => 'Select at least one hobby.'];
         }
         if (count($preferences) === 0) {
-            $errors['preferences'] = 'Select at least one preference.';
+            return ['success' => false, 'field' => 'preferences', 'message' => 'Select at least one preference.'];
         }
 
-        return empty($errors)
-            ? ['success' => true,  'errors' => []]
-            : ['success' => false, 'errors' => $errors];
+        return ['success' => true];
     }
 }

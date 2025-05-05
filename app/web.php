@@ -17,12 +17,9 @@ Route::get('/logout', [HomeController::class, 'logoutHome']);
 
 // profile routes
 Route::get('/profile', [ProfileController::class, 'validateLogin']);
-Route::get('/profile', [ProfileController::class, 'viewProfile']);
+// Route::get('/profile', [ProfileController::class, 'viewProfile']);
 Route::get('/profile/edit', [ProfileController::class, 'editProfile']);
 Route::post('/profile/edit', [ProfileController::class, 'saveProfile']);
-
-Route::post('/profile/validate', [ProfileController::class, 'validateProfileData']);
-
 Route::get('/profile/create', [ProfileController::class, 'createProfile']);
 Route::post('/profile/create', [ProfileController::class, 'submitProfile']);
 
@@ -70,7 +67,6 @@ Route::get('/api/location-feedback', [GatheringController::class, 'ajaxGetLocati
 
 
 // AJAX Validation
-// Route::post('/api/validate-profile', [ProfileController::class, 'validateProfile']);
 Route::post('/api/validate-profile', [ProfileController::class, 'validateProfileData']);
 Route::post('/api/validate-reflection', [ReflectionController::class, 'validateReflection']);
 Route::post('/api/validate-gathering', [GatheringController::class, 'ajaxValidateGathering']);
