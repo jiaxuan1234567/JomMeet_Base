@@ -101,7 +101,7 @@ class GatheringHelperService
                             'field' => $field,
                             'touched' => $touched,
                             'errors' => [
-                                $touched => 'You have a gathering start from ' . $joinedStart . ' to ' . $joinedEnd . '.'
+                                $touched => 'You have a gathering start from ' . $joinedStart->format('Y-m-d H:i') . ' to ' . $joinedEnd->format('Y-m-d H:i') . '.'
                             ]
                         ];
                     }
@@ -134,7 +134,7 @@ class GatheringHelperService
                             'field' => $field,
                             'touched' => $touched,
                             'errors' => [
-                                $touched => 'You have a gathering start from ' . $joinedStart . ' to ' . $joinedEnd . '.'
+                                $touched => 'You have a gathering start from ' . $joinedStart->format('Y-m-d H:i') . ' to ' . $joinedEnd->format('Y-m-d H:i') . '.'
                             ]
                         ];
                     }
@@ -179,6 +179,8 @@ class GatheringHelperService
         $touched = $data['touched'] ?? '';
         $tag = $data['value']['gatheringTag'] ?? '';
         $error = '';
+
+        $validTags = array_map('strtoupper', $validTags);
 
         if ($tag === '') {
             $error = 'Preference is required.';
