@@ -19,7 +19,6 @@ class ProfileController
 
     public function validateLogin()
     {
-
         // Get submitted credentials
         $phoneNumber = $_POST['phoneNumber'] ?? '';
         $password = $_POST['password'] ?? '';

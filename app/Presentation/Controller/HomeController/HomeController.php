@@ -51,6 +51,11 @@ class HomeController
 
     public function loginHome()
     {
+        if (!empty($_SESSION['profile']['profileID'])) {
+            header('Location: /');
+            exit;
+        }
+
         include $this->fileHelper->getFilePath('Login');
     }
 
