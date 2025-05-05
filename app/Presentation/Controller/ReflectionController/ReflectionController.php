@@ -48,6 +48,10 @@ class ReflectionController
         $reflectionContent = $_POST['reflectionContent'];
 
         $this->reflectionModel->editSaveReflection($reflectionId, $reflectionTitle, $reflectionContent);
+        $_SESSION['flash_message'] = [
+            'type' => 'success',
+            'text' => 'Your self-reflection has been successfully updated.'
+        ];
         header("Location: /reflection");
     }
 
@@ -64,6 +68,10 @@ class ReflectionController
     public function deleteReflection($reflectionId)
     {
         $this->reflectionModel->deleteReflectionById($reflectionId);
+        $_SESSION['flash_message'] = [
+            'type' => 'success',
+            'text' => 'Your self-reflection has been successfully deleted.'
+        ];
         header("Location: /reflection");
     }
 

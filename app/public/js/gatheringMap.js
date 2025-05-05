@@ -69,6 +69,27 @@ async function showDetailPanel(loc, pos, liElem) {
         console.warn('Google photo fetch failed:', err);
     }
 
+    // Load feedback data via AJAX
+    let feedbackHTML = '';
+    try {
+        const feedbacks = await $.getJSON(`/api/location-feedback?locationId=${loc.locationID}`);
+        if (feedbacks.length) {
+            feedbackHTML = '<div class="mt-2 small text-muted">';
+            feedbacks.forEach(fb => {
+                feedbackHTML += `<div class="border-top pt-1">
+                    <div><strong>${fb.name}</strong></div>
+                    <div>${fb.feedbackDesc}</div>
+                </div>`;
+            });
+            feedbackHTML += '</div>';
+        } else {
+            feedbackHTML = '<div class="mt-2 small text-muted">No feedback yet.</div>';
+        }
+    } catch (err) {
+        console.error("Feedback fetch failed:", err);
+        feedbackHTML = '<div class="mt-2 text-danger small">Failed to load feedback.</div>';
+    }
+
     const html = `
     <div class="card shadow border-0 rounded-4" style="width: 260px;">
       <img src="${imageUrl || 'https://cdn-icons-png.flaticon.com/512/1161/1161388.png'}"
@@ -79,6 +100,7 @@ async function showDetailPanel(loc, pos, liElem) {
         ${loc.closeTime ? `<p class="mb-2 small text-muted">Close: ${loc.closeTime}</p>` : ''}
         ${typeof loc.commentCount !== 'undefined' ? `<p class="mb-1 small text-muted">Comment(${loc.commentCount})</p>` : ''}
         <button id="selectBtn" class="btn btn-primary btn-sm w-100 rounded border-0 button-blue-color" style="font-weight: 500;">Select</button>
+        ${feedbackHTML}
       </div>
     </div>`;
 
@@ -93,8 +115,18 @@ async function showDetailPanel(loc, pos, liElem) {
 }
 
 function submitLocationForm(loc) {
+    // Restore current fieldStates or create fresh
+    const fieldStates = JSON.parse(sessionStorage.getItem('__field_states__')) || {};
+
+    fieldStates['inputLocation'].value = loc.locationName;
+
+    // Optionally store raw ID for post-processing
     sessionStorage.setItem('locationId', loc.locationID);
-    sessionStorage.setItem('inputLocation', loc.locationName);
+
+    // Save full state
+    sessionStorage.setItem('__field_states__', JSON.stringify(fieldStates));
+
+    // Redirect
     window.location.href = '/my-gathering/create';
 }
 

@@ -398,6 +398,33 @@ class GatheringDAO
     }
 
     // Check if user-related gathering only
+    // -----------------------------------------------------------------------------------------------
+    // Auto update gathering status
+    public function updateGatheringStatuses()
+    {
+        try {
+            $now = new \DateTime();
+            $nowFormatted = $now->format('Y-m-d H:i:s');
+
+            $sql = "UPDATE gathering
+                SET status = CASE
+                    WHEN CONCAT(date, ' ', startTime) > :now THEN 'NEW'
+                    WHEN CONCAT(date, ' ', startTime) <= :now AND CONCAT(date, ' ', endTime) >= :now THEN 'START'
+                    WHEN CONCAT(date, ' ', endTime) < :now THEN 'END'
+                    ELSE status
+                END
+                WHERE status != 'CANCELLED'";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':now' => $nowFormatted]);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] updateGatheringStatuses: " . $e->getMessage());
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    // Get User-related gathering only
     public function isProfileInvolved($gatheringId, $profileId)
     {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM profilegathering WHERE gatheringID = :gid AND profileID = :pid");
@@ -562,6 +589,47 @@ class GatheringDAO
         }
     }
 
+    public function getAllProfileHobby($profileId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT hobby 
+            FROM profile_hobby 
+            WHERE profileID = :profileId
+        ");
+            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Fetch all hobby values into an array
+            $hobbies = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            return $hobbies;
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching hobbies: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAllProfilePreference($profileId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT preference 
+                FROM profile_preference 
+                WHERE profileID = :profileId
+            ");
+            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Fetch all preference values into an array
+            $preferences = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            return $preferences;
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching preferences: " . $e->getMessage());
+            return [];
+        }
+    }
     //     public function insertLocationFeedback(array $data)
     // {
     //     try {
@@ -713,45 +781,99 @@ class GatheringDAO
         ]);
     }
 
-    public function getAllProfileHobby($profileId)
+    public function getGatheringWithHostInfoByGatheringId($gatheringId)
     {
         try {
             $stmt = $this->db->prepare("
-            SELECT hobby 
-            FROM profile_hobby 
-            WHERE profileID = :profileId
-        ");
-            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+                SELECT g.*, p.phone, p.nickname
+                FROM gathering g
+                JOIN profile p ON g.hostProfileID = p.profileID
+                WHERE g.gatheringID = :gatheringId
+            ");
+            $stmt->bindParam(':gatheringId', $gatheringId, PDO::PARAM_INT);
             $stmt->execute();
-
-            // Fetch all hobby values into an array
-            $hobbies = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-            return $hobbies;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("[GatheringDAO] Error fetching hobbies: " . $e->getMessage());
-            return [];
+            error_log("[GatheringDAO] Error fetching gathering info: " . $e->getMessage());
+            return null;
         }
     }
 
-    public function getAllProfilePreference($profileId)
+    public function getGatheringWithAllParticipantInfoByGatheringId($gatheringId)
     {
         try {
             $stmt = $this->db->prepare("
-                SELECT preference 
-                FROM profile_preference 
-                WHERE profileID = :profileId
+                SELECT g.*, p.phone, p.nickname
+                FROM gathering g
+                JOIN profilegathering pg ON g.gatheringID = pg.gatheringID
+                JOIN profile p ON pg.profileID = p.profileID
+                WHERE g.gatheringID = :gatheringId
             ");
-            $stmt->bindParam(':profileId', $profileId, PDO::PARAM_INT);
+            $stmt->bindParam(':gatheringId', $gatheringId, PDO::PARAM_INT);
             $stmt->execute();
-
-            // Fetch all preference values into an array
-            $preferences = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-            return $preferences;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("[GatheringDAO] Error fetching preferences: " . $e->getMessage());
-            return [];
+            error_log("[GatheringDAO] Error fetching gathering info: " . $e->getMessage());
+            return null;
         }
+    }
+
+    public function getRemindersByHost($gatheringID)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT r.*, g.theme, p.nickname
+            FROM reminder r
+            JOIN gathering g ON r.gatheringID = g.gatheringID
+            JOIN profile p ON r.profileID = p.profileID
+            WHERE r.gatheringID = :gatheringID
+            ORDER BY r.createdAt DESC
+        ");
+            $stmt->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error in getAllRemindersByGatheringId: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getRemindersByParticipant($gatheringID, $profileID)
+    {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT r.*, g.theme, g.hostProfileID, p.nickname
+                FROM reminder r
+                JOIN gathering g ON r.gatheringID = g.gatheringID
+                JOIN profile p ON r.profileID = p.profileID
+                WHERE r.gatheringID = :gatheringID
+                AND (r.profileID = :profileID OR r.profileID = g.hostProfileID)
+                ORDER BY r.createdAt DESC
+            ");
+
+            $stmt->bindParam(':gatheringID', $gatheringID, PDO::PARAM_INT);
+            $stmt->bindParam(':profileID', $profileID, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error in getRemindersByParticipant: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function createReminder($r)
+    {
+        $sql = "INSERT INTO `reminder` (profileID, description, createdAt, gatheringID) 
+                VALUES (:profileID, :description, :createdAt, :gatheringID)";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':profileID'    => $r['profileId'],
+            ':description'  => $r['description'],
+            ':createdAt'    => $r['createdAt'],
+            ':gatheringID'  => $r['gatheringId'],
+        ]);
+
+        return (int)$this->db->lastInsertId();
     }
 }
