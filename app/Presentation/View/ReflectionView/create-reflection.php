@@ -2,15 +2,6 @@
 date_default_timezone_set("Asia/Kuala_Lumpur");
 $_title = 'Create Reflection';
 require_once __DIR__ . '/../HomeView/header.php';
-
-//old validation
-// $errors = $_SESSION['reflectionErrors'] ?? [];
-// $old = $_SESSION['old'] ?? [];
-
-// // Clear after use
-// unset($_SESSION['reflectionErrors']);
-// unset($_SESSION['old']);
-
 ?>
 
 

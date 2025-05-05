@@ -24,29 +24,6 @@ class ReflectionModel
     // ------------------------------------------ Create Part ------------------------------------------//
     public function saveReflection($profileId, $reflectionDate, $reflectionTitle, $reflectionContent)
     {
-        // // businesss logic validation
-        // if (empty($reflectionTitle)) {
-        //     $_err['reflectionTitle'] = 'Required';
-        // } elseif (strlen($reflectionTitle) > 50) {
-        //     $_err['reflectionTitle'] = 'Maximum length 50 characters';
-        // }
-
-        // if (empty($reflectionContent)) {
-        //     $_err['reflectionContent'] = 'Required';
-        // } elseif (strlen($reflectionContent) > 5000) {
-        //     $_err['reflectionContent'] = 'Maximum length 5000 characters';
-        // }
-
-        // if (!empty($_err)) {
-        //     $_SESSION['reflectionErrors'] = $_err;
-        //     $_SESSION['old'] = [
-        //         'reflectionTitle' => $reflectionTitle,
-        //         'reflectionContent' => $reflectionContent,
-        //     ];
-        //     header("Location: /reflection/create");
-        //     exit;
-        // }
-
         return $this->reflectionDAO->saveReflection($profileId, $reflectionDate, $reflectionTitle, $reflectionContent);
     }
 
@@ -67,51 +44,14 @@ class ReflectionModel
     // Save the editing
     public function editSaveReflection($reflectionId, $reflectionTitle, $reflectionContent)
     {
-        // // businesss logic validation
-        // if (empty($reflectionTitle)) {
-        //     $_err['reflectionTitle'] = 'Required';
-        // } elseif (strlen($reflectionTitle) > 50) {
-        //     $_err['reflectionTitle'] = 'Maximum length 50 characters';
-        // }
-
-        // if (empty($reflectionContent)) {
-        //     $_err['reflectionContent'] = 'Required';
-        // } elseif (strlen($reflectionContent) > 5000) {
-        //     $_err['reflectionContent'] = 'Maximum length 5000 characters';
-        // }
-
-        // if (!empty($_err)) {
-        //     $_SESSION['reflectionErrors'] = $_err;
-        //     $_SESSION['old'] = [
-        //         'reflectionTitle' => $reflectionTitle,
-        //         'reflectionContent' => $reflectionContent,
-        //     ];
-        //     header("Location: /reflection/edit");
-        //     exit;
-        // }
-
         return $this->reflectionDAO->editSaveReflection($reflectionId, $reflectionTitle, $reflectionContent);
     }
-
 
     // ------------------------------------------ Delete Part ------------------------------------------//
     public function deleteReflectionById($reflectionId)
     {
         return $this->reflectionDAO->deleteReflectionById($reflectionId);
     }
-
-    // public function validateReflection($content) {
-    //     if(empty(trim($content))) {
-    //         return ['success' => false, 'message' => 'The input firld cannot be empty.'];
-    //     }
-
-    //     if(mb_strlen($content) > 5000) {
-    //         return ['success' => false, 'message' => 'Your message is too long. Please limit it to 5000 characters.'];
-    //     }
-
-    //     return ['success' => true];
-
-    // }
 
     // ------------------------------------------ Validation Part ------------------------------------------//
     public function validateReflection($reflectionTitle, $reflectionContent)
