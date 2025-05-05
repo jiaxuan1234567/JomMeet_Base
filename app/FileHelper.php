@@ -72,6 +72,8 @@ class FileHelper
             "defaultTag" => "/asset/default-tag.png",
             "map" => "/asset/map.png",
             "food" => "/asset/eat.png",
+            "coffee" => "/asset/dinnerpic.png",
+            "picnic" => "/asset/picnic.png",
             "chill" => "/asset/chill.png",
             "study" => "/asset/study.png",
             "nature" => "/asset/natural.png",
@@ -81,6 +83,7 @@ class FileHelper
             "music" => "/asset/music.png",
             "movie" => "/asset/movie.png",
             "hangout" => "/asset/party.png",
+            "sports" => "/asset/gym.png",
         ];
 
         switch ($this->permission) {
