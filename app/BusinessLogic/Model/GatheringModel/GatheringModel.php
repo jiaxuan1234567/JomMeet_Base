@@ -639,6 +639,17 @@ class GatheringModel
                 return false;
             }
 
+            // validate time constraint
+            $start = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+            $hoursDiff = ($start->getTimestamp() - (new DateTime())->getTimestamp()) / 3600;
+
+            error_log('diff: ' . $hoursDiff);
+            if ($hoursDiff < 3) {
+                $_SESSION['flash_message'] = "Gathering can only be cancelled at least 3 hours before it starts.";
+                $_SESSION['flash_type'] = "error";
+                return false;
+            }
+
             // Leave
             $result = $this->gatheringDAO->leaveGathering($profileId, $gatheringId);
 
