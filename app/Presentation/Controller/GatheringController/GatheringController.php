@@ -24,6 +24,7 @@ class GatheringController
     public function viewCreate()
     {
         $_SESSION['allow_select_location'] = true;
+
         $preferenceTags = $this->gatheringModel->getPreferenceTags();
         $paxLimit = $this->gatheringModel->getPaxLimit();
         $allowedDate = $this->gatheringModel->getCreateAllowedDate();
@@ -61,8 +62,6 @@ class GatheringController
         }
 
         unset($_SESSION['allow_select_location']);
-
-        $redirectUrl = $_GET['redirect'] ?? '/my-gathering/create';
         include $this->fileHelper->getFilePath('SelectLocation');
     }
 
@@ -79,7 +78,7 @@ class GatheringController
                 $_SESSION['flash_message'] = 'Gathering has been created successfully!';
                 $_SESSION['flash_type'] = 'success';
 
-                header("Location: /my-gathering#hosted");
+                header("Location: /my-gathering");
                 exit;
             }
         } catch (Exception $e) {
@@ -120,7 +119,8 @@ class GatheringController
     {
         $result = $this->gatheringModel->cancelGathering($id);
 
-        $returnLoc = is_array($result) ? "/my-gathering#cancelled" : "/my-gathering";
+        //$returnLoc = is_array($result) ? "/my-gathering#cancelled" : "/my-gathering";
+        $returnLoc = "/my-gathering";
         header("Location: " . $returnLoc);
         exit;
     }
@@ -128,6 +128,7 @@ class GatheringController
     // POST: leave-gathering
     public function leaveGathering($gatheringId)
     {
+
         $profileId = $_SESSION['profile']['profileID'];
         $result = $this->gatheringModel->leaveGathering($profileId, $gatheringId);
 
