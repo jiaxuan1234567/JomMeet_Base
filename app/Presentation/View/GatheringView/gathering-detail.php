@@ -12,6 +12,20 @@ require_once __DIR__ . '/../HomeView/header.php';
 </div>
 
 <div class="container py-3" style="height:630px;">
+    <!-- Flash Message -->
+    <?php
+    if (!empty($_SESSION['flash_message'])):
+    ?>
+        <div id="flashMessage"
+            class="flash-message"
+            data-type="<?= $_SESSION['flash_type'] ?? '' ?>"
+            data-msg="<?= $_SESSION['flash_message'] ?>">
+        </div>
+        <?php
+        unset($_SESSION['flash_message']);
+        unset($_SESSION['flash_type']);
+        ?>
+    <?php endif; ?>
     <!-- Content -->
     <div class="container justify-content-between p-3 mt-7 border rounded bg-blue-color border-light-blue">
         <div class="row">
