@@ -15,11 +15,6 @@ class HomeController
         $this->fileHelper = new FileHelper('home');
     }
 
-    // public function redirect($key)
-    // {
-    //     return $this->fileHelper->getFilePath($key);
-    // }
-
     public function home()
     {
         include $this->fileHelper->getFilePath('HomePage');

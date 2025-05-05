@@ -413,26 +413,49 @@ class GatheringDAO
         return $stmt->fetchColumn() > 0;
     }
 
-    public function createGathering($d)
+    public function createGathering($d, $hostProfileId)
     {
         $sql = "INSERT INTO `gathering` (locationID, theme, maxParticipant, minParticipant, currentParticipant, date, startTime, endTime, status, preference, hostProfileID) 
         VALUES (:locationID, :theme, :max, :min, :current, :date, :start, :end, :status, :preference, :hostProfileID)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':locationID'   => $d['locationId'],
-            ':theme'        => $d['theme'],
-            ':max'          => $d['maxParticipant'],
-            ':min'          => $d['minParticipant'],
-            ':current'      => $d['currentParticipant'] ?? 0,
-            ':date'         => $d['date'],
+            ':theme'        => $d['inputTheme'],
+            ':max'          => $d['inputPax'],
+            ':date'         => $d['inputDate'],
             ':start'        => $d['startTime'],
             ':end'          => $d['endTime'],
-            ':status'       => $d['status'],
-            ':preference'   => $d['preference'],
-            ':hostProfileID' => $d['hostProfileID']
+            ':preference'   => $d['gatheringTag'],
+            ':hostProfileID' => $hostProfileId,
+            ':min'          => $d['minPax'],
+            ':current'      => $d['currentPax'],
+            ':status'       => $d['status']
         ]);
 
         return (int)$this->db->lastInsertId();
+    }
+
+    public function updateGathering($d, $hostProfileId, $gatheringId)
+    {
+        $stmt = $this->db->prepare("
+            UPDATE `gathering`
+            SET theme = :theme, maxParticipant = :maxPax, date = :date,
+                startTime = :start, endTime = :end, preference = :preference,
+                locationID = :locationID
+            WHERE gatheringID = :id AND hostProfileID = :hostId
+        ");
+
+        return $stmt->execute([
+            ':theme' => $d['inputTheme'],
+            ':maxPax' => $d['inputPax'],
+            ':date' => $d['inputDate'],
+            ':start' => $d['startTime'],
+            ':end' => $d['endTime'],
+            ':preference' => $d['gatheringTag'],
+            ':locationID' => $d['locationId'],
+            ':id' => $gatheringId,
+            ':hostId' => $hostProfileId
+        ]);
     }
 
     public function addUserToGathering($userID, $gatheringID)
@@ -485,29 +508,6 @@ class GatheringDAO
             error_log("[GatheringDAO] cancelWithParticipants failed: " . $e->getMessage());
             return false;
         }
-    }
-
-    public function updateGathering($d, $hostProfileId, $gatheringId)
-    {
-        $stmt = $this->db->prepare("
-            UPDATE `gathering`
-            SET theme = :theme, maxParticipant = :maxPax, date = :date,
-                startTime = :start, endTime = :end, preference = :preference,
-                locationID = :locationID
-            WHERE gatheringID = :id AND hostProfileID = :hostId
-        ");
-
-        return $stmt->execute([
-            ':theme' => $d['inputTheme'],
-            ':maxPax' => $d['inputPax'],
-            ':date' => $d['inputDate'],
-            ':start' => $d['startTime'],
-            ':end' => $d['endTime'],
-            ':preference' => $d['gatheringTag'],
-            ':locationID' => $d['locationId'],
-            ':id' => $gatheringId,
-            ':hostId' => $hostProfileId
-        ]);
     }
 
     public function leaveGathering($profileId, $gatheringId)
