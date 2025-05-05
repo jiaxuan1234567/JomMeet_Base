@@ -76,7 +76,7 @@ class FileHelper
             "picnic" => "/asset/picnic.png",
             "chill" => "/asset/chill.png",
             "study" => "/asset/study.png",
-            "nature" => "/asset/natural.png",
+            "natural" => "/asset/natural.png",
             "shopping" => "/asset/shopping.png",
             "workout" => "/asset/gym.png",
             "entertainment" => "/asset/game.png",

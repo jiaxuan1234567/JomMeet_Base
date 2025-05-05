@@ -30,39 +30,6 @@ class GatheringController
         include $this->fileHelper->getFilePath('CreateGathering');
     }
 
-    // POST: create-gathering
-    public function createGathering()
-    {
-        $data = [
-            'locationId'        => (int)($_POST['locationId'] ?? 0),
-            'theme'             => trim($_POST['inputTheme'] ?? ''),
-            'maxParticipant'    => (int)($_POST['inputPax'] ?? 0),
-            'minParticipant'    => (int)($_POST['minParticipant'] ?? 3),
-            'currentParticipant' => 0,
-            'date'              => $_POST['inputDate'] ?? '',
-            'startTime'         => $_POST['startTime'] ?? '',
-            'endTime'           => $_POST['endTime'] ?? '',
-            'status'            => 'NEW',
-            'preference'        => $_POST['gatheringTag'] ?? '',
-            'hostProfileID' => $_SESSION['profile']['profileID']
-        ];
-
-        try {
-            $newId = $this->gatheringModel->createGathering($data);
-            unset($_SESSION['allow_select_location']);
-
-            $_SESSION['flash_message'] = 'Gathering has been created successfully!';
-            $_SESSION['flash_type'] = 'success';
-
-            header("Location: /my-gathering#hosted");
-            exit;
-        } catch (Exception $e) {
-            // on error, you could re-render the form with $e->getMessage()
-            http_response_code(500);
-            echo "Error creating gathering: " . htmlspecialchars($e->getMessage());
-        }
-    }
-
     // GET: edit-gathering
     public function viewEdit($gatheringId)
     {
@@ -83,20 +50,6 @@ class GatheringController
         include $this->fileHelper->getFilePath('EditGathering');
     }
 
-    // POST: edit-gathering
-    public function editSubmit($gatheringId)
-    {
-        $data = $_POST;
-        $profileId = $_SESSION['profile']['profileID'];
-
-        $this->gatheringModel->updateGathering($data, $profileId, $gatheringId);
-        unset($_SESSION['allow_select_location']);
-        $_SESSION['flash_message'] = 'Gathering updated successfully!';
-        $_SESSION['flash_type'] = 'success';
-        header("Location: /my-gathering");
-        exit;
-    }
-
     // GET: select-location
     public function viewSelectLocation()
     {
@@ -111,6 +64,55 @@ class GatheringController
 
         $redirectUrl = $_GET['redirect'] ?? '/my-gathering/create';
         include $this->fileHelper->getFilePath('SelectLocation');
+    }
+
+    // POST: create-gathering
+    public function createGathering()
+    {
+        $data = $_POST;
+        $profileId = $_SESSION['profile']['profileID'];
+        unset($_SESSION['allow_select_location']);
+
+        try {
+            $newId = $this->gatheringModel->createGathering($data, $profileId);
+            if ($newId) {
+                $_SESSION['flash_message'] = 'Gathering has been created successfully!';
+                $_SESSION['flash_type'] = 'success';
+
+                header("Location: /my-gathering#hosted");
+                exit;
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+        }
+        $_SESSION['flash_message'] = 'Error occured while creating gathering.';
+        $_SESSION['flash_type'] = 'error';
+        header("Location: /my-gathering");
+        exit;
+    }
+
+    // POST: edit-gathering
+    public function editSubmit($gatheringId)
+    {
+        $data = $_POST;
+        $profileId = $_SESSION['profile']['profileID'];
+
+        try {
+            $result = $this->gatheringModel->updateGathering($data, $profileId, $gatheringId);
+            if ($result) {
+                $_SESSION['flash_message'] = 'Gathering has been updated successfully!';
+                $_SESSION['flash_type'] = 'success';
+
+                header("Location: /my-gathering");
+                exit;
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+        }
+        $_SESSION['flash_message'] = 'Error occured while updating gathering.';
+        $_SESSION['flash_type'] = 'error';
+        header("Location: /my-gathering");
+        exit;
     }
 
     // POST: cancel-gathering

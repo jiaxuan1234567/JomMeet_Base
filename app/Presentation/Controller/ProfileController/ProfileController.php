@@ -217,7 +217,19 @@ class ProfileController
             $preferences
         );
 
-        echo json_encode($result);
+        if (isset($result['field'])) {
+            $response = [
+              'success' => $result['success'],
+              'errors'  => $result['success']
+                ? []
+                : [ $result['field'] => $result['message'] ]
+            ];
+          } else {
+            // assume model already returned the new shape
+            $response = $result;
+          }
+
+        echo json_encode($response);
         exit;
     }
 }

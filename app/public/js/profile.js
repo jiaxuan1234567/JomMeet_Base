@@ -97,26 +97,21 @@ $(document).ready(function () {
       data: payload,
       dataType: 'json',
       success(res) {
-        console.log('✅ /api/validate-profile', res);
-        if (res.success) {
-          // clear all error boxes
-          ['Nickname', 'Aboutme', 'Mbti', 'Hobbies', 'Preferences']
-            .forEach(s => $(`#error${s}`).text(''));
-            // $('#errorNickname').text('').removeClass('is-invalid');
-            // $('#nickname').removeClass('is-invalid');
-        } else {
-          // show errors
-          Object.entries(res.errors || {}).forEach(([fld, msg]) => {
-            const label = fld.charAt(0).toUpperCase() + fld.slice(1);
-            $(`#error${label}`).text(msg);
+        console.log('✅ /api/validate-profile response:', res);
+        ['nickname', 'aboutme', 'mbti', 'hobbies', 'preferences'].forEach(fld => {
+          const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
+          $(`#error${cap}`).text('');               
+          $(`[name=${fld}]`).removeClass('is-invalid'); 
+        });
 
-            // $('#errorNickname').text(res.errors.nickname);
-            // $('#nickname').addClass('is-invalid');
+        // if validation failed, show new ones
+        if (!res.success) {
+          Object.entries(res.errors).forEach(([fld, msg]) => {
+            const cap = fld.charAt(0).toUpperCase() + fld.slice(1);
+            $(`#error${cap}`).text(msg);               
+            $(`[name=${fld}]`).addClass('is-invalid'); 
           });
         }
-      },
-      error(xhr, status, err) {
-        console.error('❌ Validation failed:', status, err);
       }
     });
   }
@@ -136,12 +131,12 @@ $(document).ready(function () {
 
   // Save confirmation
   $form.on('submit', function (e) {
-    // final sync
     $hiddenH.val($hBtns.filter('.active').map((_, b) => b.dataset.value).get().join(','));
     $hiddenP.val($pBtns.filter('.active').map((_, b) => b.dataset.value).get().join(','));
 
     e.preventDefault();
     if ($save.prop('disabled')) return;
+
     if (confirm('Confirm to update your profile details?')) {
       $form.off('submit').submit();
     }

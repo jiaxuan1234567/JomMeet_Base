@@ -117,7 +117,6 @@ class GatheringModel
         return $validGatherings;
     }
 
-
     // replace getAvailableGatherings
     public function getPublicGatheringById($profileId, $gatheringId)
     {
@@ -228,19 +227,6 @@ class GatheringModel
     public function verifyUserInGathering($userID, $gatheringID)
     {
         return $this->gatheringDAO->verifyUserInGathering($userID, $gatheringID);
-
-        // // Get the gatherings for the user
-        // $gathering = $this->dao->getProfileGatheringByUserId($userID);
-
-        // // Iterate through the gatherings
-        // foreach ($gathering as $g) {
-        //     // Check if this gathering matches the user and the gathering ID
-        //     if ($g['gatheringID'] == $gatheringID && $g['profileID'] == $userID) {
-        //         error_log("User $userID is already part of gathering $gatheringID.");
-        //         return false; // The user is already part of this gathering
-        //     }
-        // }
-        // return true; // User has not joined this gathering
     }
 
     public function isBeforeStartTime($gatheringID)
@@ -371,202 +357,9 @@ class GatheringModel
         return false;
     }
 
-
-    // my-gathering
-    public function getMyGatheringsWithTab($profileId)
-    {
-        try {
-            // jx
-            $this->gatheringDAO->updateGatheringStatuses();
-            // -----
-            $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
-            $grouped = $this->getMyGatheringRawTabs();
-
-            foreach ($rows as $g) {
-                $status = strtolower($g['status']);
-                $isHost = (bool)$g['isHost'];
-                $isJoined = (bool)$g['isJoined'];
-
-                $gathering = [
-                    'id'        => (int)$g['gatheringID'],
-                    'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
-                    'locationID'  => (int)$g['locationID'],
-                    'theme'     => $g['theme'],
-                    'date'      => date('d F Y', strtotime($g['date'])),
-                    'startTime' => date('g:i A', strtotime($g['startTime'])),
-                    'endTime'   => date('g:i A', strtotime($g['endTime'])),
-                    'pax'       => (int)$g['currentParticipant'],
-                    'maxPax'    => (int)$g['maxParticipant'],
-                    'venue'     => $g['venue'],
-                    'status'    => $status,
-                    'isHost'    => $isHost,
-                    'isJoined'  => $isJoined,
-                    'action'    => $this->determineActions($status, $isHost, $isJoined),
-                ];
-
-                $grouped['all'][] = $gathering;
-
-                if ($isHost) {
-                    $grouped['hosted'][] = $gathering;
-                    if ($status === 'cancelled') {
-                        $grouped['cancelled'][] = $gathering;
-                    }
-                }
-
-                if ($status === 'new') {
-                    $grouped['upcoming'][] = $gathering;
-                } elseif ($status === 'start') {
-                    $grouped['ongoing'][] = $gathering;
-                } elseif ($status === 'end') {
-                    $grouped['completed'][] = $gathering;
-                }
-            }
-
-            return $grouped;
-        } catch (Exception $e) {
-            error_log("[GatheringModel] Error in getMyGatheringsByCategory: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    // Create Gathering
-    public function createGathering($data)
-    {
-        try {
-            $newId = $this->gatheringDAO->createGathering($data);
-            $profileId = $_SESSION['profile']['profileID'];
-            $this->gatheringDAO->addUserToGathering($profileId, $newId);
-            return $newId;
-        } catch (Exception $e) {
-            error_log("[GatheringModel] Error creating gathering: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Edit Gathering
-    public function updateGathering($data, $profileId, $gatheringId)
-    {
-        try {
-            $result = $this->gatheringDAO->updateGathering($data, $profileId, $gatheringId);
-            $gathering = $this->gatheringDAO->getGatheringWithAllParticipantInfoByGatheringId($gatheringId);
-
-            if ($result) {
-                error_log("Gathering $gatheringId updated successfully.");
-
-                // Notify participants about the update
-                foreach ($gathering as $g) {
-                    $this->notificationService->sendInfobipWhatsAppTemplate(
-                        $g['phone'],
-                        $g['nickname'],
-                        $g,
-                        "gathering_updated"
-                    );
-                    break; // Only send to the first participant for testing purposes
-                }
-            } else {
-                error_log("Failed to update gathering $gatheringId.");
-            }
-
-            return $result;
-        } catch (Exception $e) {
-            error_log("[GatheringModel] Error updating gathering: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Host Cancel Gathering
-    public function cancelGathering($id)
-    {
-        $profileID = $_SESSION['profile']['profileID'];
-        $gathering = $this->gatheringDAO->getGatheringById($id);
-
-        // validate user is host
-        if ($profileID != $gathering['hostProfileID']) {
-            $_SESSION['flash_message'] = "Unauthorized action.";
-            $_SESSION['flash_type'] = "error";
-            return false;
-        }
-
-        // validate time constraint
-        $start = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
-        $hoursDiff = ($start->getTimestamp() - (new DateTime())->getTimestamp()) / 3600;
-
-        error_log('diff: ' . $hoursDiff);
-        if ($hoursDiff < 3) {
-            $_SESSION['flash_message'] = "Gathering can only be cancelled at least 3 hours before it starts.";
-            $_SESSION['flash_type'] = "error";
-            return false;
-        }
-
-        $result = $this->gatheringDAO->cancelWithParticipant($id);
-
-        if (is_array($result)) {
-            // notify participants (skeleton function)
-            foreach ($result as $p) {
-                error_log("Would notify profile ID $p about cancellation of gathering $id");
-            }
-
-            $_SESSION['flash_message'] = "Gathering has been cancelled successfully.";
-            $_SESSION['flash_type'] = "success";
-
-            foreach ($result as $p) {
-                $this->notificationService->sendInfobipWhatsAppTemplate(
-                    $p['phone'],
-                    $p['profile']['nickname'],
-                    $gathering,
-                    "gathering_cancelled"
-                );
-                break; // Only send to the first participant for testing purposes
-            }
-        } else {
-            $_SESSION['flash_message'] = "Something went wrong. Please try again.";
-            $_SESSION['flash_type'] = "error";
-        }
-
-        return $result;
-    }
-
-    // Participant Leave Gathering
-    public function leaveGathering($profileId, $gatheringId)
-    {
-        try {
-            // Validate Gathering is Valid
-            $gathering = $this->gatheringDAO->getGatheringWithHostInfoByGatheringId($gatheringId);
-            if (!$gathering) {
-                return false;
-            }
-
-            // Is Host?
-            if ($gathering['hostProfileID'] == $profileId) {
-                // Host cannot leave
-                return false;
-            }
-
-            // Leave
-            $result = $this->gatheringDAO->leaveGathering($profileId, $gatheringId);
-
-            if ($result) {
-                $_SESSION['flash_type'] = 'success';
-                $_SESSION['flash_message'] = 'You have successfully left the gathering.';
-
-                $this->notificationService->sendInfobipWhatsAppTemplate(
-                    $gathering['phone'],
-                    $gathering['nickname'],
-                    $gathering,
-                    "user_left"
-                );
-            } else {
-                $_SESSION['flash_type'] = 'error';
-                $_SESSION['flash_message'] = 'Something went wrong.';
-            }
-            return $result;
-        } catch (Exception $e) {
-            $this->gatheringDAO->rollback(); // in case of uncaught error
-            error_log("[GatheringModel] Error in leaveGathering: " . $e->getMessage());
-            return false;
-        }
-    }
-
+    // ============================================================================
+    // MATCH ALGORITHM
+    // ============================================================================
     public function matchGathering($userID)
     {
         try {
@@ -692,140 +485,221 @@ class GatheringModel
         }
     }
 
-    // // validate Gathering Fields
-    // public function validateGatheringFields($data, $fields, $editingId = null)
-    // {
-    //     // 1) fetch persistence‐backed facts
-    //     $validTags = $this->getPreference();
-    //     $locRow = $this->locationDAO->getLocationById($post['locationId'] ?? '');
-    //     if ($locRow === false) $locRow = null;
-    //     $joined = $this->gatheringDAO->getJoinedGatheringByUserId(
-    //         $_SESSION['profile']['profileID'] ?? 0
-    //     );
-
-    //     // 2) call pure helper
-    //     return $this->validatorService->validate($data, $validTags, $locRow, $joined, $fields, $editingId);
-    // }
-
-    /*
-    [
-        'field' => 'fieldId || time',
-        'touched' => 'fieldId',
-        'value' => [
-            'locationName' => 'name',
-            'locationId' => 'id'
-        ],
-        'value' => [
-            'inputDate' => date,
-            'startTime' => startDT,
-            'endTime' => endDT
-        ]
-        'value' => 'data'
-    ]
-    
-    [
-    'valid' => true || false,
-    'field' => 'field',
-    'touched' => fieldId',
-    'errors' => [
-        'f1' => 'e1',
-        'f2' => 'e2',
-        'f3' => ''
-    ]
-    ]
-    */
-    public function validateGathering($data, $editingId = null)
+    // ============================================================================
+    // MY GATHERING (Host)
+    // ============================================================================
+    public function getMyGatheringsWithTab($profileId)
     {
-        $touched = $data['touched'];
-        $response = ['valid' => true, 'errors' => []];
-        $gatheringHelper = new GatheringHelperService();
-
         try {
-            switch ($touched) {
-                case 'inputDate':
-                case 'startTime':
-                case 'endTime':
-                    $joined = $this->gatheringDAO->getJoinedGatheringByUserId($_SESSION['profile']['profileID'] ?? 0);
-                    $response = $gatheringHelper->validateDateTime($data, $joined, $editingId);
-                    break;
-                case 'locationName':
-                case 'locationId':
-                case 'inputLocation':
-                    $validLoc = $this->gatheringDAO->getGatheringLocationById($data['value']['locationId'] ?? '');
-                    $response = $gatheringHelper->validateLocation($data, $validLoc);
-                    break;
-                case 'gatheringTag':
-                    $validTags = $this->getPreference();
-                    $response = $gatheringHelper->validateGatheringTag($data, $validTags);
-                    break;
-                case 'inputTheme':
-                    $response = $gatheringHelper->validateTheme($data);
-                    break;
-                case 'inputPax':
-                    if (empty($editingId)) {
-                        $min = $this->getPaxLimit()['minPax'];
-                        $max = $this->getPaxLimit()['maxPax'];
-                    } else {
-                        $paxLimit = $this->getEditPaxLimit($this->gatheringDAO->getGatheringById($editingId));
-                        $min = $paxLimit['minPax'];
-                        $max = $paxLimit['maxPax'];
+            // jx
+            $this->gatheringDAO->updateGatheringStatuses();
+            // -----
+            $rows = $this->gatheringDAO->getUserAllGatherings($profileId);
+            $grouped = $this->getMyGatheringRawTabs();
+
+            foreach ($rows as $g) {
+                $status = strtolower($g['status']);
+                $isHost = (bool)$g['isHost'];
+                $isJoined = (bool)$g['isJoined'];
+
+                $gathering = [
+                    'id'        => (int)$g['gatheringID'],
+                    'cover'     => $this->fileHelper->getFilePath(strtolower($g['preference'])),
+                    'locationID'  => (int)$g['locationID'],
+                    'theme'     => $g['theme'],
+                    'date'      => date('d F Y', strtotime($g['date'])),
+                    'startTime' => date('g:i A', strtotime($g['startTime'])),
+                    'endTime'   => date('g:i A', strtotime($g['endTime'])),
+                    'pax'       => (int)$g['currentParticipant'],
+                    'maxPax'    => (int)$g['maxParticipant'],
+                    'venue'     => $g['venue'],
+                    'status'    => $status,
+                    'isHost'    => $isHost,
+                    'isJoined'  => $isJoined,
+                    'action'    => $this->determineActions($status, $isHost, $isJoined),
+                ];
+
+                $grouped['all'][] = $gathering;
+
+                if ($isHost) {
+                    $grouped['hosted'][] = $gathering;
+                    if ($status === 'cancelled') {
+                        $grouped['cancelled'][] = $gathering;
                     }
+                }
 
-                    $response = $gatheringHelper->validatePax($data, $min, $max);
-                    break;
+                if ($status === 'new') {
+                    $grouped['upcoming'][] = $gathering;
+                } elseif ($status === 'start') {
+                    $grouped['ongoing'][] = $gathering;
+                } elseif ($status === 'end') {
+                    $grouped['completed'][] = $gathering;
+                }
             }
+
+            return $grouped;
         } catch (Exception $e) {
-            $response['valid'] = false;
-            $response['errors'] = $e->getMessage();
-        }
-        return $response;
-    }
-
-    // Status Service (run job)
-    public function checkAndTransitionGatherings()
-    {
-        // 1) DAO gives only the candidates
-        $candidates = $this->gatheringDAO->fetchGatheringsToTransition();
-
-        // 2) Service returns a map [id=>newStatus]
-        $toUpdate = (new CheckGatheringStatusService())->identifyTransitions($candidates);
-
-        // 3) Persist each change
-        $updated = false;
-        foreach ($toUpdate as $id => $newStatus) {
-            if ($this->gatheringDAO->updateGatheringStatus($id, $newStatus)) {
-                $updated = true;
-            }
-        }
-
-        return $updated;
-    }
-
-    // Helper Function
-    private function determineActions($status, $isHost, $isJoined)
-    {
-        if ($status === 'cancelled') {
+            error_log("[GatheringModel] Error in getMyGatheringsByCategory: " . $e->getMessage());
             return [];
         }
-
-        if ($status === 'new') {
-            return $isHost
-                ? ['send reminder', 'edit gathering', 'cancel gathering']
-                : ['reply reminder', 'leave gathering'];
-        }
-
-        if ($status === 'start') {
-            return $isHost
-                ? ['send reminder', 'reply reminder']
-                : ['reply reminder'];
-        }
-
-        if ($status === 'end') {
-            return ['gathering feedback', 'location feedback'];
-        }
-
-        return [];
     }
+
+    // ============================================================================
+    // CREATE GATHERING (Host)
+    // ============================================================================
+    public function createGathering($data, $hostProfileId)
+    {
+        try {
+            // Validate again before save
+            if (!$this->validateGatheringBeforeSave($data)) {
+                return false;
+            }
+            $data['minPax'] = $this->getPaxLimit()['minPax'];
+            $data['currentPax'] = 0;
+            $data['status'] = 'NEW';
+
+            $newId = $this->gatheringDAO->createGathering($data, $hostProfileId);
+            $profileId = $_SESSION['profile']['profileID'];
+            $this->gatheringDAO->addUserToGathering($profileId, $newId);
+            return $newId;
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error creating gathering: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // ============================================================================
+    // EDIT GATHERING (Host)
+    // ============================================================================
+    public function updateGathering($data, $profileId, $gatheringId)
+    {
+        try {
+            // Validate again before save
+            if (!$this->validateGatheringBeforeSave($data, $gatheringId)) {
+                return false;
+            }
+            $result = $this->gatheringDAO->updateGathering($data, $profileId, $gatheringId);
+            $gathering = $this->gatheringDAO->getGatheringWithAllParticipantInfoByGatheringId($gatheringId);
+
+            if ($result) {
+                // Notify participants about the update
+                foreach ($gathering as $g) {
+                    $this->notificationService->sendInfobipWhatsAppTemplate(
+                        $g['phone'],
+                        $g['nickname'],
+                        $gathering,
+                        "gathering_updated"
+                    );
+                    break; // Only send to the first participant for testing purposes
+                }
+            } else {
+                error_log("Failed to update gathering $gatheringId.");
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            error_log("[GatheringModel] Error updating gathering: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // ============================================================================
+    // CANCEL GATHERING (Host)
+    // ============================================================================
+    public function cancelGathering($id)
+    {
+        $profileID = $_SESSION['profile']['profileID'];
+        $gathering = $this->gatheringDAO->getGatheringById($id);
+
+        // validate user is host
+        if ($profileID != $gathering['hostProfileID']) {
+            $_SESSION['flash_message'] = "Unauthorized action.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
+        // validate time constraint
+        $start = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+        $hoursDiff = ($start->getTimestamp() - (new DateTime())->getTimestamp()) / 3600;
+
+        error_log('diff: ' . $hoursDiff);
+        if ($hoursDiff < 3) {
+            $_SESSION['flash_message'] = "Gathering can only be cancelled at least 3 hours before it starts.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
+        $result = $this->gatheringDAO->cancelWithParticipant($id);
+
+        if (is_array($result)) {
+            // notify participants (skeleton function)
+            foreach ($result as $p) {
+                error_log("Would notify profile ID $p about cancellation of gathering $id");
+            }
+
+            $_SESSION['flash_message'] = "Gathering has been cancelled successfully.";
+            $_SESSION['flash_type'] = "success";
+
+            foreach ($result as $p) {
+                $this->notificationService->sendInfobipWhatsAppTemplate(
+                    $p['phone'],
+                    $p['profile']['nickname'],
+                    $gathering,
+                    "gathering_cancelled"
+                );
+                break; // Only send to the first participant for testing purposes
+            }
+        } else {
+            $_SESSION['flash_message'] = "Something went wrong. Please try again.";
+            $_SESSION['flash_type'] = "error";
+        }
+
+        return $result;
+    }
+
+    // ============================================================================
+    // LEAVE GATHERING (Participant)
+    // ============================================================================
+    public function leaveGathering($profileId, $gatheringId)
+    {
+        try {
+            // Validate Gathering is Valid
+            $gathering = $this->gatheringDAO->getGatheringWithHostInfoByGatheringId($gatheringId);
+            if (!$gathering) {
+                return false;
+            }
+
+            // Is Host?
+            if ($gathering['hostProfileID'] == $profileId) {
+                // Host cannot leave
+                return false;
+            }
+
+            // Leave
+            $result = $this->gatheringDAO->leaveGathering($profileId, $gatheringId);
+
+            if ($result) {
+                $_SESSION['flash_type'] = 'success';
+                $_SESSION['flash_message'] = 'You have successfully left the gathering.';
+
+                $this->notificationService->sendInfobipWhatsAppTemplate(
+                    $gathering['phone'],
+                    $gathering['nickname'],
+                    $gathering,
+                    "user_left"
+                );
+            } else {
+                $_SESSION['flash_type'] = 'error';
+                $_SESSION['flash_message'] = 'Something went wrong.';
+            }
+            return $result;
+        } catch (Exception $e) {
+            $this->gatheringDAO->rollback(); // in case of uncaught error
+            error_log("[GatheringModel] Error in leaveGathering: " . $e->getMessage());
+            return false;
+        }
+    }
+
     // ============================================================================
     // LOCATION PART
     // ============================================================================
@@ -923,5 +797,190 @@ class GatheringModel
             error_log("[GatheringModel] Error creating reminder: " . $e->getMessage());
             return false;
         }
+    }
+
+    // ============================================================================
+    // FUNCTIONS
+    // ============================================================================
+    public function validateGathering($data, $editingId = null)
+    {
+        $touched = $data['touched'];
+        $response = ['valid' => true, 'errors' => []];
+        $gatheringHelper = new GatheringHelperService();
+
+        try {
+            switch ($touched) {
+                case 'inputDate':
+                case 'startTime':
+                case 'endTime':
+                    $joined = $this->gatheringDAO->getJoinedGatheringByUserId($_SESSION['profile']['profileID'] ?? 0);
+                    $response = $gatheringHelper->validateDateTime($data, $joined, $editingId);
+                    break;
+                case 'locationName':
+                case 'locationId':
+                case 'inputLocation':
+                    $validLoc = $this->gatheringDAO->getGatheringLocationById($data['value']['locationId'] ?? '');
+                    $response = $gatheringHelper->validateLocation($data, $validLoc);
+                    break;
+                case 'gatheringTag':
+                    $validTags = $this->getPreference();
+                    $response = $gatheringHelper->validateGatheringTag($data, $validTags);
+                    break;
+                case 'inputTheme':
+                    $response = $gatheringHelper->validateTheme($data);
+                    break;
+                case 'inputPax':
+                    if (empty($editingId)) {
+                        $min = $this->getPaxLimit()['minPax'];
+                        $max = $this->getPaxLimit()['maxPax'];
+                    } else {
+                        $paxLimit = $this->getEditPaxLimit($this->gatheringDAO->getGatheringById($editingId));
+                        $min = $paxLimit['minPax'];
+                        $max = $paxLimit['maxPax'];
+                    }
+
+                    $response = $gatheringHelper->validatePax($data, $min, $max);
+                    break;
+            }
+        } catch (Exception $e) {
+            $response['valid'] = false;
+            $response['errors'] = $e->getMessage();
+        }
+        return $response;
+    }
+
+    public function validateGatheringAllFields($data, $editingId = null)
+    {
+        $response = false;
+
+        if (!isset($data['value']) || !is_array($data['value'])) {
+            return [
+                'valid' => false,
+                'errors' => ['Invalid structure']
+            ];
+        }
+
+        foreach ($data['value'] as $field => $fieldData) {
+            $result = $this->validateGathering($fieldData, $editingId);
+            error_log('result: ' . $result['valid'] . ', errors: ' . implode($result['errors']));
+
+            if ($result['valid']) {
+                $response = true;
+            } else {
+                return false;
+            }
+        }
+
+        return $response;
+    }
+
+    public function validateGatheringBeforeSave($post, $editingId = null)
+    {
+        $validateInput = $this->normalizeToValidationFields($post);
+        $result = $this->validateGatheringAllFields($validateInput, $editingId);
+
+        return $result;
+    }
+
+    private function normalizeToValidationFields($post)
+    {
+        $inputDate = $post['inputDate'] ?? '';
+        $startTime = $post['startTime'] ?? '';
+        $endTime = $post['endTime'] ?? '';
+
+        // Combine date + time into ISO strings
+        $startDatetime = $inputDate && $startTime ? $inputDate . 'T' . $startTime : '';
+        $endDatetime   = $inputDate && $endTime ? $inputDate . 'T' . $endTime : '';
+        return [
+            'field' => 'all',
+            'touched' => 'all',
+            'value' => [
+                'inputLocation' => [
+                    'field' => 'inputLocation',
+                    'touched' => 'inputLocation',
+                    'value' => [
+                        'locationId'   => $post['locationId'] ?? '',
+                        'locationName' => $post['inputLocation'] ?? ''
+                    ]
+                ],
+                'inputDate' => [
+                    'field' => 'time',
+                    'touched' => 'startTime',
+                    'value' => [
+                        'inputDate' => $inputDate,
+                        'startTime' => $startDatetime,
+                        'endTime'   => $endDatetime
+                    ]
+                ],
+                'inputTheme' => [
+                    'field' => 'inputTheme',
+                    'touched' => 'inputTheme',
+                    'value' => [
+                        'inputTheme' => $post['inputTheme'] ?? ''
+                    ]
+                ],
+                'inputPax' => [
+                    'field' => 'inputPax',
+                    'touched' => 'inputPax',
+                    'value' => [
+                        'inputPax' => $post['inputPax'] ?? ''
+                    ]
+                ],
+                'gatheringTag' => [
+                    'field' => 'gatheringTag',
+                    'touched' => 'gatheringTag',
+                    'value' => [
+                        'gatheringTag' => $post['gatheringTag'] ?? ''
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    private function determineActions($status, $isHost, $isJoined)
+    {
+        if ($status === 'cancelled') {
+            return [];
+        }
+
+        if ($status === 'new') {
+            return $isHost
+                ? ['send reminder', 'edit gathering', 'cancel gathering']
+                : ['reply reminder', 'leave gathering'];
+        }
+
+        if ($status === 'start') {
+            return $isHost
+                ? ['send reminder', 'reply reminder']
+                : ['reply reminder'];
+        }
+
+        if ($status === 'end') {
+            return ['gathering feedback', 'location feedback'];
+        }
+
+        return [];
+    }
+
+    // ============================================================================
+    // CHECK GATHERING STATUS WORKER
+    // ============================================================================
+    public function checkAndTransitionGatherings()
+    {
+        // 1) DAO gives only the candidates
+        $candidates = $this->gatheringDAO->fetchGatheringsToTransition();
+
+        // 2) Service returns a map [id=>newStatus]
+        $toUpdate = (new CheckGatheringStatusService())->identifyTransitions($candidates);
+
+        // 3) Persist each change
+        $updated = false;
+        foreach ($toUpdate as $id => $newStatus) {
+            if ($this->gatheringDAO->updateGatheringStatus($id, $newStatus)) {
+                $updated = true;
+            }
+        }
+
+        return $updated;
     }
 }
