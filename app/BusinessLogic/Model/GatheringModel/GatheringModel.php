@@ -916,12 +916,50 @@ class GatheringModel
 
     public function createReminder($data)
     {
+        $desc = trim($data['description'] ?? '');
+        if ($desc === '') {
+            return [
+                'success' => false, 
+                'message' => 'Description cannot be empty.'
+            ];
+        }
+        if (mb_strlen($desc) > 255) {
+            return [
+                'success' => false, 
+                'message' => 'Description must be less than 255 characters.'
+            ];
+        }
+
         try {
             $reminderId = $this->gatheringDAO->createReminder($data);
-            return $reminderId;
+            return ['success' => true, 'reminderId' => $reminderId];
         } catch (Exception $e) {
             error_log("[GatheringModel] Error creating reminder: " . $e->getMessage());
-            return false;
+            return ['success' => false, 'message' => 'Internal error while creating reminder.'];
         }
+    }
+
+    public function validateReminder($description)
+    {
+        if ($description !== null) {
+            if (trim($description) === '') {
+                return [
+                    'success' => false,
+                    'field' => 'description',
+                    'message' => 'Description cannot be empty.',
+                ];
+            }
+
+            if (mb_strlen($description) > 255) {
+                return [
+                    'success' => false,
+                    'field' => 'description',
+                    'message' => 'Description must be less than 255 characters.',
+                    'pre_desc' => $description,
+                ];
+            }
+        }
+
+        return ['success' => true];
     }
 }

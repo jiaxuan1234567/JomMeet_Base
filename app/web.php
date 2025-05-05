@@ -71,6 +71,7 @@ Route::post('/api/validate-profile', [ProfileController::class, 'validateProfile
 Route::post('/api/validate-reflection', [ReflectionController::class, 'validateReflection']);
 Route::post('/api/validate-gathering', [GatheringController::class, 'ajaxValidateGathering']);
 Route::post('/api/validate-gathering-edit', [GatheringController::class, 'ajaxValidateEditGathering']);
+Route::post('/api/validate-reminder', [GatheringController::class, 'validateReminder']);
 
 Route::get('/api/my-gathering/{status}', [GatheringController::class, 'ajaxGetMyGathering']);
 

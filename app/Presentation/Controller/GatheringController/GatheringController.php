@@ -408,7 +408,7 @@ class GatheringController
             $userID = $_SESSION['profile']['profileID'] ?? null;
             error_log("User ID: " . $userID);
             $_SESSION['flash_message'] = "Match Gathering Found.";
-            $_SESSION['flash_type'] = "success";        
+            $_SESSION['flash_type'] = "success";
             $gatherings = $this->gatheringModel->matchGathering($userID);
 
             if (empty($gatherings)) {
@@ -576,6 +576,7 @@ class GatheringController
 
         $gathering = $this->gatheringModel->getUserGatheringById($profileId, $gatheringId);
 
+
         if (!$gathering) {
             $_SESSION['flash_message'] = "You are not authorized to view this gathering reminder.";
             $_SESSION['flash_type'] = "error";
@@ -585,9 +586,13 @@ class GatheringController
 
         $reminders = $this->gatheringModel->getReminders($gatheringId, $profileId);
 
-        foreach ($reminders as &$reminder) {
-            $reminder['timeAgo'] = $this->formatTimeAgo($reminder['createdAt']);
-            $reminder['role'] = $gathering['hostProfileID'] == $reminder['profileID'] ? 'Host' : 'Participant';
+        if (!empty($reminders)) {
+            foreach ($reminders as &$reminder) {
+                $reminder['timeAgo'] = $this->formatTimeAgo($reminder['createdAt']);
+                $reminder['role'] = $gathering['hostProfileID'] == $reminder['profileID'] ? 'Host' : 'Participant';
+            }
+        } else {
+            $userRole = ($gathering['hostProfileID'] == $profileId) ? 'Host' : 'Participant';
         }
 
         include $this->fileHelper->getFilePath('GatheringReminder');
@@ -614,16 +619,29 @@ class GatheringController
     public function createGatheringReminder()
     {
         $data = [
-            'profileId'         => $_SESSION['profile']['profileID'],
-            'gatheringId'       => (int)($_POST['gatheringID'] ?? null),
-            'description'       => $_POST['description'] ?? '',
-            'createdAt'         => date('Y-m-d H:i:s'),
+            'profileId'     => $_SESSION['profile']['profileID'],
+            'gatheringId'   => (int)($_POST['gatheringID'] ?? null),
+            'description'   => $_POST['description'] ?? '',
+            'createdAt'     => date('Y-m-d H:i:s'),
         ];
+
+        $validationResult = $this->gatheringModel->validateReminder($data['description']);
+
+        if (!$validationResult['success']) {
+            $_SESSION['flash_message'] = $validationResult['message'];
+            $_SESSION['flash_type'] = 'error';
+            $_SESSION['validation_errors'] = true;
+            $_SESSION['previous_desc'] = $validationResult['pre_desc'];
+
+            header("Location: /my-gathering/reminder/view/" . $data['gatheringId']);
+            exit;
+        }
 
         try {
             $newId = $this->gatheringModel->createReminder($data);
             $_SESSION['flash_message'] = 'Reminder has been created successfully!';
             $_SESSION['flash_type'] = 'success';
+            $_SESSION['validation_errors'] = false;
 
             header("Location: /my-gathering/reminder/view/" . $data['gatheringId']);
             exit;
@@ -631,5 +649,17 @@ class GatheringController
             http_response_code(500);
             echo "Error creating gathering: " . htmlspecialchars($e->getMessage());
         }
+    }
+
+    public function validateReminderData()
+    {
+        header('Content-Type: application/json');
+
+        $description = trim($_POST['description'] ?? null);
+
+        $result = $this->gatheringModel->validateReminder($description);
+
+        echo json_encode($result);
+        exit;
     }
 }
