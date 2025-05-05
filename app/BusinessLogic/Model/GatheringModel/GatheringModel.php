@@ -819,32 +819,6 @@ class GatheringModel
 
                     $response = $gatheringHelper->validatePax($data, $min, $max);
                     break;
-                case 'all':
-                    $joined = $this->gatheringDAO->getJoinedGatheringByUserId($_SESSION['profile']['profileID'] ?? 0);
-                    $validTags = $this->getPreference();
-                    $validLoc = $this->gatheringDAO->getGatheringLocationById($data['value']['locationId'] ?? '');
-
-                    $dateResult = $gatheringHelper->validateDateTime($data, $joined, $editingId);
-                    $themeResult = $gatheringHelper->validateTheme($data);
-                    $tagResult = $gatheringHelper->validateGatheringTag($data, $validTags);
-                    $locResult = $gatheringHelper->validateLocation($data, $validLoc);
-
-                    if (empty($editingId)) {
-                        $paxLimit = $this->getPaxLimit();
-                    } else {
-                        $paxLimit = $this->getEditPaxLimit($this->gatheringDAO->getGatheringById($editingId));
-                    }
-                    $paxResult = $gatheringHelper->validatePax($data, $paxLimit['minPax'], $paxLimit['maxPax']);
-
-                    $all = [$dateResult, $themeResult, $tagResult, $locResult, $paxResult];
-
-                    foreach ($all as $res) {
-                        if (!$res['valid']) {
-                            $response['valid'] = false;
-                            $response['errors'] = array_merge($response['errors'], $res['errors']);
-                        }
-                    }
-                    break;
             }
         } catch (Exception $e) {
             $response['valid'] = false;
@@ -853,28 +827,91 @@ class GatheringModel
         return $response;
     }
 
+    public function validateGatheringAllFields($data, $editingId = null)
+    {
+        $response = [
+            'valid' => true,
+            'errors' => []
+        ];
+
+        if (!isset($data['value']) || !is_array($data['value'])) {
+            return [
+                'valid' => false,
+                'errors' => ['Invalid structure']
+            ];
+        }
+
+        foreach ($data['value'] as $field => $fieldData) {
+            $result = $this->validateGathering($fieldData, $editingId);
+
+            if (!$result['valid']) {
+                $response['valid'] = false;
+                $response['errors'] = array_merge($response['errors'], $result['errors'] ?? []);
+            }
+        }
+
+        return $response;
+    }
+
     public function validateGatheringBeforeSave($post, $editingId = null)
     {
         $validateInput = $this->normalizeToValidationFields($post);
-        $result = $this->validateGathering($validateInput, $editingId);
+        $result = $this->validateGatheringAllFields($validateInput, $editingId);
 
-        return $result['valid'];
+        return $result;
     }
 
     private function normalizeToValidationFields($post)
     {
+        $inputDate = $post['inputDate'] ?? '';
+        $startTime = $post['startTime'] ?? '';
+        $endTime = $post['endTime'] ?? '';
+
+        // Combine date + time into ISO strings
+        $startDatetime = $inputDate && $startTime ? $inputDate . 'T' . $startTime : '';
+        $endDatetime   = $inputDate && $endTime ? $inputDate . 'T' . $endTime : '';
         return [
             'field' => 'all',
             'touched' => 'all',
             'value' => [
-                'locationId'    => $post['locationId'] ?? '',
-                'locationName'  => '', // optional unless needed
-                'inputTheme'    => $post['inputTheme'] ?? '',
-                'inputPax'      => $post['inputPax'] ?? '',
-                'inputDate'     => $post['inputDate'] ?? '',
-                'startTime'     => $post['startTime'] ?? '',
-                'endTime'       => $post['endTime'] ?? '',
-                'gatheringTag'  => $post['gatheringTag'] ?? '',
+                'inputLocation' => [
+                    'field' => 'inputLocation',
+                    'touched' => 'inputLocation',
+                    'value' => [
+                        'locationId'   => $post['locationId'] ?? '',
+                        'locationName' => $post['inputLocation'] ?? ''
+                    ]
+                ],
+                'inputDate' => [
+                    'field' => 'time',
+                    'touched' => 'startTime',
+                    'value' => [
+                        'inputDate' => $inputDate,
+                        'startTime' => $startDatetime,
+                        'endTime'   => $endDatetime
+                    ]
+                ],
+                'inputTheme' => [
+                    'field' => 'inputTheme',
+                    'touched' => 'inputTheme',
+                    'value' => [
+                        'inputTheme' => $post['inputTheme'] ?? ''
+                    ]
+                ],
+                'inputPax' => [
+                    'field' => 'inputPax',
+                    'touched' => 'inputPax',
+                    'value' => [
+                        'inputPax' => $post['inputPax'] ?? ''
+                    ]
+                ],
+                'gatheringTag' => [
+                    'field' => 'gatheringTag',
+                    'touched' => 'gatheringTag',
+                    'value' => [
+                        'gatheringTag' => $post['gatheringTag'] ?? ''
+                    ]
+                ]
             ]
         ];
     }

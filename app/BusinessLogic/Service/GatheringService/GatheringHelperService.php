@@ -173,7 +173,7 @@ class GatheringHelperService
     {
         $field = $data['field'] ?? '';
         $touched = $data['touched'] ?? '';
-        $tag = $data['value'] ?? '';
+        $tag = $data['value']['gatheringTag'] ?? '';
         $error = '';
 
         if ($tag === '') {
@@ -194,7 +194,7 @@ class GatheringHelperService
     {
         $field = $data['field'] ?? '';
         $touched = $data['touched'] ?? '';
-        $theme = $data['value'] ?? '';
+        $theme = $data['value']['inputTheme']  ?? '';
         $error = '';
 
         if ($theme === '') {
@@ -217,7 +217,7 @@ class GatheringHelperService
     {
         $field = $data['field'] ?? '';
         $touched = $data['touched'] ?? '';
-        $pax = $data['value'] ?? '';
+        $pax = $data['value']['inputPax']  ?? '';
 
         $error = ($pax < $min || $pax > $max)
             ? 'Pax must be between ' . $min . ' and ' . $max . '.'

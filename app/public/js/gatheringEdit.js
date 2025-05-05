@@ -245,7 +245,9 @@ $(() => {
         return {
             field: fieldId,
             touched: fieldId,
-            value: data
+            value: {
+                [fieldId]: data
+            }
         };
     }
 
@@ -262,76 +264,4 @@ $(() => {
 
         $('#createBtn').prop('disabled', !(hasChange && allValid));
     }
-
-    // function locationDataHandler() {
-    //     const inputLocation = $('#inputLocation');
-    //     const locationId = $('#locationId');
-    //     return {
-    //         field: 'inputLocation',
-    //         touched: 'inputLocation',
-    //         value: {
-    //             locationName: inputLocation,
-    //             locationId: locationId
-    //         }
-    //     };
-    // }
-
-    // function datetimeDataHandler(fieldId) {
-    //     const date = $('#inputDate').val();
-    //     const startTime = $('#startTime').val();
-    //     const endTime = $('#endTime').val();
-    //     const nextDayNote = $('#nextDayNote');
-    //     let startDatetime = '';
-    //     let endDatetime = '';
-
-    //     if (date && startTime) {
-    //         startDatetime = new Date(`${date}T${startTime}`);
-    //     }
-    //     if (date && endTime) {
-    //         console.log(endTime);
-    //         endDatetime = new Date(`${date}T${endTime}`);
-    //         if (startDatetime) {
-
-    //             if (!isNaN(startDatetime.getTime()) && !isNaN(endDatetime.getTime())) {
-    //                 if (endDatetime < startDatetime) {
-    //                     endDatetime.setDate(endDatetime.getDate() + 1);
-    //                     nextDayNote.show(); // 👈 show label
-    //                 } else {
-    //                     nextDayNote.hide(); // 👈 hide if not needed
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     const payload = {
-    //         field: '', // will be assigned below
-    //         touched: fieldId,
-    //         value: {
-    //             inputDate: date || '',
-    //             startTime: startDatetime,
-    //             endTime: endDatetime
-    //         }
-    //     };
-
-    //     // Determine which field(s) were touched and the main field flag
-    //     // field : inputDate, startTime, endTime, time
-    //     if (fieldId === 'inputDate') {
-    //         payload.field = 'inputDate';
-    //     } else if (startTime && endTime) {
-    //         payload.field = 'time';
-    //     } else {
-    //         payload.field = fieldId;
-    //     }
-
-    //     return payload;
-    // }
-
-    // function dataHandler(fieldId, data) {
-    //     return {
-    //         field: fieldId,
-    //         touched: fieldId,
-    //         value: data
-    //     }
-    // }
-    // updateButtons();
 });

@@ -76,7 +76,7 @@ $(() => {
 
     updateButtons();
 
-    $('#createGatheringFormEl').on('submit', function () {
+    $('#createGatheringFormEl').on('submit', function (e) {
         $('#createBtn').prop('disabled', true).text('Creating...');
         sessionStorage.removeItem('__field_states__');
     });
@@ -250,7 +250,9 @@ $(() => {
         return {
             field: fieldId,
             touched: fieldId,
-            value: data
+            value: {
+                [fieldId]: data
+            }
         };
     }
 

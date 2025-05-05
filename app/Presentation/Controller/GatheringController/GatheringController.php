@@ -69,19 +69,6 @@ class GatheringController
     // POST: create-gathering
     public function createGathering()
     {
-        // $data = [
-        //     'locationId'        => (int)($_POST['locationId'] ?? 0),
-        //     'theme'             => trim($_POST['inputTheme'] ?? ''),
-        //     'maxParticipant'    => (int)($_POST['inputPax'] ?? 0),
-        //     'minParticipant'    => (int)($_POST['minParticipant'] ?? 3),
-        //     'currentParticipant' => 0,
-        //     'date'              => $_POST['inputDate'] ?? '',
-        //     'startTime'         => $_POST['startTime'] ?? '',
-        //     'endTime'           => $_POST['endTime'] ?? '',
-        //     'status'            => 'NEW',
-        //     'preference'        => $_POST['gatheringTag'] ?? '',
-        //     'hostProfileID' => $_SESSION['profile']['profileID']
-        // ];
         $data = $_POST;
         $profileId = $_SESSION['profile']['profileID'];
         unset($_SESSION['allow_select_location']);
