@@ -59,6 +59,9 @@ require_once __DIR__ . '/../HomeView/header.php';
         <div id="detailOverlay" class="position-absolute w-100 h-100 top-0 start-0" style="display: none; z-index: 10;">
             <div id="detailPanel" class="position-absolute"></div>
         </div>
+
+        <!-- Feedback Panel -->
+        <div id="feedbackPanel" class="position-absolute shadow bg-white rounded p-3" style="display: none; width: 260px; top: 140px; right: 20px; z-index: 1002;"></div>
     </div>
 </div>
 

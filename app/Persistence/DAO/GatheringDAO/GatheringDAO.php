@@ -853,7 +853,7 @@ class GatheringDAO
     // ============================================================================
     // LOCATION PART
     // ============================================================================
-    public function fetchAll()
+    public function fetchAllGatheringLocation()
     {
         $sql = "SELECT * FROM `location`";
         $stmt = $this->db->query($sql);

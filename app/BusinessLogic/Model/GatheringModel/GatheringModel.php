@@ -809,7 +809,7 @@ class GatheringModel
     public function getAllLocations()
     {
         try {
-            return $this->gatheringDAO->fetchAll();
+            return $this->gatheringDAO->fetchAllGatheringLocation();
         } catch (Exception $e) {
             error_log("LocationModel Error: " . $e->getMessage());
             return [];
