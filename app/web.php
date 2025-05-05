@@ -48,12 +48,11 @@ Route::post('/my-gathering/cancel/{id}', [GatheringController::class, 'cancelGat
 
 // Gathering feedback
 // show the anonymous gathering‐feedback page
-Route::get('/my-gathering/gatheringFeedback', [GatheringController::class, 'showGatheringFeedback']);
-Route::post('/my-gathering/gatheringFeedback', [GatheringController::class, 'submitGatheringFeedback']);
-
+Route::post('/my-gathering/gatheringFeedback', [GatheringController::class, 'showGatheringFeedback']);
+Route::post('/my-gathering/postGatheringFeedback', [GatheringController::class, 'submitGatheringFeedback']);
 // Location feedback
-Route::get('/my-gathering/locationFeedback', [GatheringController::class, 'showLocationFeedback']);
-Route::post('/my-gathering/locationFeedback', [GatheringController::class, 'locationFeedback']);
+Route::post('/my-gathering/locationFeedback', [GatheringController::class, 'showLocationFeedback']);
+Route::post('/my-gathering/postLocationFeedback', [GatheringController::class, 'locationFeedback']);
 Route::get('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'viewEdit']);
 Route::post('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'editSubmit']);
 // reminder

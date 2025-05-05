@@ -408,7 +408,7 @@ class GatheringController
             $userID = $_SESSION['profile']['profileID'] ?? null;
             error_log("User ID: " . $userID);
             $_SESSION['flash_message'] = "Match Gathering Found.";
-            $_SESSION['flash_type'] = "success";        
+            $_SESSION['flash_type'] = "success";
             $gatherings = $this->gatheringModel->matchGathering($userID);
 
             if (empty($gatherings)) {
@@ -483,8 +483,8 @@ class GatheringController
     public function showLocationFeedback()
     {
         $profileId    = $_SESSION['profile']['profileID'];
-        $gatheringId  = (int)($_GET['gatheringID']  ?? 0);
-        $locationId   = (int)($_GET['locationID']   ?? 0);
+        $gatheringId  = (int)($_POST['gatheringID']  ?? 0);
+        $locationId   = (int)($_POST['locationID']   ?? 0);
 
         // Only participants can view
         if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringId)) {
@@ -522,15 +522,15 @@ class GatheringController
         }
 
         // Redirect back to the GET page
-        header("Location: /my-gathering/locationFeedback"
-            . "?gatheringID={$gatheringId}&locationID={$locationId}");
+        $gatheringFeedbacks = $this->gatheringModel->getLocationFeedback($gatheringId);
+        include $this->fileHelper->getFilePath('LocationFeedback');
         exit;
     }
 
     // GET: display all gathering feedback + form
     public function showGatheringFeedback()
     {
-        $gatheringID = (int)($_GET['gatheringID'] ?? 0);
+        $gatheringID = (int)($_POST['gatheringID'] ?? 0);
 
         // fetch all feedback entries for this gathering
         $gatheringFeedbacks = $this->gatheringModel
@@ -562,7 +562,8 @@ class GatheringController
         }
 
         // Redirect back to the GET page
-        header("Location: /my-gathering/gatheringFeedback?gatheringID={$gatheringID}");
+        $locationFeedbacks = $this->gatheringModel->getGatheringFeedback($gatheringID);
+        include $this->fileHelper->getFilePath('GatheringFeedback');
         exit;
     }
 
