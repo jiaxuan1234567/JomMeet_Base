@@ -69,7 +69,7 @@ $userid = $_SESSION['profile']['profileID'];
                                         <h6 class="fw-bold mb-1"><?= htmlspecialchars($gathering['theme']) ?></h6>
                                         <p class="mb-0 small">Date: <?= htmlspecialchars($gathering['date']) ?></p>
                                         <p class="mb-0 small">Time: <?= date('g:i A', strtotime($gathering['startTime'])) ?>–<?= date('g:i A', strtotime($gathering['endTime'])) ?></p>
-                                        <p class="mb-0 small text-truncate">Venue: <?= htmlspecialchars($gathering['venue']) ?></p>
+                                        <p class="mb-0 small text-truncate">Preference: <?= htmlspecialchars(ucfirst(strtolower($gathering['preference']))) ?></p>
                                         <p class="mb-0 small">Pax: <?= htmlspecialchars($gathering['currentParticipant']) ?>/<?= htmlspecialchars($gathering['maxParticipant']) ?></p>
                                     </div>
                                     <div class="d-flex gap-2">
