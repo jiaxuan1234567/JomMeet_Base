@@ -1,5 +1,5 @@
 <?php
-$_title = 'Selecet Location';
+$_title = 'Select Location';
 require_once __DIR__ . '/../HomeView/header.php';
 ?>
 
