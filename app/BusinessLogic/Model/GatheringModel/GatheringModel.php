@@ -390,7 +390,7 @@ class GatheringModel
             error_log("[matchGathering] Start matching for userID: $userID");
 
             // Get user's profile to access their preferences and hobbies
-            $userProfile = $this->gatheringDAO->getProfileByUserId($userID);
+            $userProfile = $this->profileModel->getProfileByUserId($userID);
             $userHobbies = $this->gatheringDAO->getAllProfileHobby($userID); // array of strings
             $userPreferences = $this->gatheringDAO->getAllProfilePreference($userID); // array of strings
             $allGatherings = $this->getAvailableGatherings($userID);

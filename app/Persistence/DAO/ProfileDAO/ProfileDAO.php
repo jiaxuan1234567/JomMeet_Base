@@ -61,6 +61,24 @@ class ProfileDAO
         }
     }
 
+    public function getProfileByUserId($userID)
+    {
+        try {
+            $stmt = $this->db->prepare("
+            SELECT *
+            FROM profile
+            WHERE profileID = :profileID        
+        ");
+            $stmt->bindParam(':profileID', $userID, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error in getProfileByUserId: " . $e->getMessage());
+            return null;
+        }
+    }
+
     public function getUserByProfileID($userId)
     {
         try {

@@ -185,4 +185,15 @@ class ProfileModel
 
         return ['success' => true];
     }
+
+    public function getProfileByUserId(int $userId): array
+    {
+        $profile = $this->profileDAO->getUserByProfileID($userId);
+
+        if (empty($profile)) {
+            return [];
+        }
+
+        return $profile;
+    }
 }

@@ -386,8 +386,6 @@ class GatheringController
                     }
                 }
 
-                error_log("[searchGatherings] Filtered Gatherings: " . print_r($filteredGatherings, true));
-
                 if (empty($filteredGatherings)) {
                     $_SESSION['flash_message'] = "No gatherings found matching the search criteria.";
                     $_SESSION['flash_type'] = "error";
