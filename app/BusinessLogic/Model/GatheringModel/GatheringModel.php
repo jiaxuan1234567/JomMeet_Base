@@ -193,10 +193,10 @@ class GatheringModel
         return $gathering;
     }
 
-    public function searchGatherings($searchTerm)
+    public function searchGatherings($searchTerm, $profileID)
     {
         try {
-            $results = $this->gatheringDAO->searchGatherings($searchTerm);
+            $results = $this->gatheringDAO->searchGatherings($searchTerm, $profileID);
             return $results ?: [];
         } catch (Exception $e) {
             error_log("[GatheringModel] Error in searchGatherings: " . $e->getMessage());
