@@ -264,16 +264,36 @@ class GatheringModel
     // Add a user to a gathering (Join gathering)
     public function addUserToGathering($userID, $gatheringID)
     {
+        // Fetch the gathering details
+        $gathering = $this->gatheringDAO->getGatheringById($gatheringID);
+
+        if (!$gathering) {
+            error_log("Gathering $gatheringID not found.");
+            $_SESSION['flash_message'] = "The gathering does not exist.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
+        // Validate the number of participants
+        if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
+            error_log("User $userID cannot join gathering $gatheringID: maximum participants reached.");
+            $_SESSION['flash_message'] = "The gathering is already full.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
+        // Add the user to the gathering
         $result = $this->gatheringDAO->addUserToGathering($userID, $gatheringID);
-        $gathering = $this->gatheringDAO->getGatheringWithAllParticipantInfoByGatheringId($gatheringID);
 
         if ($result) {
             error_log("User $userID successfully joined gathering $gatheringID.");
 
-            foreach ($gathering as $g) {
+            // Notify participants
+            $participants = $this->gatheringDAO->getGatheringWithAllParticipantInfoByGatheringId($gatheringID);
+            foreach ($participants as $participant) {
                 $this->notificationService->sendInfobipWhatsAppTemplate(
-                    $g['phone'],
-                    $g['nickname'],
+                    $participant['phone'],
+                    $participant['nickname'],
                     $gathering,
                     "user_joined"
                 );
@@ -281,6 +301,8 @@ class GatheringModel
             }
         } else {
             error_log("User $userID failed to join gathering $gatheringID.");
+            $_SESSION['flash_message'] = "Failed to join the gathering. Please try again.";
+            $_SESSION['flash_type'] = "error";
         }
 
         return $result;

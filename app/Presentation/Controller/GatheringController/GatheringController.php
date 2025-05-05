@@ -264,15 +264,31 @@ class GatheringController
 
             if ($gatheringid != null && $userid != null) {
                 $result = $this->gatheringModel->addUserToGathering($userid, $gatheringid);
-                error_log("Join Result: " . ($result ? 'Success' : 'Failure'));
-                $gatherings = $this->gatheringModel->getAllGatherings();
+
+                if ($result) {
+                    error_log("Join Result: Success");
+                    $_SESSION['flash_message'] = "You have successfully joined the gathering.";
+                    $_SESSION['flash_type'] = "success";
+                } else {
+                    error_log("Join Result: Failure");
+                    // Flash message is already set in addUserToGathering for failure cases
+                }
+
                 header("Location: /gathering");
+                exit;
             } else {
                 error_log("Missing gatheringid or userid");
+                $_SESSION['flash_message'] = "Invalid request. Missing gathering ID or user ID.";
+                $_SESSION['flash_type'] = "error";
+                header("Location: /gathering");
+                exit;
             }
         } catch (Exception $e) {
             error_log("Error in joinGathering: " . $e->getMessage());
-            return false;
+            $_SESSION['flash_message'] = "An error occurred while trying to join the gathering.";
+            $_SESSION['flash_type'] = "error";
+            header("Location: /gathering");
+            exit;
         }
     }
 
@@ -324,17 +340,20 @@ class GatheringController
             $searchTerm = $_POST['searchTerm'] ?? '';
 
             if ($searchTerm === '' || $searchTerm === null) {
-                $gatherings = $this->listGatherings($userID);
+                $_SESSION['flash_message'] = "Please enter a search term.";
+                $_SESSION['flash_type'] = "error";
                 header("Location: /gathering");
-                return;
+                exit;
             }
 
             $searchResults = $this->gatheringModel->searchGatherings($searchTerm);
 
             if (!$searchResults) {
                 error_log("[GatheringController] Search returned no results for term: '" . $searchTerm . "', showing all gatherings");
-                $gatherings = $this->listGatherings($userID);
+                $_SESSION['flash_message'] = "No gatherings found for the search term.";
+                $_SESSION['flash_type'] = "error";
                 header("Location: /gathering");
+                exit;
             } else {
                 $filteredGatherings = [];
 
@@ -351,16 +370,28 @@ class GatheringController
                     }
                 }
 
-                $gatherings = $filteredGatherings;
-            }
+                error_log("[searchGatherings] Filtered Gatherings: " . print_r($filteredGatherings, true));
 
-            return include $this->fileHelper->getFilePath('GatheringList');
+                if (empty($filteredGatherings)) {
+                    $_SESSION['flash_message'] = "No gatherings found matching the search criteria.";
+                    $_SESSION['flash_type'] = "error";
+                    header("Location: /gathering");
+                    exit;
+                }
+
+                $_SESSION['flash_message'] = "Search results found.";
+                $_SESSION['flash_type'] = "success";
+                $gatherings = $filteredGatherings;
+                return include $this->fileHelper->getFilePath('GatheringList');
+            }
         } catch (Exception $e) {
             error_log("[GatheringController] Error in searchGatherings: " . $e->getMessage());
-            return [];
+            $_SESSION['flash_message'] = "An error occurred while searching for gatherings.";
+            $_SESSION['flash_type'] = "error";
+            header("Location: /gathering");
+            exit;
         }
     }
-
 
 
     // public function isNewGatheringConflicting($userID, $gatheringID)
@@ -378,6 +409,8 @@ class GatheringController
         try {
             $userID = $_SESSION['profile']['profileID'] ?? null;
             error_log("User ID: " . $userID);
+            $_SESSION['flash_message'] = "Match Gathering Found.";
+            $_SESSION['flash_type'] = "success";        
             $gatherings = $this->gatheringModel->matchGathering($userID);
 
             if (empty($gatherings)) {
@@ -397,7 +430,7 @@ class GatheringController
         $this->gatheringModel->checkAndTransitionGatherings();
     }
 
-    //
+
     // HELPER FUNCTION to save location (will DELETE in future)
     //
     public function saveLocation()
