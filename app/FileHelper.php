@@ -68,18 +68,19 @@ class FileHelper
             "StylesCSS" => "/css/styles.css",
             "iconPNG" => "/asset/bubble.png",
             "match" => "/asset/Random.png",
-            "dinner" => "/asset/dinnerpic.png",
+            "dining" => "/asset/dinnerpic.png",
             "defaultTag" => "/asset/default-tag.png",
             "map" => "/asset/map.png",
             "food" => "/asset/eat.png",
             "chill" => "/asset/chill.png",
             "study" => "/asset/study.png",
-            "natural" => "/asset/natural.png",
+            "nature" => "/asset/natural.png",
             "shopping" => "/asset/shopping.png",
             "workout" => "/asset/gym.png",
             "entertainment" => "/asset/game.png",
             "music" => "/asset/music.png",
             "movie" => "/asset/movie.png",
+            "hangout" => "/asset/party.png",
         ];
 
         switch ($this->permission) {
