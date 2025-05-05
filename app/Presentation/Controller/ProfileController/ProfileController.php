@@ -19,7 +19,6 @@ class ProfileController
 
     public function validateLogin()
     {
-
         // Get submitted credentials
         $phoneNumber = $_POST['phoneNumber'] ?? '';
         $password = $_POST['password'] ?? '';
@@ -162,22 +161,6 @@ class ProfileController
             $hobbies,
             $preferences
         );
-<<<<<<< HEAD
-=======
-
-        if (isset($result['field'])) {
-            $response = [
-                'success' => $result['success'],
-                'errors'  => $result['success']
-                    ? []
-                    : [$result['field'] => $result['message']]
-            ];
-        } else {
-            // assume model already returned the new shape
-            $response = $result;
-        }
-
->>>>>>> main
         echo json_encode($response);
         exit;
     }
