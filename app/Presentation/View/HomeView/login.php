@@ -1,8 +1,5 @@
 <?php
 $title = "Login";
-
-use Presentation\Controller\GatheringController\HomeController;
-
 $asset = new FileHelper('asset');
 ?>
 <!-- Bootstrap -->
@@ -54,10 +51,6 @@ $asset = new FileHelper('asset');
                             <button type="submit" class="btn btn-primary">Login</button>
                         </div>
                     </form>
-<!-- 
-                    <div class="text-center mt-3">
-                        Don't have an account? <a href="/profile/create">Sign up</a>
-                    </div> -->
                 </div>
             </div>
         </div>
