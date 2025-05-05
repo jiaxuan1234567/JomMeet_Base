@@ -77,6 +77,7 @@ $(() => {
     updateButtons();
 
     $('#createGatheringFormEl').on('submit', function () {
+        $('#createBtn').prop('disabled', true).text('Creating...');
         sessionStorage.removeItem('__field_states__');
     });
 

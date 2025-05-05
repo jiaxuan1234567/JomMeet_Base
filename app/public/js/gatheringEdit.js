@@ -52,7 +52,7 @@ $(() => {
 
     // Submit Button
     $('#createGatheringFormEl').on('submit', function () {
-        //sessionStorage.removeItem('__field_states__');
+        $('#createBtn').prop('disabled', true).text('Updating...');
     });
 
     fields.forEach(fieldId => {

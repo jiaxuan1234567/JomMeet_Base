@@ -8,7 +8,7 @@ require_once __DIR__ . '/../HomeView/header.php';
     <!-- Spline 3D Object -->
     <spline-viewer url="https://prod.spline.design/VDuiMvkxF4DPHkAv/scene.splinecode" class="spline-model"></spline-viewer>
     <div>
-        <a href="#" class="btn hero-btn px-4 py-2">Let's get started</a>
+        <a href="/gathering" class="btn hero-btn px-4 py-2">Let's get started</a>
     </div>
 </section>
 
