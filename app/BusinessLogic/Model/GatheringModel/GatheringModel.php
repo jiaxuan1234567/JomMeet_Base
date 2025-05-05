@@ -1045,4 +1045,10 @@ class GatheringModel
 
         return $updated;
     }
+
+    public function getLocationFeedbackByGatheringAndLocation(int $gatheringId, int $locationId): array
+    {
+        return $this->gatheringDAO
+            ->getLocationFeedbackByGatheringAndLocation($gatheringId, $locationId);
+    }
 }

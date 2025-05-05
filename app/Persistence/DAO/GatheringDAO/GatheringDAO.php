@@ -854,4 +854,32 @@ class GatheringDAO
             return null;
         }
     }
+    
+       public function getLocationFeedbackByGatheringAndLocation($gatheringId, $locationId)
+    {
+        try {
+            $stmt = $this->db->prepare("
+              SELECT 
+                f.feedbackDesc,
+                f.date,
+                p.profileID,
+                p.nickname AS name,
+                NULL          AS avatar
+              FROM feedback f
+              JOIN profile p ON f.profileID = p.profileID
+             WHERE f.gatheringID  = :gid
+               AND f.locationID   = :lid
+               AND f.feedbackType = 'LOCATION'
+             ORDER BY f.date DESC
+            ");
+            $stmt->execute([
+              ':gid' => $gatheringId,
+              ':lid' => $locationId
+            ]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching location feedbacks: " . $e->getMessage());
+            return [];
+        }
+    }
 }
