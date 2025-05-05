@@ -54,15 +54,26 @@ class GatheringController
     // GET: select-location
     public function viewSelectLocation()
     {
-        if (empty($_SESSION['allow_select_location'])) {
+        //empty($_SESSION['allow_select_location'])
+        if ($_SESSION['previous_page'] != '/api/validate-gathering') {
             $_SESSION['flash_message'] = 'Restricted Page';
             $_SESSION['flash_type'] = 'error';
             header('Location: /');
             exit;
         }
 
-        unset($_SESSION['allow_select_location']);
+        //unset($_SESSION['allow_select_location']);
         include $this->fileHelper->getFilePath('SelectLocation');
+    }
+
+    // POST: select-location
+    public function SelectedLocation()
+    {
+        if (isset($_SESSION['allow_select_location'])) {
+            unset($_SESSION['allow_select_location']);
+        }
+        header('Location: /my-gathering/create');
+        exit;
     }
 
     // POST: create-gathering

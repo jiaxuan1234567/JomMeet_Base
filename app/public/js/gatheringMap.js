@@ -148,7 +148,19 @@ function submitLocationForm(loc) {
     sessionStorage.setItem('__field_states__', JSON.stringify(fieldStates));
 
     // Redirect
-    window.location.href = '/my-gathering/create';
+    //window.location.href = '/my-gathering/create';
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/my-gathering/create/location';
+    form.style.display = 'none';
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'locationId';
+    input.value = loc.locationID;
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
 }
 
 async function performSearch() {
