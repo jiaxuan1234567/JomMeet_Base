@@ -298,29 +298,6 @@ class GatheringDAO
             return [];
         }
     }
-    
-    // Auto update gathering status
-    public function updateGatheringStatuses()
-    {
-        try {
-            $now = new \DateTime();
-            $nowFormatted = $now->format('Y-m-d H:i:s');
-
-            $sql = "UPDATE gathering
-                SET status = CASE
-                    WHEN CONCAT(date, ' ', startTime) > :now THEN 'NEW'
-                    WHEN CONCAT(date, ' ', startTime) <= :now AND CONCAT(date, ' ', endTime) >= :now THEN 'START'
-                    WHEN CONCAT(date, ' ', endTime) < :now THEN 'END'
-                    ELSE status
-                END
-                WHERE status != 'CANCELLED'";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([':now' => $nowFormatted]);
-        } catch (PDOException $e) {
-            error_log("[GatheringDAO] updateGatheringStatuses: " . $e->getMessage());
-        }
-    }
 
 
     public function getUserHostedGatherings($profileId)
