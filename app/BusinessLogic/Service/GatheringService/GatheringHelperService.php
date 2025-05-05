@@ -179,7 +179,6 @@ class GatheringHelperService
         $touched = $data['touched'] ?? '';
         $tag = $data['value']['gatheringTag'] ?? '';
         $error = '';
-        $validTags = array_map('strtoupper', $validTags);
 
         if ($tag === '') {
             $error = 'Preference is required.';

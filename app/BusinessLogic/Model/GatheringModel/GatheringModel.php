@@ -32,6 +32,7 @@ class GatheringModel
     public function getPreference()
     {
         return $this->profileModel->getAllPreferences();
+        //return ['FOOD', 'CHILL', 'STUDY', 'NATURAL', 'SHOPPING', 'WORKOUT', 'ENTERTAINMENT', 'MUSIC', 'MOVIE'];
     }
 
     public function getPreferenceTags()

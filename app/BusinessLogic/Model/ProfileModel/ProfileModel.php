@@ -59,6 +59,11 @@ class ProfileModel
         ];
     }
 
+    // public function getPreference()
+    // {
+    //     return ['FOOD', 'CHILL', 'STUDY', 'NATURAL', 'SHOPPING', 'WORKOUT', 'ENTERTAINMENT', 'MUSIC', 'MOVIE'];
+    // }
+
     public function getAllPreferences()
     {
         return ['Food', 'Chill', 'Study', 'Natural', 'Shopping', 'Workout', 'Entertainment', 'Music', 'Movie'];
