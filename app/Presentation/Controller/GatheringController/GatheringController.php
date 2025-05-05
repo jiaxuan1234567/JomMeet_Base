@@ -449,32 +449,37 @@ class GatheringController
     // ============================================================================
     // GET the feedback page
     // POST to save feedback
-    public function locationFeedback()
-    {
-        $profileId    = $_SESSION['profile']['profileID'];
-        $gatheringId  = (int)($_POST['gatheringID']   ?? 0);
-        $locationId   = (int)($_POST['locationID']    ?? 0);
-        $desc         = trim($_POST['feedbackDesc']   ?? '');
+    public function submitLocationFeedback()
+{
+    $profileId    = $_SESSION['profile']['profileID'];
+    $gatheringId  = (int)($_POST['gatheringID']   ?? 0);
+    $locationId   = (int)($_POST['locationID']    ?? 0);
+    $desc         = trim($_POST['feedbackDesc']   ?? '');
 
-        // Only participants can submit
-        if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringId)) {
-            $_SESSION['flash_message'] = "You must join this gathering to leave feedback.";
-            $_SESSION['flash_type']    = "error";
-        }
-        // And only once per gathering
-        else if ($this->gatheringModel->saveLocationFeedback($profileId, $gatheringId, $locationId, $desc)) {
-            $_SESSION['flash_message'] = "Thank you for your feedback!";
-            $_SESSION['flash_type']    = "success";
-        } else {
-            $_SESSION['flash_message'] = "You have already left feedback for this gathering.";
-            $_SESSION['flash_type']    = "error";
-        }
-
-        $locationFeedbacks = $this->gatheringModel->getLocationFeedback($locationId);
-        error_log("Location Feedbacks: " . print_r($locationFeedbacks, true));
-        include $this->fileHelper->getFilePath('LocationFeedback');
-        exit;
+    if (empty($desc)) {
+        $_SESSION['flash_message'] = "Your feedback is invalid.";
+        $_SESSION['flash_type']    = "error";
     }
+ 
+    else if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringId)) {
+        $_SESSION['flash_message'] = "You must join this gathering to leave feedback.";
+        $_SESSION['flash_type']    = "error";
+    }
+    
+    else if ($this->gatheringModel->saveLocationFeedback($profileId, $gatheringId, $locationId, $desc)) {
+        $_SESSION['flash_message'] = "Your feedback has been successfully submitted.";
+        $_SESSION['flash_type']    = "success";
+    } else {
+        $_SESSION['flash_message'] = "You have already left feedback for this gathering.";
+        $_SESSION['flash_type']    = "error";
+    }
+
+    $locationFeedbacks = $this->gatheringModel->getLocationFeedbackByGatheringAndLocation($gatheringId, $locationId);
+    error_log("Location Feedbacks: " . print_r($locationFeedbacks, true));
+    include $this->fileHelper->getFilePath('LocationFeedback');
+    exit;
+}
+
 
     // GET: display all gathering feedback + form
     public function showGatheringFeedback()
@@ -488,6 +493,24 @@ class GatheringController
         // include the view—which expects $gatheringID & $gatheringFeedbacks
         include $this->fileHelper->getFilePath('GatheringFeedback');
     }
+
+    // public function showLocationFeedback()
+    // {
+    //     $profileId    = $_SESSION['profile']['profileID'];
+    //     $gatheringId  = (int)($_POST['gatheringID']  ?? 0);
+    //     $locationId   = (int)($_POST['locationID']   ?? 0);
+
+    //     // Only participants can view
+    //     if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringId)) {
+    //         $_SESSION['flash_message'] = "You must join this gathering to leave feedback.";
+    //         $_SESSION['flash_type']    = "error";
+    //         header("Location: /my-gathering/view/{$gatheringId}");
+    //         exit;
+    //     }
+
+    //     $locationFeedbacks = $this->gatheringModel->getLocationFeedback($locationId);
+    //     include $this->fileHelper->getFilePath('LocationFeedback');
+    // }
 
     public function showLocationFeedback()
     {
@@ -503,9 +526,13 @@ class GatheringController
             exit;
         }
 
-        $locationFeedbacks = $this->gatheringModel->getLocationFeedback($locationId);
+        $locationFeedbacks = $this->gatheringModel
+            ->getLocationFeedbackByGatheringAndLocation($gatheringId, $locationId);
+
+
         include $this->fileHelper->getFilePath('LocationFeedback');
     }
+
 
     // POST: save a new anonymous gathering feedback, then redirect back
     public function submitGatheringFeedback()
@@ -513,15 +540,19 @@ class GatheringController
         $profileId   = $_SESSION['profile']['profileID'];
         $gatheringID = (int)($_POST['gatheringID'] ?? 0);
         $desc        = trim($_POST['feedbackDesc'] ?? '');
+        if (empty($desc)) {
+            $_SESSION['flash_message'] = "Your feedback is invalid.";
+            $_SESSION['flash_type']    = "error";
+        }
 
         // Only participants can submit
-        if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringID)) {
+        else if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringID)) {
             $_SESSION['flash_message'] = "You must join this gathering to leave feedback.";
             $_SESSION['flash_type']    = "error";
         }
         // And only once per gathering
         else if ($this->gatheringModel->addGatheringFeedback($profileId, $gatheringID, $desc)) {
-            $_SESSION['flash_message'] = "Thank you for your feedback!";
+            $_SESSION['flash_message'] = "Your feedback has been successfully submitted.";
             $_SESSION['flash_type']    = "success";
         } else {
             $_SESSION['flash_message'] = "You have already left feedback for this gathering.";

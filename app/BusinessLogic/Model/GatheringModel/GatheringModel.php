@@ -243,6 +243,7 @@ class GatheringModel
         return $this->gatheringDAO->verifyUserInGathering($userID, $gatheringID);
     }
 
+
     public function isBeforeStartTime($gatheringID)
     {
         try {
