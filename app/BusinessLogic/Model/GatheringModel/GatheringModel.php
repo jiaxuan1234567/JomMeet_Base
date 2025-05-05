@@ -3,6 +3,7 @@
 namespace BusinessLogic\Model\GatheringModel;
 
 use Persistence\DAO\GatheringDAO\GatheringDAO;
+use BusinessLogic\Model\ProfileModel\ProfileModel;
 use BusinessLogic\Service\GatheringService\NotificationService;
 use BusinessLogic\Service\GatheringService\GatheringHelperService;
 use BusinessLogic\Service\GatheringService\CheckGatheringStatusService;
@@ -15,12 +16,14 @@ class GatheringModel
     private $gatheringDAO;
     private $notificationService;
     private $fileHelper;
+    private $profileModel;
 
     public function __construct()
     {
         $this->gatheringDAO = new GatheringDAO();
         $this->notificationService = new NotificationService();
         $this->fileHelper = new FileHelper('gathering');
+        $this->profileModel = new ProfileModel();
     }
 
     // ============================================================================
@@ -28,7 +31,8 @@ class GatheringModel
     // ============================================================================
     public function getPreference()
     {
-        return ['FOOD', 'CHILL', 'STUDY', 'NATURAL', 'SHOPPING', 'WORKOUT', 'ENTERTAINMENT', 'MUSIC', 'MOVIE'];
+        return $this->profileModel->getAllPreferences();
+        //return ['FOOD', 'CHILL', 'STUDY', 'NATURAL', 'SHOPPING', 'WORKOUT', 'ENTERTAINMENT', 'MUSIC', 'MOVIE'];
     }
 
     public function getPreferenceTags()
@@ -288,6 +292,16 @@ class GatheringModel
         if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
             error_log("User $userID cannot join gathering $gatheringID: maximum participants reached.");
             $_SESSION['flash_message'] = "The gathering is already full.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
+        $now = new DateTime();
+        $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
+        $endTime = new DateTime($gathering['date'] . ' ' . $gathering['endTime']);
+        if ($this->gatheringDAO->hasTimeConflict($userID, $startTime, $endTime)) {
+            error_log("User $userID cannot join gathering $gatheringID: time conflict with another gathering.");
+            $_SESSION['flash_message'] = "You have a time conflict with another gathering.";
             $_SESSION['flash_type'] = "error";
             return false;
         }
@@ -803,13 +817,13 @@ class GatheringModel
         $desc = trim($data['description'] ?? '');
         if ($desc === '') {
             return [
-                'success' => false, 
+                'success' => false,
                 'message' => 'Description cannot be empty.'
             ];
         }
         if (mb_strlen($desc) > 255) {
             return [
-                'success' => false, 
+                'success' => false,
                 'message' => 'Description must be less than 255 characters.'
             ];
         }
@@ -846,7 +860,7 @@ class GatheringModel
 
         return ['success' => true];
     }
-    
+
     // ============================================================================
     // FUNCTIONS
     // ============================================================================

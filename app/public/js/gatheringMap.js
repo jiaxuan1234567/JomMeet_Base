@@ -69,6 +69,8 @@ async function showDetailPanel(loc, pos, liElem) {
         if (photo?.name) {
             const apiKey = 'AIzaSyCIm3LWq0gbsblgi0kmbEscuFq9zUoERD4';
             imageUrl = `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxWidthPx=400`;
+            //imageUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=PHOTO_REF&key=${apiKey}`;
+
         }
     } catch (err) {
         console.warn('Google photo fetch failed:', err);
@@ -297,93 +299,3 @@ $(document).ready(function () {
         $('#vertBar').toggleClass('d-none', !hasText);
     });
 });
-
-
-/* ------------------------ use to add location ---------------------------------------- */
-// async function performSearch() {
-//     const query = $('#searchBox').val().trim();
-//     if (!query) return;
-
-//     $('#resultsList').empty();
-
-//     const { Place, Marker, LatLng, Size, Animation } = await loadLibraries();
-
-//     // build the request
-//     const request = {
-//         textQuery: query,
-//         fields: ['id', 'displayName', 'formattedAddress', 'location'],
-//         locationBias: map.getCenter().toJSON(),
-//         maxResultCount: 10
-//     };
-
-//     // call the new searchByText endpoint :contentReference[oaicite:0]{index=0}
-//     //@ts-ignore
-//     const { places } = await Place.searchByText(request);
-
-//     places.forEach(place => {
-//         console.log(place.id, place.displayName, place.formattedAddress, place.location);
-//         const pos = place.location;
-
-//         // 3a) list item
-//         const $li = $('<li>')
-//             .addClass('list-group-item list-group-item-action')
-//             .html(`<strong>${place.displayName}</strong><br>${place.formattedAddress || ''}`)
-//             .appendTo('#resultsList')
-//             .on('click', () => selectPlace(place));
-
-//         // 3b) marker
-//         const m = new google.maps.Marker({
-//             position: pos,
-//             map,
-//             icon: {
-//                 url: '/asset/geo-alt.svg',
-//                 scaledSize: google.maps.Size(32, 32)
-//             },
-//         });
-//         m.placeData = place;  // stash the full Place object
-//         m.addListener('click', () => {
-//             selectPlace(place);
-//             m.setAnimation(google.maps.Animation.BOUNCE);
-//             setTimeout(() => m.setAnimation(null), 700);
-//         });
-//         markers.push(m);
-//     });
-
-//     // zoom to first result
-//     if (places[0]) {
-//         map.panTo(places[0].location);
-//         map.setZoom(15);
-//     }
-// }
-// async function selectPlace(place) {
-//     // pan & zoom
-//     map.panTo(place.location);
-//     map.setZoom(17);
-
-//     // update hidden coords
-//     updateCoordinates(place.location.toJSON());
-
-//     // if you need more fields than your initial search, you can do:
-//     // const detailer = new Place({ id: place.placeId });
-//     // await detailer.fetchFields({ fields:['displayName','formattedAddress','openingHours','rating'] });
-//     // then read detailer.displayName, etc. :contentReference[oaicite:1]{index=1}
-
-//     const payload = {
-//         place_id: place.id,
-//         name: place.displayName,
-//         address: place.formattedAddress,
-//         latitude: place.location.lat(),
-//         longitude: place.location.lng()
-//     };
-//     console.log('About to save:', payload);
-
-//     // POST back to your server
-//     $.ajax({
-//         url: '/gathering/location/save',
-//         method: 'POST',
-//         contentType: 'application/json',
-//         data: JSON.stringify(payload),
-//         success: e => console.log('Location saved!', e),
-//         error: e => console.error('Save failed', e)
-//     });
-// }

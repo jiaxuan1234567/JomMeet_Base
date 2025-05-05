@@ -4,10 +4,8 @@ namespace Presentation\Controller\GatheringController;
 
 use BusinessLogic\Model\GatheringModel\GatheringModel;
 
-use Database;
 use Exception;
 use FileHelper;
-use PDOException;
 
 class GatheringController
 {
@@ -55,8 +53,14 @@ class GatheringController
     public function viewSelectLocation()
     {
         //empty($_SESSION['allow_select_location'])
-        if ($_SESSION['previous_page'] != '/api/validate-gathering' && $_SESSION['previous_page'] != '/api/savedLocations' && $_SESSION['previous_page'] != '/my-gathering/create') {
-            $_SESSION['flash_message'] = 'Restricted Page' . $_SESSION['previous_page'];
+        if (
+            $_SESSION['previous_page'] != '/api/validate-gathering' &&
+            $_SESSION['previous_page'] != '/api/savedLocations' &&
+            $_SESSION['previous_page'] != '/api/location-feedback' &&
+            $_SESSION['previous_page'] != '/api/search-location' &&
+            $_SESSION['previous_page'] != '/my-gathering/create'
+        ) {
+            $_SESSION['flash_message'] = 'Restricted Page';
             $_SESSION['flash_type'] = 'error';
             header('Location: /');
             exit;
@@ -440,54 +444,6 @@ class GatheringController
     public function runGatheringJob()
     {
         $this->gatheringModel->checkAndTransitionGatherings();
-    }
-
-
-    // HELPER FUNCTION to save location (will DELETE in future)
-    //
-    public function saveLocation()
-    {
-        // read JSON POST body
-        $loc = json_decode(file_get_contents('php://input'), true);
-
-        $db = Database::getConnection();
-
-        try {
-            try {
-                $placeId = $loc['place_id'];
-                $name = $loc['name'];
-                $address = $loc['address'];
-                $latitude = $loc['latitude'];
-                $longtitude = $loc['longitude'];
-
-                $sql = "
-                          INSERT INTO `location` (placeID, locationName, address,  longitude, latitude)
-                          VALUES (:pid, :name, :addr, :lng, :lat)
-                          ON DUPLICATE KEY UPDATE
-                            locationName = VALUES(locationName),
-                            `address`    = VALUES(`address`),
-                            latitude     = VALUES(latitude),
-                            longitude    = VALUES(longitude)
-            
-                        ";
-                $stmt = $db->prepare($sql);
-                return $stmt->execute([
-                    ':pid'  => $placeId,
-                    ':name' => $name,
-                    ':addr' => $address,
-                    ':lng'  => $longtitude,
-                    ':lat'  => $latitude,
-                ]);
-            } catch (PDOException $e) {
-                error_log("Error in saveLocation: " . $e->getMessage());
-                return false;
-            }
-            http_response_code(200);
-            echo $status;
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo $e->getMessage();
-        }
     }
 
     // ============================================================================
