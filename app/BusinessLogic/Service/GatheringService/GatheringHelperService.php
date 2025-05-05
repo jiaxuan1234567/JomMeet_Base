@@ -107,10 +107,8 @@ class GatheringHelperService
                     }
                 }
             }
-        }
-
-        // Validate single field overlaps
-        if ($field === $touched) {
+        } else {
+            //if ($field === $touched)
             if ($field === 'inputDate' && $date && $date < $today) {
                 return [
                     'valid' => false,
@@ -122,8 +120,9 @@ class GatheringHelperService
                 ];
             }
 
-            if ($field === 'startTime' || $field === 'endTime') {
-                $targetDT = $field === 'startTime' ? $startDT : $endDT;
+            if ($field === 'inputDateStartTime' || $field === 'inputDateEndTime') {
+                $targetDT = $field === 'inputDateStartTime' ? $startDT : $endDT;
+                error_log($targetDT->format('Y-m-d H:i') ?? 'null');
 
                 foreach ($joinedGatherings as $g) {
                     $joinedStart = new DateTime("{$g['date']} {$g['startTime']}");
