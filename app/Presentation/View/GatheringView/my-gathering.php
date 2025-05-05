@@ -154,10 +154,10 @@ $asset = new FileHelper('asset');
         const $tabContent = $('#gatheringTabsContent .tab-pane');
 
         // Render all tabs at once based on the key
-        Object.entries(allGatherings).forEach(([key, gatherings]) => {
-            const $container = $(`#${key} .row`);
-            renderGatheringList($container, gatherings);
-        });
+        // Object.entries(allGatherings).forEach(([key, gatherings]) => {
+        //     const $container = $(`#${key} .row`);
+        //     renderGatheringList($container, gatherings);
+        // });
 
         // Update tab UI (active color)
         function setActiveTab(status) {
@@ -214,6 +214,45 @@ $asset = new FileHelper('asset');
             const actions = g.action.map(label => {
                 switch (label.toLowerCase()) {
                     case 'send reminder':
+                        return `<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>`;
+                    case 'edit gathering':
+                        return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
+                    case 'cancel gathering':
+                        return `<li><form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
+                                <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
+                            </form></li>`;
+                    case 'reply reminder':
+                        return `<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>`;
+                    case 'leave gathering':
+                        return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
+                                <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
+                            </form></li>`;
+                    case 'gathering feedback':
+                        return `<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>`;
+                    case 'location feedback':
+                        return `<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>`;
+                    default:
+                        return '';
+                }
+            }).join('');
+
+            return `
+            <div class="dropdown rounded border-0">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
+                    Action
+                </button>
+                <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
+                    ${actions}
+                </ul>
+            </div>
+        `;
+        }
+
+        function renderActions(g) {
+            if (!g.action || !g.action.length) return '';
+            const actions = g.action.map(label => {
+                switch (label.toLowerCase()) {
+                    case 'send reminder':
                         return `<li><a class="dropdown-item fw-bold" href="/my-gathering/reminder/view/${g.id}">Send Reminder</a></li>`;
                     case 'edit gathering':
                         return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
@@ -250,6 +289,14 @@ $asset = new FileHelper('asset');
         `;
         }
 
+        function ajaxRender(status) {
+            $.get(`/api/my-gathering/${status}`, function(gatherings) {
+                console.log('success', status, gatherings);
+                const $container = $(`#${status} .row`);
+                renderGatheringList($container, gatherings);
+            });
+        }
+
         // Tab switch behavior
         $tabs.on('click', function(e) {
             e.preventDefault();
@@ -265,12 +312,14 @@ $asset = new FileHelper('asset');
             //     const $container = $(`#${status} .row`);
             //     renderGatheringList($container, gatherings);
             // });
+            ajaxRender(status);
         });
 
         const initialTab = window.location.hash.slice(1) || 'all';
         setActiveTab(initialTab);
         $tabContent.removeClass('show active');
         $(`#${initialTab}`).addClass('show active');
+        ajaxRender(initialTab);
 
         // // Jiaxuan
         // window.confirmCancelGathering = function(id) {
@@ -282,45 +331,6 @@ $asset = new FileHelper('asset');
         //     $('#leaveGatheringModal').modal('show');
         // };
     });
-
-    function renderActions(g) {
-        if (!g.action || !g.action.length) return '';
-        const actions = g.action.map(label => {
-            switch (label.toLowerCase()) {
-                case 'send reminder':
-                    return `<li><a class="dropdown-item fw-bold" href="#">Send Reminder</a></li>`;
-                case 'edit gathering':
-                    return `<li><a class="dropdown-item fw-bold" href="/my-gathering/edit/${g.id}">Edit Gathering</a></li>`;
-                case 'cancel gathering':
-                    return `<li><form method="POST" action="/my-gathering/cancel/${g.id}" onsubmit="return confirm('Confirm to cancel the gathering?')">
-                                <button type="submit" class="dropdown-item fw-bold">Cancel Gathering</button>
-                            </form></li>`;
-                case 'reply reminder':
-                    return `<li><a class="dropdown-item fw-bold" href="#">Reply Reminder</a></li>`;
-                case 'leave gathering':
-                    return `<li><form method="POST" action="/my-gathering/leave/${g.id}" onsubmit="return confirm('Confirm to leave the gathering?')">
-                                <button type="submit" class="dropdown-item fw-bold">Leave Gathering</button>
-                            </form></li>`;
-                case 'gathering feedback':
-                    return `<li><a class="dropdown-item fw-bold" href="#">Gathering Feedback</a></li>`;
-                case 'location feedback':
-                    return `<li><a class="dropdown-item fw-bold" href="#">Location Feedback</a></li>`;
-                default:
-                    return '';
-            }
-        }).join('');
-
-        return `
-            <div class="dropdown rounded border-0">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px;">
-                    Action
-                </button>
-                <ul class="dropdown-menu p-0 action-dropdown" style="background-color: #F5F5F7;">
-                    ${actions}
-                </ul>
-            </div>
-        `;
-    }
 </script>
 
 <?php require_once __DIR__ . '/../HomeView/footer.php'; ?>

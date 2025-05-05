@@ -145,40 +145,40 @@ class GatheringController
         exit;
     }
 
-    // // AJAX GET: my gathering with status
-    // public function ajaxGetMyGathering($status)
-    // {
-    //     $userID = $_SESSION['userID'] ?? null;
-    //     if (!$userID) {
-    //         http_response_code(401);
-    //         echo json_encode(['error' => 'Unauthorized']);
-    //         return;
-    //     }
+    // AJAX GET: my gathering with status
+    public function ajaxGetMyGathering($status)
+    {
+        $userID = $_SESSION['profile']['profileID'] ?? null;
+        if (!$userID) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Unauthorized']);
+            return;
+        }
 
-    //     $allGatherings = $this->gatheringModel->getMyGatheringsWithTab($userID); // ← Your full list
-    //     $status = strtolower($status);
+        $allGatherings = $this->gatheringModel->getMyGatheringsWithTab($userID); // ← Your full list
+        $status = strtolower($status);
 
-    //     $filtered = array_filter($allGatherings, function ($g) use ($status) {
-    //         switch ($status) {
-    //             case 'hosted':
-    //                 return $g['isHost'] && $g['status'] !== 'cancelled';
-    //             case 'upcoming':
-    //                 return $g['status'] === 'new';
-    //             case 'ongoing':
-    //                 return $g['status'] === 'start';
-    //             case 'completed':
-    //                 return $g['status'] === 'end';
-    //             case 'cancelled':
-    //                 return $g['isHost'] && $g['status'] === 'cancelled';
-    //             case 'all':
-    //             default:
-    //                 return true;
-    //         }
-    //     });
+        // $filtered = array_filter($allGatherings, function ($g) use ($status) {
+        //     switch ($status) {
+        //         case 'hosted':
+        //             return $g['isHost'] && $g['status'] !== 'cancelled';
+        //         case 'upcoming':
+        //             return $g['status'] === 'new';
+        //         case 'ongoing':
+        //             return $g['status'] === 'start';
+        //         case 'completed':
+        //             return $g['status'] === 'end';
+        //         case 'cancelled':
+        //             return $g['isHost'] && $g['status'] === 'cancelled';
+        //         case 'all':
+        //         default:
+        //             return true;
+        //     }
+        // });
 
-    //     header('Content-Type: application/json');
-    //     echo json_encode(array_values($filtered));
-    // }
+        header('Content-Type: application/json');
+        echo json_encode($allGatherings[$status] ?? []);
+    }
 
     // GET: gathering-detail
     public function viewDetail($gatheringId)
@@ -246,20 +246,20 @@ class GatheringController
     }
 
     public function ajaxGetLocationFeedback()
-{
-    header('Content-Type: application/json');
+    {
+        header('Content-Type: application/json');
 
-    $locationId = $_GET['locationId'] ?? null;
+        $locationId = $_GET['locationId'] ?? null;
 
-    if (!$locationId) {
-        echo json_encode([]);
-        return;
+        if (!$locationId) {
+            echo json_encode([]);
+            return;
+        }
+
+        $feedbacks = $this->gatheringModel->getLocationFeedback($locationId);
+
+        echo json_encode($feedbacks);
     }
-    
-    $feedbacks = $this->gatheringModel->getLocationFeedback($locationId);
-
-    echo json_encode($feedbacks);
-}
 
 
     // -- Join Gathering --
