@@ -906,4 +906,23 @@ class GatheringDAO
         $stmt->execute([':query' => '%' . $query . '%']);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getLocationByGatheringId($gatheringId)
+    {
+        try {
+            $sql = "
+                SELECT 
+                    l.*
+                FROM location l
+                JOIN gathering g ON g.locationID = l.locationID
+                WHERE g.gatheringID = :gatheringId
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':gatheringId' => $gatheringId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("[GatheringDAO] Error fetching location by gathering ID: " . $e->getMessage());
+            return null;
+        }
+    }
 }

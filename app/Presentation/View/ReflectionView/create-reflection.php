@@ -2,30 +2,16 @@
 date_default_timezone_set("Asia/Kuala_Lumpur");
 $_title = 'Create Reflection';
 require_once __DIR__ . '/../HomeView/header.php';
-
-//old validation
-// $errors = $_SESSION['reflectionErrors'] ?? [];
-// $old = $_SESSION['old'] ?? [];
-
-// // Clear after use
-// unset($_SESSION['reflectionErrors']);
-// unset($_SESSION['old']);
-
 ?>
 
 
 <div class="main d-flex flex-column min-vh-100">
-<div class="d-flex mb-4 align-items-center border-bottom border-2 px-2 py-3" style="margin-bottom: 2rem !important;">
-    <div class="col-2">
-        <a href="/reflection">
-            <i class="bi bi-arrow-left text-black h3 m-0" style="cursor: pointer;"></i>
+    <div class="container-fluid py-3 d-flex align-items-center">
+        <a href="/reflection" class="me-3">
+            <i class="bi bi-arrow-left text-black" style="font-size: 1.55rem;"></i>
         </a>
+        <h4 class="mb-0">Create Self-Reflection</h4>
     </div>
-    <div class="col-8 text-center">
-        <h2 class="fw-bold mb-0 h5">Create Self-Reflection</h2>
-    </div>
-    <div class="col-2"></div>
-</div>
 
     <div class="container mb-5">
         <div class="container border border-2 rounded-3 m-2 align-content-center" style="background-color: rgba(222,236,255,68); border-color:#0077CC !important;">
