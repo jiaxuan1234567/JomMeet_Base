@@ -11,7 +11,7 @@
                 <div class="col footer-link">
                     <h6>Home</h6>
                     <a href="/reflection">Reflection</a>
-                    <a href="/reflection">Gathering</a>
+                    <a href="/gathering">Gathering</a>
                     <a href="/my-gathering">My Gathering</a>
                 </div>
                 <div class="col footer-link">
