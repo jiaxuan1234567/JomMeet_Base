@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `jommeet`
 --
+CREATE DATABASE IF NOT EXISTS `jommeet` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `jommeet`;
 
 -- --------------------------------------------------------
 
