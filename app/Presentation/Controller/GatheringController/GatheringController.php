@@ -551,6 +551,8 @@ class GatheringController
             $_SESSION['flash_message'] = "You must join this gathering to leave feedback.";
             $_SESSION['flash_type']    = "error";
         }
+
+        
         // And only once per gathering
         else if ($this->gatheringModel->addGatheringFeedback($profileId, $gatheringID, $desc)) {
             $_SESSION['flash_message'] = "Your feedback has been successfully submitted.";
