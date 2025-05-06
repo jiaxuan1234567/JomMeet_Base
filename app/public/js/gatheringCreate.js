@@ -107,7 +107,6 @@ $(() => {
         $('#inputLocation').val(fieldStates['inputLocation'].value);
         $('#locationId').val(id);
         fieldStates['inputLocation'].value = fieldStates['inputLocation'].value;
-        console.log('Location: ', locationDataHandler());
         validateField('inputLocation', locationDataHandler());
     }
 
@@ -133,7 +132,6 @@ $(() => {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function (response) {
-                console.log(response);
 
                 const isValid = response.valid === true;
                 const touched = response.touched;
@@ -174,8 +172,6 @@ $(() => {
 
                 sessionStorage.setItem('__field_states__', JSON.stringify(fieldStates));
                 toggleSubmitButton();
-
-                console.log(fieldStates);
             },
             error: function (xhr) {
                 console.error('AJAX error: ', xhr.responseText);
