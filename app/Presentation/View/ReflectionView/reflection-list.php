@@ -32,13 +32,13 @@ require_once __DIR__ . '/../HomeView/header.php';
                             <div class="col-md-10">
                                 <a href="/reflection/view/<?= $reflection['selfreflectID'] ?>" class="text-decoration-none text-reset">
                                     <div class="card my-4 col-md-4" style="background-color: rgb(86,159,255);">
-                                        <h4 class="card-content font-weight-medium m-2 align-self-center" style="font-size: 20px;"><?php echo htmlspecialchars(date('j F Y g:ia', strtotime($reflection['date']))); ?></h4>
+                                        <h4 class="card-content font-weight-medium m-2 align-self-center" style="font-size: 18px;"><?php echo htmlspecialchars(date('j F Y g:ia', strtotime($reflection['date']))); ?></h4>
                                     </div>
                                     <div class="mb-3">
-                                        <h3 class="ps-3" style="font-size: 45px; letter-spacing: -2px;"><?php echo htmlspecialchars($reflection['title']); ?></h3>
+                                        <h3 class="ps-3" style="font-size: 25px; "><?php echo htmlspecialchars($reflection['title']); ?></h3>
                                     </div>
                                     <div class="mb-4">
-                                        <p class="ps-3" style="font-size: 22px; line-height: 1.22;">
+                                        <p class="ps-3" style="font-size: 18px; line-height: 1.22;">
                                             <?php
                                             $words = explode(' ', strip_tags($reflection['content']));
                                             $preview = implode(' ', array_slice($words, 0, 10));

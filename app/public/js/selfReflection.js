@@ -1,26 +1,4 @@
 $(document).ready(function () {
-    // $('#selfReflectionForm').on('submit', function (e) {
-    //     e.preventDefault();
-
-    //     $.ajax({
-    //         url: /reflection/validate,
-    //         type: 'POST',
-    //         data: { reflectionContent: $(reflectionContent).val() },
-    //         success: function (response) {
-    //             const res = JSON.parse(response);
-    //             if (res.success) {
-    //                 header("Location: /reflection");
-    //             } else {
-    //                 $('#reflectionContent').addClass('is-invalid');
-    //                 $('#errorReflection').text(res.message);
-    //             }
-    //         },
-    //         error: function () {
-    //             alert('An error occured while validating.');
-    //         }
-    //     });
-    // });
-
     const $title = $('#reflectionTitle');
     const $content = $('#reflectionContent');
     const $errorBox = $('#errorReflection');
@@ -81,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
             submitBtn.style.opacity = '0.7';
         } else {
             submitBtn.disabled = false;
-            submitBtn.style.backgroundColor = ''; // Reset to Bootstrap default
+            submitBtn.style.backgroundColor = ''; // Reset to default color
             submitBtn.style.borderColor = '';
             submitBtn.style.cursor = '';
             submitBtn.style.opacity = '';
