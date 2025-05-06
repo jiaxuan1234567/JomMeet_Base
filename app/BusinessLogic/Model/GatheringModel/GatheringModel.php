@@ -292,7 +292,7 @@ class GatheringModel
         // Validate the number of participants
         if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
             error_log("User $userID cannot join gathering $gatheringID: maximum participants reached.");
-            $_SESSION['flash_message'] = "The gathering is already full.";
+            $_SESSION['flash_message'] = "Sorry, this gathering is full of participants. Please select other gatherings.";
             $_SESSION['flash_type'] = "error";
             return false;
         }
@@ -303,6 +303,13 @@ class GatheringModel
         if ($this->gatheringDAO->hasTimeConflict($userID, $startTime, $endTime)) {
             error_log("User $userID cannot join gathering $gatheringID: time conflict with another gathering.");
             $_SESSION['flash_message'] = "You have a time conflict with another gathering.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
+        if($this->isBeforeStartTime($gatheringID) == false){
+            error_log("User $userID cannot join gathering $gatheringID: gathering has already started.");
+            $_SESSION['flash_message'] = "The gathering has already started.";
             $_SESSION['flash_type'] = "error";
             return false;
         }
@@ -642,14 +649,13 @@ class GatheringModel
 
             // validate time constraint
             $start = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
-            $hoursDiff = ($start->getTimestamp() - (new DateTime())->getTimestamp()) / 3600;
 
-            error_log('diff: ' . $hoursDiff);
-            if ($hoursDiff < 3) {
-                $_SESSION['flash_message'] = "Gathering can only be cancelled at least 3 hours before it starts.";
+            if ((new DateTime()) >= $start) {
+                $_SESSION['flash_message'] = "You cannot leave a gathering that has already started.";
                 $_SESSION['flash_type'] = "error";
                 return false;
             }
+
 
             // Leave
             $result = $this->gatheringDAO->leaveGathering($profileId, $gatheringId);
@@ -746,13 +752,25 @@ class GatheringModel
     // ============================================================================
     // REMINDER PART
     // ============================================================================
+
     public function getReminders($gatheringId, $profileId)
     {
         $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
 
         if (!$gathering) {
             error_log("[getReminders] Gathering ID $gatheringId not found.");
-            return false;
+            return [
+                'success' => false,
+                'message' => "You are not authorized to view this gathering reminder."
+            ];
+        }
+
+        if ($gathering['status'] == 'CANCELLED' || $gathering['status'] == 'END') {
+            error_log("[getReminders] Gathering ID $gatheringId is not in valid status.");
+            return [
+                'success' => false,
+                'message' => "Gathering has already ended or been cancelled."
+            ];
         }
 
         if ($gathering['hostProfileID'] == $profileId) {
@@ -761,7 +779,10 @@ class GatheringModel
             $reminders = $this->gatheringDAO->getRemindersByParticipant($gatheringId, $profileId);
         }
 
-        return $reminders;
+        return [
+            'success' => true,
+            'data' => $reminders
+        ];
     }
 
     public function createReminder($data)

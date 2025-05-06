@@ -282,7 +282,7 @@ class GatheringDAO
                     JOIN gathering g ON l.locationID = g.locationID
                     LEFT JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
                     WHERE (g.hostProfileID = :pid) OR (p.profileID = :pid)
-                    ORDER BY g.gatheringID DESC";
+                    ORDER BY STR_TO_DATE(CONCAT(g.date, ' ', g.startTime), '%Y-%m-%d %H:%i:%s') DESC";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -664,8 +664,8 @@ class GatheringDAO
 
     // 1) retrieve all gathering feedback entries
     public function getGatheringFeedbackByGathering(int $gatheringId): array
-{
-    $sql = "
+    {
+        $sql = "
       SELECT 
         f.feedbackDesc,
         f.date,
@@ -675,10 +675,10 @@ class GatheringDAO
         AND f.feedbackType = 'gathering'
       ORDER BY f.date ASC
     ";
-    $stmt = $this->db->prepare($sql);
-    $stmt->execute([':gid' => $gatheringId]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':gid' => $gatheringId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
 
     // 2) insert a new gathering feedback

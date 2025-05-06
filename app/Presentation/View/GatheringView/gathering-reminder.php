@@ -79,22 +79,22 @@ require_once __DIR__ . '/../HomeView/header.php';
         </div>
 
         <?php if (!empty($reminders)): ?>
-            <?php foreach ($reminders as $reminder): ?>
+            <?php foreach ($reminders as $r): ?>
                 <div class="row justify-content-md-center">
                     <div class="mb-5 card w-50 shadow-sm">
 
                         <div class="card-header row bg-blue-color">
                             <div class="role text-sm-start col-6">
-                                <?php echo htmlspecialchars($reminder['role']); ?>
+                                <?php echo htmlspecialchars($r['role']); ?>
                             </div>
                             <div class="time text-sm-end col-6 text-muted">
-                                <?php echo htmlspecialchars($reminder['timeAgo']); ?>
+                                <?php echo htmlspecialchars($r['timeAgo']); ?>
                             </div>
                         </div>
 
                         <div class="card-body">
-                            <h5 class="card-title"><?php echo htmlspecialchars($reminder['nickname']); ?></h5>
-                            <p class="card-text"><?php echo htmlspecialchars($reminder['description']); ?></p>
+                            <h5 class="card-title"><?php echo htmlspecialchars($r['nickname']); ?></h5>
+                            <p class="card-text"><?php echo htmlspecialchars($r['description']); ?></p>
                         </div>
 
                     </div>

@@ -65,7 +65,6 @@ $(() => {
     });
 
     function validateField(fieldId, data) {
-        console.log('Data: ', data);
         $gatheringId = $('#gatheringId').val();
         $.ajax({
             url: '/api/validate-gathering-edit',
@@ -76,7 +75,6 @@ $(() => {
                 data: data
             }),
             success: function (response) {
-                console.log('Response: ', response);
 
 
                 const isValid = response.valid === true;
@@ -123,8 +121,6 @@ $(() => {
                     }
                 }
                 toggleSubmitButton();
-
-                console.log('Edit Field State: ', editFieldStates);
             },
             error: function (xhr, status, error) {
                 console.error('AJAX error: ', xhr.responseText);
