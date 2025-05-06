@@ -233,7 +233,7 @@ class GatheringDAO
         FROM gathering g
         JOIN profilegathering pg ON pg.gatheringID = g.gatheringID
         WHERE pg.profileID = :pid
-        AND g.status = 'NEW'
+        AND g.status IN ('NEW', 'START')
         AND (
             (:start BETWEEN CONCAT(g.date, ' ', g.startTime) AND 
                 CASE 
