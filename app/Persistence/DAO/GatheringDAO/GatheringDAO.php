@@ -281,7 +281,8 @@ class GatheringDAO
                 FROM `location` l
                 JOIN gathering g ON l.locationID = g.locationID
                 LEFT JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
-                WHERE (g.hostProfileID = :pid) OR (p.profileID = :pid)";
+                WHERE (g.hostProfileID = :pid) OR (p.profileID = :pid)
+                ORDER BY STR_TO_DATE(CONCAT(g.date, ' ', g.startTime), '%Y-%m-%d %H:%i:%s') DESC";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -853,8 +854,8 @@ class GatheringDAO
             return null;
         }
     }
-    
-       public function getLocationFeedbackByGatheringAndLocation($gatheringId, $locationId)
+
+    public function getLocationFeedbackByGatheringAndLocation($gatheringId, $locationId)
     {
         try {
             $stmt = $this->db->prepare("
@@ -872,8 +873,8 @@ class GatheringDAO
              ORDER BY f.date DESC
             ");
             $stmt->execute([
-              ':gid' => $gatheringId,
-              ':lid' => $locationId
+                ':gid' => $gatheringId,
+                ':lid' => $locationId
             ]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
