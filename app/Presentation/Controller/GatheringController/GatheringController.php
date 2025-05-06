@@ -493,8 +493,8 @@ class GatheringController
     public function showLocationFeedback()
     {
         $profileId    = $_SESSION['profile']['profileID'];
-        $gatheringId  = (int)($_GET['gatheringID']  ?? 0);
-        $locationId   = (int)($_GET['locationID']   ?? 0);
+        $gatheringId  = (int)($_POST['gatheringID']  ?? 0);
+        $locationId   = (int)($_POST['locationID']   ?? 0);
 
         // Only participants can view
         if (! $this->gatheringModel->verifyUserInGathering($profileId, $gatheringId)) {
