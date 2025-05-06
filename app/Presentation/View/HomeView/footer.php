@@ -21,9 +21,9 @@
                 </div>
                 <div class="col footer-link">
                     <h6>Help</h6>
-                    <a href="about.php#faq">FAQ</a>
-                    <a href="about.php#terms">Terms of use</a>
-                    <a href="about.php#privacy">Private Policy</a>
+                    <a href="/help">FAQ</a>
+                    <a href="/help">Terms of use</a>
+                    <a href="/help">Private Policy</a>
                 </div>
                 <div class="col footer-link">
                     <p class="mb-0">JomMeet Sdn. Bhd.<br>
