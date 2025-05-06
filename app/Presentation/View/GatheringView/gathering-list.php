@@ -18,21 +18,21 @@ $userid = $_SESSION['profile']['profileID'];
         </div>
         <div class="col-9">
             <form class="d-flex" id="search" action="/gathering/search" method="POST">
-                <input class="form-control me-1" name="searchTerm" type="search" 
-                       placeholder="Search by theme, date, time, or preference" 
-                       aria-label="Search" 
-                       value="<?php echo htmlspecialchars($_POST['searchTerm'] ?? ''); ?>"
-                       style="width: 100%;">
+                <input class="form-control me-1" name="searchTerm" type="search"
+                    placeholder="Search by theme, date, time, or preference"
+                    aria-label="Search"
+                    value="<?php echo htmlspecialchars($_POST['searchTerm'] ?? ''); ?>"
+                    style="width: 100%;">
                 <button type="submit" class="btn btn-outline-primary ms-1">Search</button>
             </form>
         </div>
         <div class="col-1 ps-1">
-            <a href="/gathering/match" 
-               class="btn btn-light border border-secondary d-inline-flex align-items-center gap-1" 
-               style="width:100px;">
-                <img src="<?= $asset->getFilePath('match') ?>" 
-                     alt="Icon" 
-                     style="width: 20px; height: 20px;">
+            <a href="/gathering/match"
+                class="btn btn-light border border-secondary d-inline-flex align-items-center gap-1"
+                style="width:100px;">
+                <img src="<?= $asset->getFilePath('match') ?>"
+                    alt="Icon"
+                    style="width: 20px; height: 20px;">
                 <span>Match</span>
             </a>
         </div>
@@ -60,7 +60,7 @@ $userid = $_SESSION['profile']['profileID'];
         <?php if (empty($gatherings)): ?>
             <div style="height: 575px;">
                 <div class="alert alert-info">
-                    No gatherings available at the moment.
+                    The current gathering list is empty, wait for someone to host a gathering or host one yourself.
                 </div>
             </div>
         <?php else: ?>

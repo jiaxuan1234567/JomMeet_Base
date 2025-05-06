@@ -292,7 +292,7 @@ class GatheringModel
         // Validate the number of participants
         if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
             error_log("User $userID cannot join gathering $gatheringID: maximum participants reached.");
-            $_SESSION['flash_message'] = "The gathering is already full.";
+            $_SESSION['flash_message'] = "Sorry, this gathering is full of participants. Please select other gatherings.";
             $_SESSION['flash_type'] = "error";
             return false;
         }
@@ -303,6 +303,13 @@ class GatheringModel
         if ($this->gatheringDAO->hasTimeConflict($userID, $startTime, $endTime)) {
             error_log("User $userID cannot join gathering $gatheringID: time conflict with another gathering.");
             $_SESSION['flash_message'] = "You have a time conflict with another gathering.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
+        if($this->isBeforeStartTime($gatheringID) == false){
+            error_log("User $userID cannot join gathering $gatheringID: gathering has already started.");
+            $_SESSION['flash_message'] = "The gathering has already started.";
             $_SESSION['flash_type'] = "error";
             return false;
         }

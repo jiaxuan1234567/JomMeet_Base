@@ -56,6 +56,7 @@ Route::post('/my-gathering/postGatheringFeedback', [GatheringController::class, 
 // Location feedback
 Route::post('/my-gathering/locationFeedback', [GatheringController::class, 'showLocationFeedback']);
 Route::post('/my-gathering/postLocationFeedback', [GatheringController::class, 'submitLocationFeedback']);
+//Gathering Edit
 Route::get('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'viewEdit']);
 Route::post('/my-gathering/edit/{gatheringId}', [GatheringController::class, 'editSubmit']);
 // reminder

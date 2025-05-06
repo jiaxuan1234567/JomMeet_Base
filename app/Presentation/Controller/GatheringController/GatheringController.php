@@ -357,7 +357,7 @@ class GatheringController
 
             if ($searchTerm === '' || $searchTerm === null) {
                 $_SESSION['flash_message'] = "Please enter a search term.";
-                $_SESSION['flash_type'] = "error";
+                $_SESSION['flash_type'] = "success";
                 header("Location: /gathering");
                 exit;
             }
@@ -551,6 +551,8 @@ class GatheringController
             $_SESSION['flash_message'] = "You must join this gathering to leave feedback.";
             $_SESSION['flash_type']    = "error";
         }
+
+        
         // And only once per gathering
         else if ($this->gatheringModel->addGatheringFeedback($profileId, $gatheringID, $desc)) {
             $_SESSION['flash_message'] = "Your feedback has been successfully submitted.";

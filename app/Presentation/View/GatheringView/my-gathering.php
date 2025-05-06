@@ -100,7 +100,7 @@ $asset = new FileHelper('asset');
             if (!gatherings || !gatherings.length) {
                 $container.html(`
                 <img src="<?= $asset->getFilePath('iconPNG'); ?>" alt="" class="mx-auto d-block w-25">
-                <p class="text-center text-black fw-semibold mt-4">No gatherings found.</p>
+                <p class="text-center text-black fw-semibold mt-4">No gathering joined record.</p>
             `);
                 return;
             }
