@@ -20,7 +20,7 @@ class ReflectionDAO
     public function getAllReflections($profileId)
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM self_reflect WHERE profileID = $profileId");
+            $stmt = $this->db->prepare("SELECT * FROM self_reflect WHERE profileID = $profileId ORDER BY selfreflectID DESC");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
