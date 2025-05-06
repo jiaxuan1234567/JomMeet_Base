@@ -50,3 +50,15 @@ $decrease.on('click', function () {
 $('#triggerDatePicker').on('click', function () {
     $inputDate[0].showPicker?.();
 });
+
+let previousDate = $('#inputDate').val();
+
+$('#inputDate').on('focus', function () {
+    previousDate = $(this).val();
+});
+
+$('#inputDate').on('change', function () {
+    if (!$(this).val()) {
+        $(this).val(previousDate);
+    }
+});
