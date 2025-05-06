@@ -136,31 +136,31 @@ class GatheringModel
     {
         $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
         if (!$gathering) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId not found.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId not found.");
             return false;
         }
 
         // 1. Must be ACTIVE
         if ($gathering['status'] !== 'NEW') {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: status is '{$gathering['status']}', not 'NEW'.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: status is '{$gathering['status']}', not 'NEW'.");
             return false;
         }
 
         // 2. Not hosted by user
         if ($gathering['hostProfileID'] == $profileId) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: hosted by profile ID $profileId.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: hosted by profile ID $profileId.");
             return false;
         }
 
         // 3. No.Pax not full
         if ($gathering['currentParticipant'] >= $gathering['maxParticipant']) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: max participants reached ({$gathering['currentParticipant']}/{$gathering['maxParticipant']}).");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: max participants reached ({$gathering['currentParticipant']}/{$gathering['maxParticipant']}).");
             return false;
         }
 
         // 4. Not joined already
         if ($this->gatheringDAO->isUserJoined($gatheringId, $profileId)) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: user $profileId already joined.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: user $profileId already joined.");
             return false;
         }
 
@@ -168,7 +168,7 @@ class GatheringModel
         $now = new DateTime();
         $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
         if ($startTime <= $now) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
             return false;
         }
 
@@ -177,18 +177,18 @@ class GatheringModel
         $startTime = new DateTime($gathering['date'] . ' ' . $gathering['startTime']);
         $endTime = new DateTime($gathering['date'] . ' ' . $gathering['endTime']);
         if ($startTime <= $now) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: already started at {$startTime->format('Y-m-d H:i:s')}.");
             return false;
         }
 
 
         // 6. Not clashing with user’s active joined gatherings
         if ($this->gatheringDAO->hasTimeConflict($profileId, $startTime, $endTime)) {
-            error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: time conflict with another joined gathering.");
+            // error_log("[getPublicGatheringById] Gathering ID $gatheringId rejected: time conflict with another joined gathering.");
             return false;
         }
 
-        error_log("[getPublicGatheringById] Passed all checks before time conflict for gathering $gatheringId.");
+        // error_log("[getPublicGatheringById] Passed all checks before time conflict for gathering $gatheringId.");
 
         return $gathering;
     }
@@ -242,6 +242,7 @@ class GatheringModel
     {
         return $this->gatheringDAO->verifyUserInGathering($userID, $gatheringID);
     }
+
 
     public function isBeforeStartTime($gatheringID)
     {

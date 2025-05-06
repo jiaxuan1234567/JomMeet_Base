@@ -42,17 +42,39 @@ if (isset($_SESSION['profile']['profileID'])) {
 
     <div id="feedbackContainer" style="width: 100%; max-width: 1000px; margin: 0 auto; overflow-y: auto; padding: 10px 20px;">
       <?php if (empty($gatheringFeedbacks)): ?>
-        <p class="text-center text-muted">No feedback yet. Be the first to share!</p>
+        <p class="text-center text-muted">No feedback from other participants. You can provide your feedback in the field.</p>
       <?php else: ?>
         <?php foreach ($gatheringFeedbacks as $fb): ?>
           <?php
           $feedbackAuthor = isset($fb['profileID']) ? (int) $fb['profileID'] : 0;
           $isMine = ($feedbackAuthor === $loggedInProfile);
           ?>
-          <div class="rounded p-3 mb-3 shadow-sm" style="background-color: <?= $isMine ? '#DEECFF' : '#FFFFFF' ?>;">
-            <small class="text-muted"><?= htmlspecialchars($fb['date']) ?></small>
-            <p class="mt-1 mb-0"><?= nl2br(htmlspecialchars($fb['feedbackDesc'])) ?></p>
+
+          <div class="d-flex mb-3 shadow-sm"
+            style="background-color: <?= $isMine ? '#DEECFF' : '#FFFFFF' ?>;
+            border-radius: 10px;
+            padding: 15px;
+            word-wrap: break-word;
+            width: 100%;">
+
+            <img src="<?= htmlspecialchars($fb['avatar'] ?? '/asset/userIcon.png') ?>"
+              alt="User Avatar"
+              class="rounded-circle"
+              style="width: 40px; height: 40px; object-fit: cover; margin-right: 15px; flex-shrink: 0;">
+
+            <div class="flex-grow-1"
+              style="min-width: 0; overflow-wrap: break-word; word-break: break-word;">
+
+              <?php if (!empty($fb['name'])): ?>
+                <strong><?= htmlspecialchars($fb['name']) ?></strong><br>
+              <?php endif; ?>
+
+              <small class="text-muted"><?= htmlspecialchars($fb['date']) ?></small>
+              <p class="mt-1 mb-0"><?= nl2br(htmlspecialchars($fb['feedbackDesc'])) ?></p>
+            </div>
           </div>
+
+
         <?php endforeach; ?>
       <?php endif; ?>
     </div>
