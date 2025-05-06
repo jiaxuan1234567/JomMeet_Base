@@ -169,6 +169,7 @@ async function performSearch() {
     const query = $('#searchBox').val().trim().toLowerCase();
     $('#resultsList').empty();
     $('#detailPanel').hide();
+    $('#feedbackPanel').hide();
 
     if (!query) return;
 
@@ -289,6 +290,7 @@ $(document).ready(function () {
         $('#vertBar').addClass('d-none');
         $('#resultsList').empty();
         $('#detailPanel').hide();
+        $('#feedbackPanel').hide();
         resetActiveMarker();
         $('#searchBox').focus();
     });
@@ -297,5 +299,13 @@ $(document).ready(function () {
         const hasText = $.trim($(this).val()) !== '';
         $('#clearText').toggleClass('d-none', !hasText);
         $('#vertBar').toggleClass('d-none', !hasText);
+
+
+        if (!hasText) {
+            $('#resultsList').empty();
+            $('#detailPanel').hide();
+            $('#feedbackPanel').hide();
+            resetActiveMarker();
+        }
     });
 });
