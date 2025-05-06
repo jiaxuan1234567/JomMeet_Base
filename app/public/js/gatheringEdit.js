@@ -36,14 +36,19 @@ $(() => {
         updateSelectedTagUI(value);
     });
 
-    // Submit Button
-    $('#createGatheringFormEl').on('submit', function () {
-        //$('#createBtn').prop('disabled', true).text('Updating...');
+    $('#createGatheringFormEl').on('submit', function (e) {
         if ($('#createBtn').prop('disabled')) {
-            e.preventDefault(); // prevent if not valid or no changes
-        } else {
-            $('#createBtn').prop('disabled', true).text('Updating...');
+            e.preventDefault(); // do not submit if not allowed
+            return;
         }
+
+        const confirmUpdate = confirm("Confirm to update the gathering details?");
+        if (!confirmUpdate) {
+            e.preventDefault(); // user cancelled
+            return;
+        }
+
+        $('#createBtn').prop('disabled', true).text('Updating...');
     });
 
     fields.forEach(fieldId => {
