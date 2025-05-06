@@ -32,6 +32,7 @@ class FileHelper
             'HomeModel' => "/BusinessLogic/Model/HomeModel/HomeModel.php",
             'Login' => "/Presentation/View/HomeView/login.php",
             'Help' => "/Presentation/View/HomeView/help.php",
+            'About' => "/Presentation/View/HomeView/about.php",
         ]);
 
         $profilePaths = $this->prefixWithRoot([

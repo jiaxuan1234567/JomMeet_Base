@@ -15,6 +15,7 @@ Route::get('/login', [HomeController::class, 'loginHome']);
 Route::post('/login/process', [ProfileController::class, 'validateLogin']);
 Route::get('/logout', [HomeController::class, 'logoutHome']);
 Route::get('/help', [HomeController::class, 'help']);
+Route::get('/about', [HomeController::class, 'about']);
 
 // profile routes
 Route::get('/profile', [ProfileController::class, 'validateLogin']);

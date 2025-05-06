@@ -18,8 +18,8 @@
                 </div>
                 <div class="col footer-link">
                     <h6>About Us</h6>
-                    <a href="#">About Us</a>
-                    <a href="#">Contact Us</a>
+                    <a href="/about">About Us</a>
+                    <a href="/about">Contact Us</a>
                 </div>
                 <div class="col footer-link">
                     <h6>Help</h6>

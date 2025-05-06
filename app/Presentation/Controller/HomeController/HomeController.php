@@ -68,8 +68,14 @@ class HomeController
             exit;
         }
     }
+
     public function help()
     {
         include $this->fileHelper->getFilePath('Help');
+    }
+
+    public function about()
+    {
+        include $this->fileHelper->getFilePath('About');
     }
 }
