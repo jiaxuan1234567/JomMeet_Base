@@ -264,8 +264,6 @@ class GatheringDAO
         ]);
         $conflict = $stmt->rowCount() > 0;
 
-        error_log("[hasTimeConflict] Conflict found: " . ($conflict ? "YES" : "NO"));
-
         return $conflict;
     }
 
@@ -275,15 +273,16 @@ class GatheringDAO
     {
         try {
             $sql = "SELECT 
-                g.*,
-                l.locationName AS venue, 
-                l.image, (g.hostProfileID = :pid) AS isHost, 
-                (p.profileID IS NOT NULL) AS isJoined
-                FROM `location` l
-                JOIN gathering g ON l.locationID = g.locationID
-                LEFT JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
-                WHERE (g.hostProfileID = :pid) OR (p.profileID = :pid)
-                ORDER BY STR_TO_DATE(CONCAT(g.date, ' ', g.startTime), '%Y-%m-%d %H:%i:%s') DESC";
+                        g.*,
+                        l.locationName AS venue, 
+                        l.image, 
+                        (g.hostProfileID = :pid) AS isHost, 
+                        (p.profileID IS NOT NULL) AS isJoined
+                    FROM `location` l
+                    JOIN gathering g ON l.locationID = g.locationID
+                    LEFT JOIN profilegathering p ON (g.gatheringID = p.gatheringID) AND (p.profileID = :pid)
+                    WHERE (g.hostProfileID = :pid) OR (p.profileID = :pid)
+                    ORDER BY g.gatheringID DESC";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -292,6 +291,7 @@ class GatheringDAO
             return [];
         }
     }
+
 
     public function getUserHostedGatherings($profileId)
     {
@@ -664,8 +664,8 @@ class GatheringDAO
 
     // 1) retrieve all gathering feedback entries
     public function getGatheringFeedbackByGathering(int $gatheringId): array
-    {
-        $sql = "
+{
+    $sql = "
       SELECT 
         f.feedbackDesc,
         f.date,
@@ -675,10 +675,11 @@ class GatheringDAO
         AND f.feedbackType = 'gathering'
       ORDER BY f.date ASC
     ";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':gid' => $gatheringId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':gid' => $gatheringId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
     // 2) insert a new gathering feedback
     public function insertGatheringFeedback($profileId, $gatheringId, $locationId, $desc)
