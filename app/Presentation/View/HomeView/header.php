@@ -35,7 +35,9 @@
     <header>
         <nav class="navbar navbar-expand-md navbar-light px-4 bg-blue-color">
             <span class="navbar-brand">
-                <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" alt="Logo" width="40" height="40" />
+                <a href="/" class="text-decoration-none">
+                    <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" alt="Logo" width="40" height="40" />
+                </a>
             </span>
 
             <!-- Mobile Toggler -->

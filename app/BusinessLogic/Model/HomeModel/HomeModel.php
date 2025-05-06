@@ -40,6 +40,11 @@ class HomeModel
         return (new ProfileModel())->getUserByProfileID($userId);
     }
 
+    public function getUpcomingGatheringeByProfileId($userId)
+    {
+        return (new GatheringModel())->getMyGatheringsWithTab($userId)['upcoming'] ?? [];
+    }
+
     public function logout()
     {
         return (new ProfileModel())->logout();

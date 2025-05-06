@@ -17,6 +17,9 @@ class HomeController
 
     public function home()
     {
+
+        $userId = (int) ($_SESSION['profile_id'] ?? 0);
+        $gatherings = (new HomeModel())->getUpcomingGatheringeByProfileId($userId);
         include $this->fileHelper->getFilePath('HomePage');
     }
 
