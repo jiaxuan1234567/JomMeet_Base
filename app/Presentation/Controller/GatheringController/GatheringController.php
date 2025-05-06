@@ -577,14 +577,22 @@ class GatheringController
         $gathering = $this->gatheringModel->getUserGatheringById($profileId, $gatheringId);
 
 
-        if (!$gathering) {
-            $_SESSION['flash_message'] = "You are not authorized to view this gathering reminder.";
+        // if (!$gathering) {
+        //     $_SESSION['flash_message'] = "You are not authorized to view this gathering reminder.";
+        //     $_SESSION['flash_type'] = "error";
+        //     header('Location: /my-gathering');
+        //     exit;
+        // }
+
+        $results = $this->gatheringModel->getReminders($gatheringId, $profileId);
+        $reminders = $results['data'] ?? [];
+        
+        if (!$results['success']) {
+            $_SESSION['flash_message'] = $results['message'];
             $_SESSION['flash_type'] = "error";
             header('Location: /my-gathering');
             exit;
         }
-
-        $reminders = $this->gatheringModel->getReminders($gatheringId, $profileId);
 
         if (!empty($reminders)) {
             foreach ($reminders as &$reminder) {

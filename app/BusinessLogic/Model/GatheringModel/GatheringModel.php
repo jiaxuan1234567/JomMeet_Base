@@ -746,13 +746,25 @@ class GatheringModel
     // ============================================================================
     // REMINDER PART
     // ============================================================================
+
     public function getReminders($gatheringId, $profileId)
     {
         $gathering = $this->gatheringDAO->getGatheringById($gatheringId);
 
         if (!$gathering) {
             error_log("[getReminders] Gathering ID $gatheringId not found.");
-            return false;
+            return [
+                'success' => false,
+                'message' => "You are not authorized to view this gathering reminder."
+            ];
+        }
+
+        if ($gathering['status'] == 'CANCELLED' || $gathering['status'] == 'END') {
+            error_log("[getReminders] Gathering ID $gatheringId is not in valid status.");
+            return [
+                'success' => false,
+                'message' => "Gathering has already ended or been cancelled."
+            ];
         }
 
         if ($gathering['hostProfileID'] == $profileId) {
@@ -761,7 +773,10 @@ class GatheringModel
             $reminders = $this->gatheringDAO->getRemindersByParticipant($gatheringId, $profileId);
         }
 
-        return $reminders;
+        return [
+            'success' => true,
+            'data' => $reminders
+        ];
     }
 
     public function createReminder($data)
