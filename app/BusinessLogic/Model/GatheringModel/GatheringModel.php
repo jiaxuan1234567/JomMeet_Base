@@ -307,6 +307,13 @@ class GatheringModel
             return false;
         }
 
+        if($this->isBeforeStartTime($gatheringID) == false){
+            error_log("User $userID cannot join gathering $gatheringID: gathering has already started.");
+            $_SESSION['flash_message'] = "The gathering has already started.";
+            $_SESSION['flash_type'] = "error";
+            return false;
+        }
+
         // Add the user to the gathering
         $result = $this->gatheringDAO->addUserToGathering($userID, $gatheringID);
 
