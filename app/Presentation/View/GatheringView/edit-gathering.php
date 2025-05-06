@@ -1,5 +1,5 @@
 <?php
-$_title = 'Create Gathering';
+$_title = 'Edit Gathering';
 require_once __DIR__ . '/../HomeView/header.php';
 
 $asset = new FileHelper('asset');
