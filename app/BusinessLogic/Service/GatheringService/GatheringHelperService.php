@@ -17,7 +17,7 @@ class GatheringHelperService
         $endTimeStr   = $value['endTime'] ?? '';
 
         $joinedGatherings = array_values(array_filter($joinedGatherings, function ($g) {
-            return $g['status'] == 'NEW';
+            return $g['status'] == 'NEW' || $g['status'] == 'START';
         }));
 
         if (!empty($editingId)) {
@@ -122,7 +122,6 @@ class GatheringHelperService
 
             if ($field === 'inputDateStartTime' || $field === 'inputDateEndTime') {
                 $targetDT = $field === 'inputDateStartTime' ? $startDT : $endDT;
-                error_log($targetDT->format('Y-m-d H:i') ?? 'null');
 
                 foreach ($joinedGatherings as $g) {
                     $joinedStart = new DateTime("{$g['date']} {$g['startTime']}");
