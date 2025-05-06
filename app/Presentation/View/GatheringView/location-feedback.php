@@ -36,7 +36,7 @@ if (isset($_SESSION['profile']['profileID'])) {
   </div>
 
   <!-- Feedback List -->
-  <div id="feedbackContainer" style="width: 100%; max-width: 1000px; margin: 0 auto; overflow-y: auto; padding: 10px 20px; ">
+  <div id="feedbackContainer" style="width: 100%; max-width: 1000px; margin: 0 auto; overflow-y: auto; padding: 10px 20px;">
     <?php if (empty($locationFeedbacks)): ?>
       <p class="text-center text-muted">No feedback from other participants. You can provide your feedback in the field.</p>
     <?php else: ?>
