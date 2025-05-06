@@ -1,11 +1,11 @@
 <?php
-$_title = 'Create Gathering';
+$_title = 'Edit Gathering';
 require_once __DIR__ . '/../HomeView/header.php';
 
 $asset = new FileHelper('asset');
 ?>
 
-<div class="container-fluid" id="mainContent">
+<div class="container-fluid" id="mainContent" style="min-height: 70vh;">
     <div id="createGatheringForm">
         <div class="d-flex mb-4 align-items-center border-bottom border-2 px-2 py-3">
             <div class="col-2">
