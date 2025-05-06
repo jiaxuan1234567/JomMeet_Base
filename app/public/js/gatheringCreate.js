@@ -111,18 +111,7 @@ $(() => {
     }
 
     $('#createResetBtn').on('click', function (e) {
-        e.preventDefault();
-        fields.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.value = initialValues[id]?.trim() || '';
-                fieldStates[id] = { valid: false, error: [], value: '' };
-                renderValidation(id);
-            }
-        });
-        if (initialValues['inputPax']) updateButtons?.();
         sessionStorage.removeItem('__field_states__');
-        toggleSubmitButton?.();
     });
 
     function validateField(fieldId, data) {
