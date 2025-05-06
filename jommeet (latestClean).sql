@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `jommeet`
 --
+CREATE DATABASE IF NOT EXISTS `jommeet` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `jommeet`;
 
 -- --------------------------------------------------------
 
@@ -58,14 +60,14 @@ INSERT INTO `feedback` (`feedbackID`, `profileID`, `gatheringID`, `locationID`, 
 (14, 6, 6, 5, 'Needs better parking facilities.', 'LOCATION', '2025-04-30 13:20:00'),
 (15, 2, 6, 5, 'The event started late but was fun.', 'GATHERING', '2025-04-30 18:00:00'),
 (16, 4, 6, 5, 'Too far from public transport.', 'LOCATION', '2025-04-30 11:45:00'),
-(17, 2, 12, 5, 'Great gathering experience!', 'GATHERING', '2025-04-25 14:30:00'),
-(18, 2, 12, 5, 'The location was clean and easy to find.', 'LOCATION', '2025-04-26 09:15:00'),
-(19, 3, 12, 5, 'Fun activities but the place was crowded.', 'GATHERING', '2025-04-26 16:45:00'),
-(20, 3, 12, 5, 'Location lacked proper signage.', 'LOCATION', '2025-04-27 10:05:00'),
-(21, 4, 12, 5, 'Loved the vibe and the people!', 'GATHERING', '2025-04-27 19:30:00'),
-(22, 4, 12, 5, 'Needs better parking facilities.', 'LOCATION', '2025-04-28 13:20:00'),
-(23, 5, 12, 5, 'The event started late but was fun.', 'GATHERING', '2025-04-28 18:00:00'),
-(24, 5, 12, 5, 'Too far from public transport.', 'LOCATION', '2025-04-29 11:45:00'),
+(17, 2, 12, 35, 'Great gathering experience!', 'GATHERING', '2025-04-25 14:30:00'),
+(18, 2, 12, 35, 'The location was clean and easy to find.', 'LOCATION', '2025-04-26 09:15:00'),
+(19, 3, 12, 35, 'Fun activities but the place was crowded.', 'GATHERING', '2025-04-26 16:45:00'),
+(20, 3, 12, 35, 'Location lacked proper signage.', 'LOCATION', '2025-04-27 10:05:00'),
+(21, 4, 12, 35, 'Loved the vibe and the people!', 'GATHERING', '2025-04-27 19:30:00'),
+(22, 4, 12, 35, 'Needs better parking facilities.', 'LOCATION', '2025-04-28 13:20:00'),
+(23, 5, 12, 35, 'The event started late but was fun.', 'GATHERING', '2025-04-28 18:00:00'),
+(24, 5, 12, 35, 'Too far from public transport.', 'LOCATION', '2025-04-29 11:45:00'),
 (25, 3, 16, 14, 'Great gathering experience!', 'GATHERING', '2025-04-25 14:30:00'),
 (26, 3, 16, 14, 'The location was clean and easy to find.', 'LOCATION', '2025-04-26 09:15:00'),
 (27, 5, 16, 14, 'Fun activities but the place was crowded.', 'GATHERING', '2025-04-26 16:45:00'),

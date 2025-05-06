@@ -37,14 +37,23 @@
             <span class="navbar-brand">
                 <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" alt="Logo" width="40" height="40" />
             </span>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+            <!-- Mobile Toggler -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar content -->
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
                     <li id="homeNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/">Home</a></li>
                     <li id="reflectionNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/reflection">Reflection</a></li>
                     <li id="GatheringNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/gathering">Gathering</a></li>
                     <li id="MyGatheringNav" class="nav-item"><a class="nav-link fw-bold text-black" href="/my-gathering">My Gathering</a></li>
                 </ul>
-                <div class="d-flex gap-2 align-items-center">
+
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
                     <?php if ($_SESSION['profile_id']): ?>
                         <a href="/profile" class="nav-link fw-bold me-3"><?= $_SESSION['profile']['nickname'] ?? '' ?></a>
                     <?php else: ?>
@@ -54,6 +63,7 @@
                 </div>
             </div>
         </nav>
+
     </header>
     <main>
         <?php if (!empty($_SESSION['flash_message'])): ?>
