@@ -9,8 +9,8 @@ require_once '../vendor/autoload.php';
 
 class NotificationService
 {
-    private $API_KEY = ""; // Limited access to this API key for testing purposes, use when needed
-    // private $API_KEY = "2f88f443abb07b91f86701b545ebc262-561bb53d-a772-4e91-9336-77652d981007";
+    // private $API_KEY = ""; // Limited access to this API key for testing purposes, use when needed
+    private $API_KEY = "2f88f443abb07b91f86701b545ebc262-561bb53d-a772-4e91-9336-77652d981007";
 
     public function sendInfobipWhatsAppTemplate($to, $name, $gathering, $action)
     {
