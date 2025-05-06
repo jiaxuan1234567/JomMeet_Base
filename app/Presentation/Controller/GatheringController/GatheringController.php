@@ -357,7 +357,7 @@ class GatheringController
 
             if ($searchTerm === '' || $searchTerm === null) {
                 $_SESSION['flash_message'] = "Please enter a search term.";
-                $_SESSION['flash_type'] = "error";
+                $_SESSION['flash_type'] = "success";
                 header("Location: /gathering");
                 exit;
             }
