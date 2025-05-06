@@ -329,7 +329,6 @@ class GatheringModel
                     $gathering,
                     "user_joined"
                 );
-                break; // Only send to the first participant for testing purposes
             }
         } else {
             error_log("User $userID failed to join gathering $gatheringID.");
@@ -562,7 +561,6 @@ class GatheringModel
                         $g,
                         "gathering_updated"
                     );
-                    break; // Only send to the first participant for testing purposes
                 }
             } else {
                 error_log("Failed to update gathering $gatheringId.");
@@ -601,10 +599,10 @@ class GatheringModel
             return false;
         }
 
+        $participants = $this->gatheringDAO->getGatheringWithAllParticipantInfoByGatheringId($id);
         $result = $this->gatheringDAO->cancelWithParticipant($id);
 
         if (is_array($result)) {
-            // notify participants (skeleton function)
             foreach ($result as $p) {
                 error_log("Would notify profile ID $p about cancellation of gathering $id");
             }
@@ -612,14 +610,13 @@ class GatheringModel
             $_SESSION['flash_message'] = "Gathering has been cancelled successfully.";
             $_SESSION['flash_type'] = "success";
 
-            foreach ($result as $p) {
+            foreach ($participants as $p) {
                 $this->notificationService->sendInfobipWhatsAppTemplate(
                     $p['phone'],
                     $p['profile']['nickname'],
-                    $gathering,
+                    $p,
                     "gathering_cancelled"
                 );
-                break; // Only send to the first participant for testing purposes
             }
         } else {
             $_SESSION['flash_message'] = "Something went wrong. Please try again.";
