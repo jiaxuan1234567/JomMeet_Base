@@ -38,14 +38,14 @@ if (isset($_SESSION['profile']['profileID'])) {
   <!-- Feedback List -->
   <div id="feedbackContainer" style="width: 100%; max-width: 1000px; margin: 0 auto; overflow-y: auto; padding: 10px 20px; ">
     <?php if (empty($locationFeedbacks)): ?>
-      <p class="text-center text-muted">No feedback yet. Be the first to share!</p>
+      <p class="text-center text-muted">No feedback from other participants. You can provide your feedback in the field.</p>
     <?php else: ?>
       <?php foreach ($locationFeedbacks as $fb): ?>
         <?php
         $feedbackAuthor = isset($fb['profileID']) ? (int) $fb['profileID'] : 0;
         $isMine = ($feedbackAuthor === $loggedInProfile);
         ?>
-        <div class="d-flex mb-3" style="background-color: <?= $isMine ? '#DEECFF' : '#FFFFFF' ?>; border-radius: 10px; padding: 15px;">
+        <div class="d-flex mb-3" style="background-color: <?= $isMine ? '#DEECFF' : '#FFFFFF' ?>; border-radius: 10px; padding: 15px; word-wrap: break-word;">
           <img src="<?= htmlspecialchars($fb['avatar'] ?? '/asset/userIcon.png') ?>"
             alt="User Avatar"
             class="rounded-circle"
