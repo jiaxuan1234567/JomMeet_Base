@@ -186,6 +186,7 @@ class GatheringDAO
               AND p.profileID IS NULL
               AND g.maxParticipant > g.currentParticipant
               AND g.status IN ('NEW')
+            ORDER BY g.date, g.startTime DESC
               ";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':pid' => $profileId]);
