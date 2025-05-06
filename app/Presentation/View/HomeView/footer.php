@@ -5,11 +5,13 @@
         <div class="container-fluid">
             <div class="row text-start">
                 <div class="col-md-2 text-center">
-                    <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" class="img-fluid mx-auto d-block" alt="Logo" width="50" />
-                    <h5 class="mt-2">JomMeet</h5>
+                    <a href="/" class="text-decoration-none">
+                        <img src="<?php echo (new FileHelper('asset'))->getFilePath('iconPNG') ?>" class="img-fluid mx-auto d-block" alt="Logo" width="50" />
+                        <h5 class="mt-2 text-black">JomMeet</h5>
+                    </a>
                 </div>
                 <div class="col footer-link">
-                    <h6>Home</h6>
+                    <h6><a href="/" class="text-reset">Home</a></h6>
                     <a href="/reflection">Reflection</a>
                     <a href="/gathering">Gathering</a>
                     <a href="/my-gathering">My Gathering</a>
