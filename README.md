@@ -1,7 +1,7 @@
 
 # JomMeet
 
-This project is a simple event gathering web application built using **vanilla PHP** with a **3-layer MVC architecture**. It uses **Bootstrap 5.3.5** for UI and **jQuery 3.6.0** for JavaScript. It is designed to run on **XAMPP** using PHP's built-in server.
+This project is a simple event gathering web application built with a **3-layer architecture**. It uses **Bootstrap 5.3.5** for UI and **jQuery 3.6.0** for JavaScript. It is designed to run on **XAMPP** using PHP's built-in server.
 
 ---
 
@@ -15,10 +15,6 @@ JomMeet_Base/
 │   ├── BusinessLogic/
 │   ├── Persistence/
 │   ├── public/
-│      ├── index.php
-│      ├── css/
-│      ├── js/
-│      └── asset/
 │   └── bin/
 ├── jommeet.sql
 └── README.md
