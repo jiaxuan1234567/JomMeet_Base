@@ -12,10 +12,42 @@ JomMeet_Base/
 │
 ├── App/
 │   ├── Presentation/
+│   │   ├── View/
+│   │   │   ├── HomeView/
+│   │   │   ├── ProfileView/
+│   │   │   ├── ReflectionView/
+│   │   │   └── GatheringView/
+│   │   └── Controller/
+│   │       ├── HomeController/
+│   │       ├── ProfileController/
+│   │       ├── ReflectionController/
+│   │       └── GatheringController/
+│   │
 │   ├── BusinessLogic/
+│   │   ├── Model/
+│   │   │   ├── HomeModel/
+│   │   │   ├── ProfileModel/
+│   │   │   ├── ReflectionModel/
+│   │   │   └── GatheringModel/
+│   │   └── Service/
+│   │       ├── NotificationService/
+│   │       └── GatheringService/
+│   │
 │   ├── Persistence/
+│   │   └── DAO/
+│   │       ├── ProfileDAO/
+│   │       ├── ReflectionDAO/
+│   │       └── GatheringDAO/
+│   │
 │   ├── public/
+│   │   ├── index.php          # Application entry point
+│   │   ├── css/               # Stylesheets
+│   │   ├── js/                # JavaScript files
+│   │   └── asset/             # Static assets (images, icons, etc.)
+│   │
 │   └── bin/
+│       └── checkGathering.php # Script to auto-update gathering status
+│
 ├── jommeet.sql
 └── README.md
 ```
