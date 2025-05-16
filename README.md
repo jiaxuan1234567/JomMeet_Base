@@ -1,3 +1,4 @@
+
 # JomMeet
 
 This project is a simple event gathering web application built using **vanilla PHP** with a **3-layer MVC architecture**. It uses **Bootstrap 5.3.5** for UI and **jQuery 3.6.0** for JavaScript. It is designed to run on **XAMPP** using PHP's built-in server.
@@ -13,11 +14,12 @@ JomMeet_Base/
 │   ├── Presentation/
 │   ├── BusinessLogic/
 │   ├── Persistence/
-├── public/
-│   ├── index.php
-│   ├── css/
-│   ├── js/
-│   └── asset/
+│   ├── public/
+│      ├── index.php
+│      ├── css/
+│      ├── js/
+│      └── asset/
+│   └── bin/
 ├── jommeet.sql
 └── README.md
 ```
@@ -38,6 +40,22 @@ JomMeet_Base/
 4. **Access the application in your browser**:
    ```
    http://localhost:8000
+   ```
+
+---
+
+## How to Run Gathering Status Checker
+
+The `checkGathering.php` script automatically checks and updates gathering status based on time.
+
+1. Open another terminal.
+2. Navigate to the `bin` directory:
+   ```bash
+   cd JomMeet_Base/app/bin
+   ```
+3. Run the script:
+   ```bash
+   php checkGathering.php
    ```
 
 ---
